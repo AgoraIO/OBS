@@ -1,0 +1,2412 @@
+; x86_64-w64-mingw32-dlltool -z /home/jim/packages/win64/bin/x264.orig.def --export-all-symbols /home/jim/packages/win64/bin/libx264-152.dll
+EXPORTS
+	".refptr._CRT_MT" @ 1 DATA
+	".refptr.__CTOR_LIST__" @ 2 DATA
+	".refptr.__RUNTIME_PSEUDO_RELOC_LIST_END__" @ 3 DATA
+	".refptr.__RUNTIME_PSEUDO_RELOC_LIST__" @ 4 DATA
+	".refptr.__bigtens_D2A" @ 5 DATA
+	".refptr.__dyn_tls_init_callback" @ 6 DATA
+	".refptr.__hexdig_D2A" @ 7 DATA
+	".refptr.__image_base__" @ 8 DATA
+	".refptr.__imp___mb_cur_max" @ 9 DATA
+	".refptr.__imp___pioinfo" @ 10 DATA
+	".refptr.__imp__onexit" @ 11 DATA
+	".refptr.__native_dllmain_reason" @ 12 DATA
+	".refptr.__native_startup_lock" @ 13 DATA
+	".refptr.__native_startup_state" @ 14 DATA
+	".refptr.__onexitbegin" @ 15 DATA
+	".refptr.__onexitend" @ 16 DATA
+	".refptr.__tens_D2A" @ 17 DATA
+	".refptr.__tinytens_D2A" @ 18 DATA
+	".refptr.__xc_a" @ 19 DATA
+	".refptr.__xc_z" @ 20 DATA
+	".refptr.__xi_a" @ 21 DATA
+	".refptr.__xi_z" @ 22 DATA
+	".refptr.memcpy" @ 23 DATA
+	".refptr.mingw_app_type" @ 24 DATA
+	".refptr.x264_add16x16_idct8_avx" @ 25 DATA
+	".refptr.x264_add16x16_idct8_sse2" @ 26 DATA
+	".refptr.x264_add16x16_idct_avx" @ 27 DATA
+	".refptr.x264_add16x16_idct_avx2" @ 28 DATA
+	".refptr.x264_add16x16_idct_dc_avx" @ 29 DATA
+	".refptr.x264_add16x16_idct_dc_avx2" @ 30 DATA
+	".refptr.x264_add16x16_idct_dc_mmx2" @ 31 DATA
+	".refptr.x264_add16x16_idct_dc_sse2" @ 32 DATA
+	".refptr.x264_add16x16_idct_dc_ssse3" @ 33 DATA
+	".refptr.x264_add16x16_idct_sse2" @ 34 DATA
+	".refptr.x264_add4x4_idct_avx" @ 35 DATA
+	".refptr.x264_add4x4_idct_mmx" @ 36 DATA
+	".refptr.x264_add4x4_idct_sse4" @ 37 DATA
+	".refptr.x264_add8x8_idct8_avx" @ 38 DATA
+	".refptr.x264_add8x8_idct8_sse2" @ 39 DATA
+	".refptr.x264_add8x8_idct_avx" @ 40 DATA
+	".refptr.x264_add8x8_idct_avx2" @ 41 DATA
+	".refptr.x264_add8x8_idct_avx512" @ 42 DATA
+	".refptr.x264_add8x8_idct_dc_mmx2" @ 43 DATA
+	".refptr.x264_add8x8_idct_dc_ssse3" @ 44 DATA
+	".refptr.x264_add8x8_idct_sse2" @ 45 DATA
+	".refptr.x264_cabac_block_residual_8x8_rd_internal_avx512" @ 46 DATA
+	".refptr.x264_cabac_block_residual_8x8_rd_internal_lzcnt" @ 47 DATA
+	".refptr.x264_cabac_block_residual_8x8_rd_internal_sse2" @ 48 DATA
+	".refptr.x264_cabac_block_residual_8x8_rd_internal_ssse3" @ 49 DATA
+	".refptr.x264_cabac_block_residual_8x8_rd_internal_ssse3_lzcnt" @ 50 DATA
+	".refptr.x264_cabac_block_residual_internal_avx2" @ 51 DATA
+	".refptr.x264_cabac_block_residual_internal_avx512" @ 52 DATA
+	".refptr.x264_cabac_block_residual_internal_lzcnt" @ 53 DATA
+	".refptr.x264_cabac_block_residual_internal_sse2" @ 54 DATA
+	".refptr.x264_cabac_block_residual_rd_internal_avx512" @ 55 DATA
+	".refptr.x264_cabac_block_residual_rd_internal_lzcnt" @ 56 DATA
+	".refptr.x264_cabac_block_residual_rd_internal_sse2" @ 57 DATA
+	".refptr.x264_cabac_block_residual_rd_internal_ssse3" @ 58 DATA
+	".refptr.x264_cabac_block_residual_rd_internal_ssse3_lzcnt" @ 59 DATA
+	".refptr.x264_cabac_entropy" @ 60 DATA
+	".refptr.x264_cabac_transition" @ 61 DATA
+	".refptr.x264_cache_mv_func_table" @ 62 DATA
+	".refptr.x264_cache_mvd_func_table" @ 63 DATA
+	".refptr.x264_cache_ref_func_table" @ 64 DATA
+	".refptr.x264_coeff0_token" @ 65 DATA
+	".refptr.x264_coeff_abs_level_m1_offset" @ 66 DATA
+	".refptr.x264_coeff_flag_offset_chroma_422_dc" @ 67 DATA
+	".refptr.x264_coeff_last15_avx512" @ 68 DATA
+	".refptr.x264_coeff_last15_lzcnt" @ 69 DATA
+	".refptr.x264_coeff_last15_sse2" @ 70 DATA
+	".refptr.x264_coeff_last16_avx512" @ 71 DATA
+	".refptr.x264_coeff_last16_lzcnt" @ 72 DATA
+	".refptr.x264_coeff_last16_sse2" @ 73 DATA
+	".refptr.x264_coeff_last4_lzcnt" @ 74 DATA
+	".refptr.x264_coeff_last4_mmx2" @ 75 DATA
+	".refptr.x264_coeff_last64_avx2" @ 76 DATA
+	".refptr.x264_coeff_last64_avx512" @ 77 DATA
+	".refptr.x264_coeff_last64_lzcnt" @ 78 DATA
+	".refptr.x264_coeff_last64_sse2" @ 79 DATA
+	".refptr.x264_coeff_last8_avx512" @ 80 DATA
+	".refptr.x264_coeff_last8_lzcnt" @ 81 DATA
+	".refptr.x264_coeff_last8_mmx2" @ 82 DATA
+	".refptr.x264_coeff_level_run15_avx2" @ 83 DATA
+	".refptr.x264_coeff_level_run15_lzcnt" @ 84 DATA
+	".refptr.x264_coeff_level_run15_sse2" @ 85 DATA
+	".refptr.x264_coeff_level_run15_ssse3" @ 86 DATA
+	".refptr.x264_coeff_level_run15_ssse3_lzcnt" @ 87 DATA
+	".refptr.x264_coeff_level_run16_avx2" @ 88 DATA
+	".refptr.x264_coeff_level_run16_lzcnt" @ 89 DATA
+	".refptr.x264_coeff_level_run16_sse2" @ 90 DATA
+	".refptr.x264_coeff_level_run16_ssse3" @ 91 DATA
+	".refptr.x264_coeff_level_run16_ssse3_lzcnt" @ 92 DATA
+	".refptr.x264_coeff_level_run4_lzcnt" @ 93 DATA
+	".refptr.x264_coeff_level_run4_mmx2" @ 94 DATA
+	".refptr.x264_coeff_level_run4_ssse3" @ 95 DATA
+	".refptr.x264_coeff_level_run4_ssse3_lzcnt" @ 96 DATA
+	".refptr.x264_coeff_level_run8_lzcnt" @ 97 DATA
+	".refptr.x264_coeff_level_run8_mmx2" @ 98 DATA
+	".refptr.x264_coeff_level_run8_ssse3" @ 99 DATA
+	".refptr.x264_coeff_level_run8_ssse3_lzcnt" @ 100 DATA
+	".refptr.x264_coeff_token" @ 101 DATA
+	".refptr.x264_count_cat_m1" @ 102 DATA
+	".refptr.x264_cpu_names" @ 103 DATA
+	".refptr.x264_dct2x4dc_mmx2" @ 104 DATA
+	".refptr.x264_dct4_weight2_tab" @ 105 DATA
+	".refptr.x264_dct4_weight_tab" @ 106 DATA
+	".refptr.x264_dct4x4dc_mmx2" @ 107 DATA
+	".refptr.x264_dct8_weight2_tab" @ 108 DATA
+	".refptr.x264_dct8_weight_tab" @ 109 DATA
+	".refptr.x264_deblock_h_chroma_422_avx" @ 110 DATA
+	".refptr.x264_deblock_h_chroma_422_intra_avx" @ 111 DATA
+	".refptr.x264_deblock_h_chroma_422_intra_sse2" @ 112 DATA
+	".refptr.x264_deblock_h_chroma_422_sse2" @ 113 DATA
+	".refptr.x264_deblock_h_chroma_avx" @ 114 DATA
+	".refptr.x264_deblock_h_chroma_intra_avx" @ 115 DATA
+	".refptr.x264_deblock_h_chroma_intra_mbaff_mmx2" @ 116 DATA
+	".refptr.x264_deblock_h_chroma_intra_sse2" @ 117 DATA
+	".refptr.x264_deblock_h_chroma_mbaff_sse2" @ 118 DATA
+	".refptr.x264_deblock_h_chroma_sse2" @ 119 DATA
+	".refptr.x264_deblock_h_luma_avx" @ 120 DATA
+	".refptr.x264_deblock_h_luma_intra_avx" @ 121 DATA
+	".refptr.x264_deblock_h_luma_intra_sse2" @ 122 DATA
+	".refptr.x264_deblock_h_luma_sse2" @ 123 DATA
+	".refptr.x264_deblock_strength_avx" @ 124 DATA
+	".refptr.x264_deblock_strength_avx2" @ 125 DATA
+	".refptr.x264_deblock_strength_avx512" @ 126 DATA
+	".refptr.x264_deblock_strength_sse2" @ 127 DATA
+	".refptr.x264_deblock_strength_ssse3" @ 128 DATA
+	".refptr.x264_deblock_v_chroma_avx" @ 129 DATA
+	".refptr.x264_deblock_v_chroma_intra_avx" @ 130 DATA
+	".refptr.x264_deblock_v_chroma_intra_sse2" @ 131 DATA
+	".refptr.x264_deblock_v_chroma_sse2" @ 132 DATA
+	".refptr.x264_deblock_v_luma_avx" @ 133 DATA
+	".refptr.x264_deblock_v_luma_intra_avx" @ 134 DATA
+	".refptr.x264_deblock_v_luma_intra_sse2" @ 135 DATA
+	".refptr.x264_deblock_v_luma_sse2" @ 136 DATA
+	".refptr.x264_decimate_score15_avx512" @ 137 DATA
+	".refptr.x264_decimate_score15_sse2" @ 138 DATA
+	".refptr.x264_decimate_score15_ssse3" @ 139 DATA
+	".refptr.x264_decimate_score16_avx512" @ 140 DATA
+	".refptr.x264_decimate_score16_sse2" @ 141 DATA
+	".refptr.x264_decimate_score16_ssse3" @ 142 DATA
+	".refptr.x264_decimate_score64_avx2" @ 143 DATA
+	".refptr.x264_decimate_score64_avx512" @ 144 DATA
+	".refptr.x264_decimate_score64_sse2" @ 145 DATA
+	".refptr.x264_decimate_score64_ssse3" @ 146 DATA
+	".refptr.x264_denoise_dct_avx" @ 147 DATA
+	".refptr.x264_denoise_dct_avx2" @ 148 DATA
+	".refptr.x264_denoise_dct_sse2" @ 149 DATA
+	".refptr.x264_denoise_dct_ssse3" @ 150 DATA
+	".refptr.x264_dequant_4x4_avx" @ 151 DATA
+	".refptr.x264_dequant_4x4_avx2" @ 152 DATA
+	".refptr.x264_dequant_4x4_avx512" @ 153 DATA
+	".refptr.x264_dequant_4x4_flat16_avx2" @ 154 DATA
+	".refptr.x264_dequant_4x4_flat16_sse2" @ 155 DATA
+	".refptr.x264_dequant_4x4_sse2" @ 156 DATA
+	".refptr.x264_dequant_4x4_xop" @ 157 DATA
+	".refptr.x264_dequant_4x4dc_avx" @ 158 DATA
+	".refptr.x264_dequant_4x4dc_avx2" @ 159 DATA
+	".refptr.x264_dequant_4x4dc_sse2" @ 160 DATA
+	".refptr.x264_dequant_8x8_avx" @ 161 DATA
+	".refptr.x264_dequant_8x8_avx2" @ 162 DATA
+	".refptr.x264_dequant_8x8_avx512" @ 163 DATA
+	".refptr.x264_dequant_8x8_flat16_avx2" @ 164 DATA
+	".refptr.x264_dequant_8x8_flat16_avx512" @ 165 DATA
+	".refptr.x264_dequant_8x8_flat16_sse2" @ 166 DATA
+	".refptr.x264_dequant_8x8_sse2" @ 167 DATA
+	".refptr.x264_dequant_8x8_xop" @ 168 DATA
+	".refptr.x264_exp2_lut" @ 169 DATA
+	".refptr.x264_frame_init_lowres_core_avx" @ 170 DATA
+	".refptr.x264_frame_init_lowres_core_avx2" @ 171 DATA
+	".refptr.x264_frame_init_lowres_core_mmx2" @ 172 DATA
+	".refptr.x264_frame_init_lowres_core_sse2" @ 173 DATA
+	".refptr.x264_frame_init_lowres_core_ssse3" @ 174 DATA
+	".refptr.x264_frame_init_lowres_core_xop" @ 175 DATA
+	".refptr.x264_free" @ 176 DATA
+	".refptr.x264_hpel_filter_avx" @ 177 DATA
+	".refptr.x264_hpel_filter_avx2" @ 178 DATA
+	".refptr.x264_hpel_filter_sse2" @ 179 DATA
+	".refptr.x264_hpel_filter_ssse3" @ 180 DATA
+	".refptr.x264_hpel_ref0" @ 181 DATA
+	".refptr.x264_hpel_ref1" @ 182 DATA
+	".refptr.x264_idct4x4dc_mmx" @ 183 DATA
+	".refptr.x264_idct_dequant_2x4_dc_avx" @ 184 DATA
+	".refptr.x264_idct_dequant_2x4_dc_sse2" @ 185 DATA
+	".refptr.x264_idct_dequant_2x4_dconly_avx" @ 186 DATA
+	".refptr.x264_idct_dequant_2x4_dconly_sse2" @ 187 DATA
+	".refptr.x264_integral_init4h_avx2" @ 188 DATA
+	".refptr.x264_integral_init4h_sse4" @ 189 DATA
+	".refptr.x264_integral_init4v_avx2" @ 190 DATA
+	".refptr.x264_integral_init4v_mmx" @ 191 DATA
+	".refptr.x264_integral_init4v_sse2" @ 192 DATA
+	".refptr.x264_integral_init4v_ssse3" @ 193 DATA
+	".refptr.x264_integral_init8h_avx" @ 194 DATA
+	".refptr.x264_integral_init8h_avx2" @ 195 DATA
+	".refptr.x264_integral_init8h_sse4" @ 196 DATA
+	".refptr.x264_integral_init8v_avx2" @ 197 DATA
+	".refptr.x264_integral_init8v_mmx" @ 198 DATA
+	".refptr.x264_integral_init8v_sse2" @ 199 DATA
+	".refptr.x264_intra_sa8d_x3_8x8_sse2" @ 200 DATA
+	".refptr.x264_intra_sa8d_x9_8x8_avx" @ 201 DATA
+	".refptr.x264_intra_sa8d_x9_8x8_sse4" @ 202 DATA
+	".refptr.x264_intra_sa8d_x9_8x8_ssse3" @ 203 DATA
+	".refptr.x264_intra_sad_x3_16x16_avx2" @ 204 DATA
+	".refptr.x264_intra_sad_x3_16x16_mmx2" @ 205 DATA
+	".refptr.x264_intra_sad_x3_16x16_sse2" @ 206 DATA
+	".refptr.x264_intra_sad_x3_16x16_ssse3" @ 207 DATA
+	".refptr.x264_intra_sad_x3_4x4_mmx2" @ 208 DATA
+	".refptr.x264_intra_sad_x3_8x8_mmx2" @ 209 DATA
+	".refptr.x264_intra_sad_x3_8x8c_avx2" @ 210 DATA
+	".refptr.x264_intra_sad_x3_8x8c_mmx2" @ 211 DATA
+	".refptr.x264_intra_sad_x3_8x8c_ssse3" @ 212 DATA
+	".refptr.x264_intra_sad_x9_4x4_avx" @ 213 DATA
+	".refptr.x264_intra_sad_x9_4x4_sse4" @ 214 DATA
+	".refptr.x264_intra_sad_x9_4x4_ssse3" @ 215 DATA
+	".refptr.x264_intra_sad_x9_8x8_avx" @ 216 DATA
+	".refptr.x264_intra_sad_x9_8x8_avx2" @ 217 DATA
+	".refptr.x264_intra_sad_x9_8x8_sse4" @ 218 DATA
+	".refptr.x264_intra_sad_x9_8x8_ssse3" @ 219 DATA
+	".refptr.x264_intra_satd_x3_16x16_mmx2" @ 220 DATA
+	".refptr.x264_intra_satd_x3_16x16_ssse3" @ 221 DATA
+	".refptr.x264_intra_satd_x3_4x4_mmx2" @ 222 DATA
+	".refptr.x264_intra_satd_x3_8x8c_mmx2" @ 223 DATA
+	".refptr.x264_intra_satd_x3_8x8c_ssse3" @ 224 DATA
+	".refptr.x264_intra_satd_x9_4x4_avx" @ 225 DATA
+	".refptr.x264_intra_satd_x9_4x4_sse4" @ 226 DATA
+	".refptr.x264_intra_satd_x9_4x4_ssse3" @ 227 DATA
+	".refptr.x264_intra_satd_x9_4x4_xop" @ 228 DATA
+	".refptr.x264_lambda2_tab" @ 229 DATA
+	".refptr.x264_last_coeff_flag_offset" @ 230 DATA
+	".refptr.x264_last_coeff_flag_offset_8x8" @ 231 DATA
+	".refptr.x264_level_token" @ 232 DATA
+	".refptr.x264_levels" @ 233 DATA
+	".refptr.x264_load_deinterleave_chroma_fdec_sse2" @ 234 DATA
+	".refptr.x264_load_deinterleave_chroma_fdec_ssse3" @ 235 DATA
+	".refptr.x264_load_deinterleave_chroma_fenc_avx2" @ 236 DATA
+	".refptr.x264_load_deinterleave_chroma_fenc_sse2" @ 237 DATA
+	".refptr.x264_load_deinterleave_chroma_fenc_ssse3" @ 238 DATA
+	".refptr.x264_log2_lut" @ 239 DATA
+	".refptr.x264_log2_lz_lut" @ 240 DATA
+	".refptr.x264_mbtree_fix8_pack_avx2" @ 241 DATA
+	".refptr.x264_mbtree_fix8_pack_ssse3" @ 242 DATA
+	".refptr.x264_mbtree_fix8_unpack_avx2" @ 243 DATA
+	".refptr.x264_mbtree_fix8_unpack_ssse3" @ 244 DATA
+	".refptr.x264_mbtree_propagate_cost_avx" @ 245 DATA
+	".refptr.x264_mbtree_propagate_cost_avx2" @ 246 DATA
+	".refptr.x264_mbtree_propagate_cost_avx512" @ 247 DATA
+	".refptr.x264_mbtree_propagate_cost_fma4" @ 248 DATA
+	".refptr.x264_mbtree_propagate_cost_sse2" @ 249 DATA
+	".refptr.x264_mc_chroma_avx" @ 250 DATA
+	".refptr.x264_mc_chroma_avx2" @ 251 DATA
+	".refptr.x264_mc_chroma_cache64_ssse3" @ 252 DATA
+	".refptr.x264_mc_chroma_mmx2" @ 253 DATA
+	".refptr.x264_mc_chroma_sse2" @ 254 DATA
+	".refptr.x264_mc_chroma_ssse3" @ 255 DATA
+	".refptr.x264_mc_copy_w16_aligned_sse" @ 256 DATA
+	".refptr.x264_mc_copy_w16_mmx" @ 257 DATA
+	".refptr.x264_mc_copy_w4_mmx" @ 258 DATA
+	".refptr.x264_mc_copy_w8_mmx" @ 259 DATA
+	".refptr.x264_memcpy_aligned_avx" @ 260 DATA
+	".refptr.x264_memcpy_aligned_avx512" @ 261 DATA
+	".refptr.x264_memcpy_aligned_sse" @ 262 DATA
+	".refptr.x264_memzero_aligned_avx" @ 263 DATA
+	".refptr.x264_memzero_aligned_avx512" @ 264 DATA
+	".refptr.x264_memzero_aligned_sse" @ 265 DATA
+	".refptr.x264_nal_escape_avx2" @ 266 DATA
+	".refptr.x264_nal_escape_mmx2" @ 267 DATA
+	".refptr.x264_nal_escape_sse2" @ 268 DATA
+	".refptr.x264_optimize_chroma_2x2_dc_avx" @ 269 DATA
+	".refptr.x264_optimize_chroma_2x2_dc_sse2" @ 270 DATA
+	".refptr.x264_optimize_chroma_2x2_dc_sse4" @ 271 DATA
+	".refptr.x264_optimize_chroma_2x2_dc_ssse3" @ 272 DATA
+	".refptr.x264_pixel_ads1_avx" @ 273 DATA
+	".refptr.x264_pixel_ads1_avx2" @ 274 DATA
+	".refptr.x264_pixel_ads1_mmx2" @ 275 DATA
+	".refptr.x264_pixel_ads1_sse2" @ 276 DATA
+	".refptr.x264_pixel_ads1_ssse3" @ 277 DATA
+	".refptr.x264_pixel_ads2_avx" @ 278 DATA
+	".refptr.x264_pixel_ads2_avx2" @ 279 DATA
+	".refptr.x264_pixel_ads2_mmx2" @ 280 DATA
+	".refptr.x264_pixel_ads2_sse2" @ 281 DATA
+	".refptr.x264_pixel_ads2_ssse3" @ 282 DATA
+	".refptr.x264_pixel_ads4_avx" @ 283 DATA
+	".refptr.x264_pixel_ads4_avx2" @ 284 DATA
+	".refptr.x264_pixel_ads4_mmx2" @ 285 DATA
+	".refptr.x264_pixel_ads4_sse2" @ 286 DATA
+	".refptr.x264_pixel_ads4_ssse3" @ 287 DATA
+	".refptr.x264_pixel_asd8_sse2" @ 288 DATA
+	".refptr.x264_pixel_asd8_ssse3" @ 289 DATA
+	".refptr.x264_pixel_avg_16x16_avx2" @ 290 DATA
+	".refptr.x264_pixel_avg_16x16_avx512" @ 291 DATA
+	".refptr.x264_pixel_avg_16x16_mmx2" @ 292 DATA
+	".refptr.x264_pixel_avg_16x16_sse2" @ 293 DATA
+	".refptr.x264_pixel_avg_16x16_ssse3" @ 294 DATA
+	".refptr.x264_pixel_avg_16x8_avx2" @ 295 DATA
+	".refptr.x264_pixel_avg_16x8_avx512" @ 296 DATA
+	".refptr.x264_pixel_avg_16x8_mmx2" @ 297 DATA
+	".refptr.x264_pixel_avg_16x8_sse2" @ 298 DATA
+	".refptr.x264_pixel_avg_16x8_ssse3" @ 299 DATA
+	".refptr.x264_pixel_avg_4x16_mmx2" @ 300 DATA
+	".refptr.x264_pixel_avg_4x16_ssse3" @ 301 DATA
+	".refptr.x264_pixel_avg_4x2_mmx2" @ 302 DATA
+	".refptr.x264_pixel_avg_4x2_ssse3" @ 303 DATA
+	".refptr.x264_pixel_avg_4x4_mmx2" @ 304 DATA
+	".refptr.x264_pixel_avg_4x4_ssse3" @ 305 DATA
+	".refptr.x264_pixel_avg_4x8_mmx2" @ 306 DATA
+	".refptr.x264_pixel_avg_4x8_ssse3" @ 307 DATA
+	".refptr.x264_pixel_avg_8x16_avx512" @ 308 DATA
+	".refptr.x264_pixel_avg_8x16_mmx2" @ 309 DATA
+	".refptr.x264_pixel_avg_8x16_sse2" @ 310 DATA
+	".refptr.x264_pixel_avg_8x16_ssse3" @ 311 DATA
+	".refptr.x264_pixel_avg_8x4_avx512" @ 312 DATA
+	".refptr.x264_pixel_avg_8x4_mmx2" @ 313 DATA
+	".refptr.x264_pixel_avg_8x4_sse2" @ 314 DATA
+	".refptr.x264_pixel_avg_8x4_ssse3" @ 315 DATA
+	".refptr.x264_pixel_avg_8x8_avx512" @ 316 DATA
+	".refptr.x264_pixel_avg_8x8_mmx2" @ 317 DATA
+	".refptr.x264_pixel_avg_8x8_sse2" @ 318 DATA
+	".refptr.x264_pixel_avg_8x8_ssse3" @ 319 DATA
+	".refptr.x264_pixel_hadamard_ac_16x16_avx" @ 320 DATA
+	".refptr.x264_pixel_hadamard_ac_16x16_avx2" @ 321 DATA
+	".refptr.x264_pixel_hadamard_ac_16x16_mmx2" @ 322 DATA
+	".refptr.x264_pixel_hadamard_ac_16x16_sse2" @ 323 DATA
+	".refptr.x264_pixel_hadamard_ac_16x16_sse4" @ 324 DATA
+	".refptr.x264_pixel_hadamard_ac_16x16_ssse3" @ 325 DATA
+	".refptr.x264_pixel_hadamard_ac_16x16_ssse3_atom" @ 326 DATA
+	".refptr.x264_pixel_hadamard_ac_16x16_xop" @ 327 DATA
+	".refptr.x264_pixel_hadamard_ac_16x8_avx" @ 328 DATA
+	".refptr.x264_pixel_hadamard_ac_16x8_avx2" @ 329 DATA
+	".refptr.x264_pixel_hadamard_ac_16x8_mmx2" @ 330 DATA
+	".refptr.x264_pixel_hadamard_ac_16x8_sse2" @ 331 DATA
+	".refptr.x264_pixel_hadamard_ac_16x8_sse4" @ 332 DATA
+	".refptr.x264_pixel_hadamard_ac_16x8_ssse3" @ 333 DATA
+	".refptr.x264_pixel_hadamard_ac_16x8_ssse3_atom" @ 334 DATA
+	".refptr.x264_pixel_hadamard_ac_16x8_xop" @ 335 DATA
+	".refptr.x264_pixel_hadamard_ac_8x16_avx" @ 336 DATA
+	".refptr.x264_pixel_hadamard_ac_8x16_mmx2" @ 337 DATA
+	".refptr.x264_pixel_hadamard_ac_8x16_sse2" @ 338 DATA
+	".refptr.x264_pixel_hadamard_ac_8x16_sse4" @ 339 DATA
+	".refptr.x264_pixel_hadamard_ac_8x16_ssse3" @ 340 DATA
+	".refptr.x264_pixel_hadamard_ac_8x16_ssse3_atom" @ 341 DATA
+	".refptr.x264_pixel_hadamard_ac_8x16_xop" @ 342 DATA
+	".refptr.x264_pixel_hadamard_ac_8x8_avx" @ 343 DATA
+	".refptr.x264_pixel_hadamard_ac_8x8_mmx2" @ 344 DATA
+	".refptr.x264_pixel_hadamard_ac_8x8_sse2" @ 345 DATA
+	".refptr.x264_pixel_hadamard_ac_8x8_sse4" @ 346 DATA
+	".refptr.x264_pixel_hadamard_ac_8x8_ssse3" @ 347 DATA
+	".refptr.x264_pixel_hadamard_ac_8x8_ssse3_atom" @ 348 DATA
+	".refptr.x264_pixel_hadamard_ac_8x8_xop" @ 349 DATA
+	".refptr.x264_pixel_sa8d_16x16_avx" @ 350 DATA
+	".refptr.x264_pixel_sa8d_16x16_sse2" @ 351 DATA
+	".refptr.x264_pixel_sa8d_16x16_sse4" @ 352 DATA
+	".refptr.x264_pixel_sa8d_16x16_ssse3" @ 353 DATA
+	".refptr.x264_pixel_sa8d_16x16_ssse3_atom" @ 354 DATA
+	".refptr.x264_pixel_sa8d_16x16_xop" @ 355 DATA
+	".refptr.x264_pixel_sa8d_8x8_avx" @ 356 DATA
+	".refptr.x264_pixel_sa8d_8x8_avx2" @ 357 DATA
+	".refptr.x264_pixel_sa8d_8x8_avx512" @ 358 DATA
+	".refptr.x264_pixel_sa8d_8x8_sse2" @ 359 DATA
+	".refptr.x264_pixel_sa8d_8x8_sse4" @ 360 DATA
+	".refptr.x264_pixel_sa8d_8x8_ssse3" @ 361 DATA
+	".refptr.x264_pixel_sa8d_8x8_ssse3_atom" @ 362 DATA
+	".refptr.x264_pixel_sa8d_8x8_xop" @ 363 DATA
+	".refptr.x264_pixel_sa8d_satd_16x16_avx" @ 364 DATA
+	".refptr.x264_pixel_sa8d_satd_16x16_avx2" @ 365 DATA
+	".refptr.x264_pixel_sa8d_satd_16x16_sse2" @ 366 DATA
+	".refptr.x264_pixel_sa8d_satd_16x16_sse4" @ 367 DATA
+	".refptr.x264_pixel_sa8d_satd_16x16_ssse3" @ 368 DATA
+	".refptr.x264_pixel_sa8d_satd_16x16_ssse3_atom" @ 369 DATA
+	".refptr.x264_pixel_sa8d_satd_16x16_xop" @ 370 DATA
+	".refptr.x264_pixel_sad_16x16_avx512" @ 371 DATA
+	".refptr.x264_pixel_sad_16x16_cache64_ssse3" @ 372 DATA
+	".refptr.x264_pixel_sad_16x16_mmx2" @ 373 DATA
+	".refptr.x264_pixel_sad_16x16_sse2" @ 374 DATA
+	".refptr.x264_pixel_sad_16x16_sse2_aligned" @ 375 DATA
+	".refptr.x264_pixel_sad_16x16_sse3" @ 376 DATA
+	".refptr.x264_pixel_sad_16x8_avx512" @ 377 DATA
+	".refptr.x264_pixel_sad_16x8_cache64_ssse3" @ 378 DATA
+	".refptr.x264_pixel_sad_16x8_mmx2" @ 379 DATA
+	".refptr.x264_pixel_sad_16x8_sse2" @ 380 DATA
+	".refptr.x264_pixel_sad_16x8_sse2_aligned" @ 381 DATA
+	".refptr.x264_pixel_sad_16x8_sse3" @ 382 DATA
+	".refptr.x264_pixel_sad_4x16_avx512" @ 383 DATA
+	".refptr.x264_pixel_sad_4x16_mmx2" @ 384 DATA
+	".refptr.x264_pixel_sad_4x4_avx512" @ 385 DATA
+	".refptr.x264_pixel_sad_4x4_mmx2" @ 386 DATA
+	".refptr.x264_pixel_sad_4x8_avx512" @ 387 DATA
+	".refptr.x264_pixel_sad_4x8_mmx2" @ 388 DATA
+	".refptr.x264_pixel_sad_8x16_avx512" @ 389 DATA
+	".refptr.x264_pixel_sad_8x16_cache64_mmx2" @ 390 DATA
+	".refptr.x264_pixel_sad_8x16_mmx2" @ 391 DATA
+	".refptr.x264_pixel_sad_8x16_sse2" @ 392 DATA
+	".refptr.x264_pixel_sad_8x4_avx512" @ 393 DATA
+	".refptr.x264_pixel_sad_8x4_cache64_mmx2" @ 394 DATA
+	".refptr.x264_pixel_sad_8x4_mmx2" @ 395 DATA
+	".refptr.x264_pixel_sad_8x8_avx512" @ 396 DATA
+	".refptr.x264_pixel_sad_8x8_cache64_mmx2" @ 397 DATA
+	".refptr.x264_pixel_sad_8x8_mmx2" @ 398 DATA
+	".refptr.x264_pixel_sad_x3_16x16_avx" @ 399 DATA
+	".refptr.x264_pixel_sad_x3_16x16_avx2" @ 400 DATA
+	".refptr.x264_pixel_sad_x3_16x16_avx512" @ 401 DATA
+	".refptr.x264_pixel_sad_x3_16x16_cache64_ssse3" @ 402 DATA
+	".refptr.x264_pixel_sad_x3_16x16_mmx2" @ 403 DATA
+	".refptr.x264_pixel_sad_x3_16x16_sse2" @ 404 DATA
+	".refptr.x264_pixel_sad_x3_16x16_sse3" @ 405 DATA
+	".refptr.x264_pixel_sad_x3_16x16_ssse3" @ 406 DATA
+	".refptr.x264_pixel_sad_x3_16x8_avx" @ 407 DATA
+	".refptr.x264_pixel_sad_x3_16x8_avx2" @ 408 DATA
+	".refptr.x264_pixel_sad_x3_16x8_avx512" @ 409 DATA
+	".refptr.x264_pixel_sad_x3_16x8_cache64_ssse3" @ 410 DATA
+	".refptr.x264_pixel_sad_x3_16x8_mmx2" @ 411 DATA
+	".refptr.x264_pixel_sad_x3_16x8_sse2" @ 412 DATA
+	".refptr.x264_pixel_sad_x3_16x8_sse3" @ 413 DATA
+	".refptr.x264_pixel_sad_x3_16x8_ssse3" @ 414 DATA
+	".refptr.x264_pixel_sad_x3_4x4_avx512" @ 415 DATA
+	".refptr.x264_pixel_sad_x3_4x4_mmx2" @ 416 DATA
+	".refptr.x264_pixel_sad_x3_4x8_avx512" @ 417 DATA
+	".refptr.x264_pixel_sad_x3_4x8_mmx2" @ 418 DATA
+	".refptr.x264_pixel_sad_x3_8x16_avx512" @ 419 DATA
+	".refptr.x264_pixel_sad_x3_8x16_cache64_mmx2" @ 420 DATA
+	".refptr.x264_pixel_sad_x3_8x16_cache64_sse2" @ 421 DATA
+	".refptr.x264_pixel_sad_x3_8x16_mmx2" @ 422 DATA
+	".refptr.x264_pixel_sad_x3_8x16_sse2" @ 423 DATA
+	".refptr.x264_pixel_sad_x3_8x4_avx512" @ 424 DATA
+	".refptr.x264_pixel_sad_x3_8x4_mmx2" @ 425 DATA
+	".refptr.x264_pixel_sad_x3_8x4_sse2" @ 426 DATA
+	".refptr.x264_pixel_sad_x3_8x8_avx512" @ 427 DATA
+	".refptr.x264_pixel_sad_x3_8x8_cache64_mmx2" @ 428 DATA
+	".refptr.x264_pixel_sad_x3_8x8_mmx2" @ 429 DATA
+	".refptr.x264_pixel_sad_x3_8x8_sse2" @ 430 DATA
+	".refptr.x264_pixel_sad_x4_16x16_avx" @ 431 DATA
+	".refptr.x264_pixel_sad_x4_16x16_avx2" @ 432 DATA
+	".refptr.x264_pixel_sad_x4_16x16_avx512" @ 433 DATA
+	".refptr.x264_pixel_sad_x4_16x16_cache64_ssse3" @ 434 DATA
+	".refptr.x264_pixel_sad_x4_16x16_mmx2" @ 435 DATA
+	".refptr.x264_pixel_sad_x4_16x16_sse2" @ 436 DATA
+	".refptr.x264_pixel_sad_x4_16x16_sse3" @ 437 DATA
+	".refptr.x264_pixel_sad_x4_16x16_ssse3" @ 438 DATA
+	".refptr.x264_pixel_sad_x4_16x8_avx" @ 439 DATA
+	".refptr.x264_pixel_sad_x4_16x8_avx2" @ 440 DATA
+	".refptr.x264_pixel_sad_x4_16x8_avx512" @ 441 DATA
+	".refptr.x264_pixel_sad_x4_16x8_cache64_ssse3" @ 442 DATA
+	".refptr.x264_pixel_sad_x4_16x8_mmx2" @ 443 DATA
+	".refptr.x264_pixel_sad_x4_16x8_sse2" @ 444 DATA
+	".refptr.x264_pixel_sad_x4_16x8_sse3" @ 445 DATA
+	".refptr.x264_pixel_sad_x4_16x8_ssse3" @ 446 DATA
+	".refptr.x264_pixel_sad_x4_4x4_avx512" @ 447 DATA
+	".refptr.x264_pixel_sad_x4_4x4_mmx2" @ 448 DATA
+	".refptr.x264_pixel_sad_x4_4x8_avx512" @ 449 DATA
+	".refptr.x264_pixel_sad_x4_4x8_mmx2" @ 450 DATA
+	".refptr.x264_pixel_sad_x4_8x16_avx512" @ 451 DATA
+	".refptr.x264_pixel_sad_x4_8x16_cache64_mmx2" @ 452 DATA
+	".refptr.x264_pixel_sad_x4_8x16_cache64_sse2" @ 453 DATA
+	".refptr.x264_pixel_sad_x4_8x16_mmx2" @ 454 DATA
+	".refptr.x264_pixel_sad_x4_8x16_sse2" @ 455 DATA
+	".refptr.x264_pixel_sad_x4_8x16_ssse3" @ 456 DATA
+	".refptr.x264_pixel_sad_x4_8x4_avx512" @ 457 DATA
+	".refptr.x264_pixel_sad_x4_8x4_mmx2" @ 458 DATA
+	".refptr.x264_pixel_sad_x4_8x4_sse2" @ 459 DATA
+	".refptr.x264_pixel_sad_x4_8x4_ssse3" @ 460 DATA
+	".refptr.x264_pixel_sad_x4_8x8_avx512" @ 461 DATA
+	".refptr.x264_pixel_sad_x4_8x8_cache64_mmx2" @ 462 DATA
+	".refptr.x264_pixel_sad_x4_8x8_mmx2" @ 463 DATA
+	".refptr.x264_pixel_sad_x4_8x8_sse2" @ 464 DATA
+	".refptr.x264_pixel_sad_x4_8x8_ssse3" @ 465 DATA
+	".refptr.x264_pixel_satd_16x16_avx" @ 466 DATA
+	".refptr.x264_pixel_satd_16x16_avx2" @ 467 DATA
+	".refptr.x264_pixel_satd_16x16_avx512" @ 468 DATA
+	".refptr.x264_pixel_satd_16x16_mmx2" @ 469 DATA
+	".refptr.x264_pixel_satd_16x16_sse2" @ 470 DATA
+	".refptr.x264_pixel_satd_16x16_sse4" @ 471 DATA
+	".refptr.x264_pixel_satd_16x16_ssse3" @ 472 DATA
+	".refptr.x264_pixel_satd_16x16_ssse3_atom" @ 473 DATA
+	".refptr.x264_pixel_satd_16x16_xop" @ 474 DATA
+	".refptr.x264_pixel_satd_16x8_avx" @ 475 DATA
+	".refptr.x264_pixel_satd_16x8_avx2" @ 476 DATA
+	".refptr.x264_pixel_satd_16x8_avx512" @ 477 DATA
+	".refptr.x264_pixel_satd_16x8_mmx2" @ 478 DATA
+	".refptr.x264_pixel_satd_16x8_sse2" @ 479 DATA
+	".refptr.x264_pixel_satd_16x8_sse4" @ 480 DATA
+	".refptr.x264_pixel_satd_16x8_ssse3" @ 481 DATA
+	".refptr.x264_pixel_satd_16x8_ssse3_atom" @ 482 DATA
+	".refptr.x264_pixel_satd_16x8_xop" @ 483 DATA
+	".refptr.x264_pixel_satd_4x16_avx" @ 484 DATA
+	".refptr.x264_pixel_satd_4x16_avx512" @ 485 DATA
+	".refptr.x264_pixel_satd_4x16_mmx2" @ 486 DATA
+	".refptr.x264_pixel_satd_4x16_sse2" @ 487 DATA
+	".refptr.x264_pixel_satd_4x16_sse4" @ 488 DATA
+	".refptr.x264_pixel_satd_4x16_ssse3" @ 489 DATA
+	".refptr.x264_pixel_satd_4x16_ssse3_atom" @ 490 DATA
+	".refptr.x264_pixel_satd_4x4_avx" @ 491 DATA
+	".refptr.x264_pixel_satd_4x4_avx512" @ 492 DATA
+	".refptr.x264_pixel_satd_4x4_mmx2" @ 493 DATA
+	".refptr.x264_pixel_satd_4x4_sse4" @ 494 DATA
+	".refptr.x264_pixel_satd_4x4_ssse3" @ 495 DATA
+	".refptr.x264_pixel_satd_4x4_xop" @ 496 DATA
+	".refptr.x264_pixel_satd_4x8_avx" @ 497 DATA
+	".refptr.x264_pixel_satd_4x8_avx512" @ 498 DATA
+	".refptr.x264_pixel_satd_4x8_mmx2" @ 499 DATA
+	".refptr.x264_pixel_satd_4x8_sse2" @ 500 DATA
+	".refptr.x264_pixel_satd_4x8_sse4" @ 501 DATA
+	".refptr.x264_pixel_satd_4x8_ssse3" @ 502 DATA
+	".refptr.x264_pixel_satd_4x8_ssse3_atom" @ 503 DATA
+	".refptr.x264_pixel_satd_4x8_xop" @ 504 DATA
+	".refptr.x264_pixel_satd_8x16_avx" @ 505 DATA
+	".refptr.x264_pixel_satd_8x16_avx2" @ 506 DATA
+	".refptr.x264_pixel_satd_8x16_avx512" @ 507 DATA
+	".refptr.x264_pixel_satd_8x16_mmx2" @ 508 DATA
+	".refptr.x264_pixel_satd_8x16_sse2" @ 509 DATA
+	".refptr.x264_pixel_satd_8x16_sse4" @ 510 DATA
+	".refptr.x264_pixel_satd_8x16_ssse3" @ 511 DATA
+	".refptr.x264_pixel_satd_8x16_ssse3_atom" @ 512 DATA
+	".refptr.x264_pixel_satd_8x16_xop" @ 513 DATA
+	".refptr.x264_pixel_satd_8x4_avx" @ 514 DATA
+	".refptr.x264_pixel_satd_8x4_avx512" @ 515 DATA
+	".refptr.x264_pixel_satd_8x4_mmx2" @ 516 DATA
+	".refptr.x264_pixel_satd_8x4_sse2" @ 517 DATA
+	".refptr.x264_pixel_satd_8x4_sse4" @ 518 DATA
+	".refptr.x264_pixel_satd_8x4_ssse3" @ 519 DATA
+	".refptr.x264_pixel_satd_8x4_ssse3_atom" @ 520 DATA
+	".refptr.x264_pixel_satd_8x4_xop" @ 521 DATA
+	".refptr.x264_pixel_satd_8x8_avx" @ 522 DATA
+	".refptr.x264_pixel_satd_8x8_avx2" @ 523 DATA
+	".refptr.x264_pixel_satd_8x8_avx512" @ 524 DATA
+	".refptr.x264_pixel_satd_8x8_mmx2" @ 525 DATA
+	".refptr.x264_pixel_satd_8x8_sse2" @ 526 DATA
+	".refptr.x264_pixel_satd_8x8_sse4" @ 527 DATA
+	".refptr.x264_pixel_satd_8x8_ssse3" @ 528 DATA
+	".refptr.x264_pixel_satd_8x8_ssse3_atom" @ 529 DATA
+	".refptr.x264_pixel_satd_8x8_xop" @ 530 DATA
+	".refptr.x264_pixel_ssd_16x16_avx" @ 531 DATA
+	".refptr.x264_pixel_ssd_16x16_avx2" @ 532 DATA
+	".refptr.x264_pixel_ssd_16x16_mmx" @ 533 DATA
+	".refptr.x264_pixel_ssd_16x16_sse2" @ 534 DATA
+	".refptr.x264_pixel_ssd_16x16_sse2slow" @ 535 DATA
+	".refptr.x264_pixel_ssd_16x16_ssse3" @ 536 DATA
+	".refptr.x264_pixel_ssd_16x16_xop" @ 537 DATA
+	".refptr.x264_pixel_ssd_16x8_avx" @ 538 DATA
+	".refptr.x264_pixel_ssd_16x8_avx2" @ 539 DATA
+	".refptr.x264_pixel_ssd_16x8_mmx" @ 540 DATA
+	".refptr.x264_pixel_ssd_16x8_sse2" @ 541 DATA
+	".refptr.x264_pixel_ssd_16x8_sse2slow" @ 542 DATA
+	".refptr.x264_pixel_ssd_16x8_ssse3" @ 543 DATA
+	".refptr.x264_pixel_ssd_16x8_xop" @ 544 DATA
+	".refptr.x264_pixel_ssd_4x16_mmx" @ 545 DATA
+	".refptr.x264_pixel_ssd_4x16_ssse3" @ 546 DATA
+	".refptr.x264_pixel_ssd_4x4_mmx" @ 547 DATA
+	".refptr.x264_pixel_ssd_4x4_ssse3" @ 548 DATA
+	".refptr.x264_pixel_ssd_4x8_mmx" @ 549 DATA
+	".refptr.x264_pixel_ssd_4x8_ssse3" @ 550 DATA
+	".refptr.x264_pixel_ssd_8x16_avx" @ 551 DATA
+	".refptr.x264_pixel_ssd_8x16_mmx" @ 552 DATA
+	".refptr.x264_pixel_ssd_8x16_sse2" @ 553 DATA
+	".refptr.x264_pixel_ssd_8x16_sse2slow" @ 554 DATA
+	".refptr.x264_pixel_ssd_8x16_ssse3" @ 555 DATA
+	".refptr.x264_pixel_ssd_8x16_xop" @ 556 DATA
+	".refptr.x264_pixel_ssd_8x4_avx" @ 557 DATA
+	".refptr.x264_pixel_ssd_8x4_mmx" @ 558 DATA
+	".refptr.x264_pixel_ssd_8x4_sse2" @ 559 DATA
+	".refptr.x264_pixel_ssd_8x4_sse2slow" @ 560 DATA
+	".refptr.x264_pixel_ssd_8x4_ssse3" @ 561 DATA
+	".refptr.x264_pixel_ssd_8x4_xop" @ 562 DATA
+	".refptr.x264_pixel_ssd_8x8_avx" @ 563 DATA
+	".refptr.x264_pixel_ssd_8x8_mmx" @ 564 DATA
+	".refptr.x264_pixel_ssd_8x8_sse2" @ 565 DATA
+	".refptr.x264_pixel_ssd_8x8_sse2slow" @ 566 DATA
+	".refptr.x264_pixel_ssd_8x8_ssse3" @ 567 DATA
+	".refptr.x264_pixel_ssd_8x8_xop" @ 568 DATA
+	".refptr.x264_pixel_ssd_nv12_core_avx" @ 569 DATA
+	".refptr.x264_pixel_ssd_nv12_core_avx2" @ 570 DATA
+	".refptr.x264_pixel_ssd_nv12_core_sse2" @ 571 DATA
+	".refptr.x264_pixel_ssd_nv12_core_xop" @ 572 DATA
+	".refptr.x264_pixel_ssim_4x4x2_core_avx" @ 573 DATA
+	".refptr.x264_pixel_ssim_4x4x2_core_sse2" @ 574 DATA
+	".refptr.x264_pixel_ssim_end4_avx" @ 575 DATA
+	".refptr.x264_pixel_ssim_end4_sse2" @ 576 DATA
+	".refptr.x264_pixel_var2_8x16_avx2" @ 577 DATA
+	".refptr.x264_pixel_var2_8x16_avx512" @ 578 DATA
+	".refptr.x264_pixel_var2_8x16_sse2" @ 579 DATA
+	".refptr.x264_pixel_var2_8x16_ssse3" @ 580 DATA
+	".refptr.x264_pixel_var2_8x8_avx2" @ 581 DATA
+	".refptr.x264_pixel_var2_8x8_avx512" @ 582 DATA
+	".refptr.x264_pixel_var2_8x8_sse2" @ 583 DATA
+	".refptr.x264_pixel_var2_8x8_ssse3" @ 584 DATA
+	".refptr.x264_pixel_var_16x16_avx" @ 585 DATA
+	".refptr.x264_pixel_var_16x16_avx2" @ 586 DATA
+	".refptr.x264_pixel_var_16x16_avx512" @ 587 DATA
+	".refptr.x264_pixel_var_16x16_sse2" @ 588 DATA
+	".refptr.x264_pixel_var_8x16_avx" @ 589 DATA
+	".refptr.x264_pixel_var_8x16_avx512" @ 590 DATA
+	".refptr.x264_pixel_var_8x16_sse2" @ 591 DATA
+	".refptr.x264_pixel_var_8x8_avx" @ 592 DATA
+	".refptr.x264_pixel_var_8x8_avx512" @ 593 DATA
+	".refptr.x264_pixel_var_8x8_sse2" @ 594 DATA
+	".refptr.x264_pixel_vsad_sse2" @ 595 DATA
+	".refptr.x264_plane_copy_deinterleave_avx2" @ 596 DATA
+	".refptr.x264_plane_copy_deinterleave_rgb_avx2" @ 597 DATA
+	".refptr.x264_plane_copy_deinterleave_rgb_sse2" @ 598 DATA
+	".refptr.x264_plane_copy_deinterleave_rgb_ssse3" @ 599 DATA
+	".refptr.x264_plane_copy_deinterleave_sse2" @ 600 DATA
+	".refptr.x264_plane_copy_deinterleave_ssse3" @ 601 DATA
+	".refptr.x264_predict_16x16_dc_avx2" @ 602 DATA
+	".refptr.x264_predict_16x16_dc_left_avx2" @ 603 DATA
+	".refptr.x264_predict_16x16_dc_left_sse2" @ 604 DATA
+	".refptr.x264_predict_16x16_dc_sse2" @ 605 DATA
+	".refptr.x264_predict_16x16_dc_top_avx2" @ 606 DATA
+	".refptr.x264_predict_16x16_dc_top_sse2" @ 607 DATA
+	".refptr.x264_predict_16x16_h_mmx2" @ 608 DATA
+	".refptr.x264_predict_16x16_h_ssse3" @ 609 DATA
+	".refptr.x264_predict_16x16_v_mmx2" @ 610 DATA
+	".refptr.x264_predict_16x16_v_sse" @ 611 DATA
+	".refptr.x264_predict_4x4_dc_mmx2" @ 612 DATA
+	".refptr.x264_predict_4x4_ddl_mmx2" @ 613 DATA
+	".refptr.x264_predict_4x4_ddr_mmx2" @ 614 DATA
+	".refptr.x264_predict_4x4_ddr_ssse3" @ 615 DATA
+	".refptr.x264_predict_4x4_hd_mmx2" @ 616 DATA
+	".refptr.x264_predict_4x4_hd_ssse3" @ 617 DATA
+	".refptr.x264_predict_4x4_hu_mmx2" @ 618 DATA
+	".refptr.x264_predict_4x4_vl_mmx2" @ 619 DATA
+	".refptr.x264_predict_4x4_vr_cache64_ssse3" @ 620 DATA
+	".refptr.x264_predict_4x4_vr_mmx2" @ 621 DATA
+	".refptr.x264_predict_4x4_vr_ssse3" @ 622 DATA
+	".refptr.x264_predict_8x16c_dc_mmx2" @ 623 DATA
+	".refptr.x264_predict_8x16c_dc_top_mmx2" @ 624 DATA
+	".refptr.x264_predict_8x16c_h_mmx2" @ 625 DATA
+	".refptr.x264_predict_8x16c_h_ssse3" @ 626 DATA
+	".refptr.x264_predict_8x16c_v_mmx" @ 627 DATA
+	".refptr.x264_predict_8x8_dc_left_mmx2" @ 628 DATA
+	".refptr.x264_predict_8x8_dc_mmx2" @ 629 DATA
+	".refptr.x264_predict_8x8_dc_top_mmx2" @ 630 DATA
+	".refptr.x264_predict_8x8_ddl_avx" @ 631 DATA
+	".refptr.x264_predict_8x8_ddl_sse2" @ 632 DATA
+	".refptr.x264_predict_8x8_ddl_ssse3" @ 633 DATA
+	".refptr.x264_predict_8x8_ddr_avx" @ 634 DATA
+	".refptr.x264_predict_8x8_ddr_sse2" @ 635 DATA
+	".refptr.x264_predict_8x8_filter_mmx2" @ 636 DATA
+	".refptr.x264_predict_8x8_filter_ssse3" @ 637 DATA
+	".refptr.x264_predict_8x8_h_mmx2" @ 638 DATA
+	".refptr.x264_predict_8x8_hd_avx" @ 639 DATA
+	".refptr.x264_predict_8x8_hd_mmx2" @ 640 DATA
+	".refptr.x264_predict_8x8_hd_sse2" @ 641 DATA
+	".refptr.x264_predict_8x8_hu_sse2" @ 642 DATA
+	".refptr.x264_predict_8x8_hu_ssse3" @ 643 DATA
+	".refptr.x264_predict_8x8_v_mmx2" @ 644 DATA
+	".refptr.x264_predict_8x8_vl_avx" @ 645 DATA
+	".refptr.x264_predict_8x8_vl_mmx2" @ 646 DATA
+	".refptr.x264_predict_8x8_vl_sse2" @ 647 DATA
+	".refptr.x264_predict_8x8_vr_avx" @ 648 DATA
+	".refptr.x264_predict_8x8_vr_sse2" @ 649 DATA
+	".refptr.x264_predict_8x8_vr_ssse3" @ 650 DATA
+	".refptr.x264_predict_8x8c_dc_mmx2" @ 651 DATA
+	".refptr.x264_predict_8x8c_dc_top_mmx2" @ 652 DATA
+	".refptr.x264_predict_8x8c_h_mmx2" @ 653 DATA
+	".refptr.x264_predict_8x8c_h_ssse3" @ 654 DATA
+	".refptr.x264_predict_8x8c_v_mmx" @ 655 DATA
+	".refptr.x264_prefetch_fenc_420_mmx2" @ 656 DATA
+	".refptr.x264_prefetch_fenc_422_mmx2" @ 657 DATA
+	".refptr.x264_prefetch_ref_mmx2" @ 658 DATA
+	".refptr.x264_quant_2x2_dc_mmx2" @ 659 DATA
+	".refptr.x264_quant_2x2_dc_ssse3" @ 660 DATA
+	".refptr.x264_quant_4x4_avx2" @ 661 DATA
+	".refptr.x264_quant_4x4_dc_avx2" @ 662 DATA
+	".refptr.x264_quant_4x4_dc_sse2" @ 663 DATA
+	".refptr.x264_quant_4x4_dc_sse4" @ 664 DATA
+	".refptr.x264_quant_4x4_dc_ssse3" @ 665 DATA
+	".refptr.x264_quant_4x4_sse2" @ 666 DATA
+	".refptr.x264_quant_4x4_sse4" @ 667 DATA
+	".refptr.x264_quant_4x4_ssse3" @ 668 DATA
+	".refptr.x264_quant_4x4x4_avx2" @ 669 DATA
+	".refptr.x264_quant_4x4x4_sse2" @ 670 DATA
+	".refptr.x264_quant_4x4x4_ssse3" @ 671 DATA
+	".refptr.x264_quant_8x8_avx2" @ 672 DATA
+	".refptr.x264_quant_8x8_sse2" @ 673 DATA
+	".refptr.x264_quant_8x8_sse4" @ 674 DATA
+	".refptr.x264_quant_8x8_ssse3" @ 675 DATA
+	".refptr.x264_run_before" @ 676 DATA
+	".refptr.x264_significant_coeff_flag_offset" @ 677 DATA
+	".refptr.x264_significant_coeff_flag_offset_8x8" @ 678 DATA
+	".refptr.x264_store_interleave_chroma_mmx2" @ 679 DATA
+	".refptr.x264_store_interleave_chroma_sse2" @ 680 DATA
+	".refptr.x264_sub16x16_dct8_avx" @ 681 DATA
+	".refptr.x264_sub16x16_dct8_avx2" @ 682 DATA
+	".refptr.x264_sub16x16_dct8_sse2" @ 683 DATA
+	".refptr.x264_sub16x16_dct8_ssse3" @ 684 DATA
+	".refptr.x264_sub16x16_dct_avx" @ 685 DATA
+	".refptr.x264_sub16x16_dct_avx2" @ 686 DATA
+	".refptr.x264_sub16x16_dct_avx512" @ 687 DATA
+	".refptr.x264_sub16x16_dct_sse2" @ 688 DATA
+	".refptr.x264_sub16x16_dct_ssse3" @ 689 DATA
+	".refptr.x264_sub16x16_dct_xop" @ 690 DATA
+	".refptr.x264_sub4x4_dct_avx512" @ 691 DATA
+	".refptr.x264_sub4x4_dct_mmx" @ 692 DATA
+	".refptr.x264_sub4x4_dct_ssse3" @ 693 DATA
+	".refptr.x264_sub8x16_dct_dc_avx512" @ 694 DATA
+	".refptr.x264_sub8x16_dct_dc_sse2" @ 695 DATA
+	".refptr.x264_sub8x16_dct_dc_ssse3" @ 696 DATA
+	".refptr.x264_sub8x8_dct8_avx" @ 697 DATA
+	".refptr.x264_sub8x8_dct8_sse2" @ 698 DATA
+	".refptr.x264_sub8x8_dct8_ssse3" @ 699 DATA
+	".refptr.x264_sub8x8_dct_avx" @ 700 DATA
+	".refptr.x264_sub8x8_dct_avx2" @ 701 DATA
+	".refptr.x264_sub8x8_dct_avx512" @ 702 DATA
+	".refptr.x264_sub8x8_dct_dc_avx512" @ 703 DATA
+	".refptr.x264_sub8x8_dct_dc_mmx2" @ 704 DATA
+	".refptr.x264_sub8x8_dct_dc_sse2" @ 705 DATA
+	".refptr.x264_sub8x8_dct_sse2" @ 706 DATA
+	".refptr.x264_sub8x8_dct_ssse3" @ 707 DATA
+	".refptr.x264_sub8x8_dct_xop" @ 708 DATA
+	".refptr.x264_total_zeros" @ 709 DATA
+	".refptr.x264_total_zeros_2x2_dc" @ 710 DATA
+	".refptr.x264_total_zeros_2x4_dc" @ 711 DATA
+	".refptr.x264_trellis_cabac_4x4_psy_sse2" @ 712 DATA
+	".refptr.x264_trellis_cabac_4x4_psy_ssse3" @ 713 DATA
+	".refptr.x264_trellis_cabac_4x4_sse2" @ 714 DATA
+	".refptr.x264_trellis_cabac_4x4_ssse3" @ 715 DATA
+	".refptr.x264_trellis_cabac_8x8_psy_sse2" @ 716 DATA
+	".refptr.x264_trellis_cabac_8x8_psy_ssse3" @ 717 DATA
+	".refptr.x264_trellis_cabac_8x8_sse2" @ 718 DATA
+	".refptr.x264_trellis_cabac_8x8_ssse3" @ 719 DATA
+	".refptr.x264_trellis_cabac_chroma_422_dc_sse2" @ 720 DATA
+	".refptr.x264_trellis_cabac_chroma_422_dc_ssse3" @ 721 DATA
+	".refptr.x264_trellis_cabac_dc_sse2" @ 722 DATA
+	".refptr.x264_trellis_cabac_dc_ssse3" @ 723 DATA
+	".refptr.x264_weight_none" @ 724 DATA
+	".refptr.x264_zigzag_interleave_8x8_cavlc_avx" @ 725 DATA
+	".refptr.x264_zigzag_interleave_8x8_cavlc_avx2" @ 726 DATA
+	".refptr.x264_zigzag_interleave_8x8_cavlc_avx512" @ 727 DATA
+	".refptr.x264_zigzag_interleave_8x8_cavlc_mmx" @ 728 DATA
+	".refptr.x264_zigzag_interleave_8x8_cavlc_sse2" @ 729 DATA
+	".refptr.x264_zigzag_scan_4x4_field_avx512" @ 730 DATA
+	".refptr.x264_zigzag_scan_4x4_field_sse" @ 731 DATA
+	".refptr.x264_zigzag_scan_4x4_frame_avx" @ 732 DATA
+	".refptr.x264_zigzag_scan_4x4_frame_avx512" @ 733 DATA
+	".refptr.x264_zigzag_scan_4x4_frame_mmx" @ 734 DATA
+	".refptr.x264_zigzag_scan_4x4_frame_ssse3" @ 735 DATA
+	".refptr.x264_zigzag_scan_4x4_frame_xop" @ 736 DATA
+	".refptr.x264_zigzag_scan_8x8_field_avx512" @ 737 DATA
+	".refptr.x264_zigzag_scan_8x8_field_mmx2" @ 738 DATA
+	".refptr.x264_zigzag_scan_8x8_field_xop" @ 739 DATA
+	".refptr.x264_zigzag_scan_8x8_frame_avx512" @ 740 DATA
+	".refptr.x264_zigzag_scan_8x8_frame_mmx2" @ 741 DATA
+	".refptr.x264_zigzag_scan_8x8_frame_sse2" @ 742 DATA
+	".refptr.x264_zigzag_scan_8x8_frame_ssse3" @ 743 DATA
+	".refptr.x264_zigzag_scan_8x8_frame_xop" @ 744 DATA
+	".refptr.x264_zigzag_sub_4x4_field_avx" @ 745 DATA
+	".refptr.x264_zigzag_sub_4x4_field_ssse3" @ 746 DATA
+	".refptr.x264_zigzag_sub_4x4_frame_avx" @ 747 DATA
+	".refptr.x264_zigzag_sub_4x4_frame_ssse3" @ 748 DATA
+	".refptr.x264_zigzag_sub_4x4ac_field_avx" @ 749 DATA
+	".refptr.x264_zigzag_sub_4x4ac_field_ssse3" @ 750 DATA
+	".refptr.x264_zigzag_sub_4x4ac_frame_avx" @ 751 DATA
+	".refptr.x264_zigzag_sub_4x4ac_frame_ssse3" @ 752 DATA
+	CloseHandle @ 753 DATA
+	CreateEventW @ 754 DATA
+	CreateSemaphoreW @ 755 DATA
+	DeleteCriticalSection @ 756 DATA
+	DllEntryPoint @ 757
+	DllMain @ 758
+	DllMainCRTStartup @ 759
+	EnterCriticalSection @ 760 DATA
+	FreeLibrary @ 761 DATA
+	GetConsoleMode @ 762 DATA
+	GetCurrentProcess @ 763 DATA
+	GetCurrentProcessId @ 764 DATA
+	GetCurrentThread @ 765 DATA
+	GetCurrentThreadId @ 766 DATA
+	GetLastError @ 767 DATA
+	GetModuleFileNameW @ 768 DATA
+	GetModuleHandleW @ 769 DATA
+	GetProcAddress @ 770 DATA
+	GetProcessAffinityMask @ 771 DATA
+	GetStdHandle @ 772 DATA
+	GetSystemTimeAsFileTime @ 773 DATA
+	GetThreadPriority @ 774 DATA
+	GetTickCount @ 775 DATA
+	InitializeCriticalSection @ 776 DATA
+	InitializeCriticalSectionAndSpinCount @ 777 DATA
+	IsDBCSLeadByteEx @ 778 DATA
+	LeaveCriticalSection @ 779 DATA
+	LoadLibraryW @ 780 DATA
+	MessageBoxW @ 781 DATA
+	MultiByteToWideChar @ 782 DATA
+	QueryPerformanceCounter @ 783 DATA
+	ReleaseSemaphore @ 784 DATA
+	RtlAddFunctionTable @ 785 DATA
+	RtlCaptureContext @ 786 DATA
+	RtlLookupFunctionEntry @ 787 DATA
+	RtlVirtualUnwind @ 788 DATA
+	SetEvent @ 789 DATA
+	SetThreadPriority @ 790 DATA
+	SetUnhandledExceptionFilter @ 791 DATA
+	Sleep @ 792 DATA
+	TerminateProcess @ 793 DATA
+	TlsGetValue @ 794 DATA
+	UnhandledExceptionFilter @ 795 DATA
+	VirtualProtect @ 796 DATA
+	VirtualQuery @ 797 DATA
+	WaitForSingleObject @ 798 DATA
+	WaitNamedPipeW @ 799 DATA
+	WideCharToMultiByte @ 800 DATA
+	WriteConsoleW @ 801 DATA
+	_CRT_INIT @ 802
+	_CRT_MT @ 803 DATA
+	_FindPESection @ 804
+	_FindPESectionByName @ 805
+	_FindPESectionExec @ 806
+	_GetPEImageBase @ 807
+	_IsNonwritableInCurrentImage @ 808
+	_ValidateImageBase @ 809
+	__Balloc_D2A @ 810
+	__Bfree_D2A @ 811
+	__CTOR_LIST__ @ 812 DATA
+	__DTOR_LIST__ @ 813 DATA
+	__IAT_end__ @ 814 DATA
+	__IAT_start__ @ 815 DATA
+	__ImageBase @ 816 DATA
+	__RUNTIME_PSEUDO_RELOC_LIST_END__ @ 817 DATA
+	__RUNTIME_PSEUDO_RELOC_LIST__ @ 818 DATA
+	___CTOR_LIST__ @ 819 DATA
+	___DTOR_LIST__ @ 820 DATA
+	___RUNTIME_PSEUDO_RELOC_LIST_END__ @ 821 DATA
+	___RUNTIME_PSEUDO_RELOC_LIST__ @ 822 DATA
+	___chkstk_ms @ 823 DATA
+	___crt_xc_end__ @ 824 DATA
+	___crt_xc_start__ @ 825 DATA
+	___crt_xi_end__ @ 826 DATA
+	___crt_xi_start__ @ 827 DATA
+	___crt_xl_start__ @ 828 DATA
+	___crt_xp_end__ @ 829 DATA
+	___crt_xp_start__ @ 830 DATA
+	___crt_xt_end__ @ 831 DATA
+	___crt_xt_start__ @ 832 DATA
+	___lc_codepage_func @ 833
+	___tls_end__ @ 834 DATA
+	___tls_start__ @ 835 DATA
+	___w64_mingwthr_add_key_dtor @ 836
+	___w64_mingwthr_remove_key_dtor @ 837
+	__any_on_D2A @ 838
+	__b2d_D2A @ 839
+	__bigtens_D2A @ 840 DATA
+	__bss_end__ @ 841 DATA
+	__bss_start__ @ 842 DATA
+	__cmp_D2A @ 843
+	__copybits_D2A @ 844
+	__d2b_D2A @ 845
+	__data_end__ @ 846 DATA
+	__data_start__ @ 847 DATA
+	__decrement_D2A @ 848
+	__diff_D2A @ 849
+	__dll__ @ 850 DATA
+	__dll_characteristics__ @ 851 DATA
+	__dllonexit @ 852
+	__do_global_ctors @ 853
+	__do_global_dtors @ 854
+	__doserrno @ 855
+	__dyn_tls_init @ 856
+	__dyn_tls_init_callback @ 857 DATA
+	__file_alignment__ @ 858 DATA
+	__freedtoa @ 859
+	__gcc_deregister_frame @ 860
+	__gcc_register_frame @ 861
+	__gdtoa @ 862
+	__gethex_D2A @ 863
+	__hexdig_D2A @ 864 DATA
+	__hexnan_D2A @ 865
+	__i2b_D2A @ 866
+	__image_base__ @ 867 DATA
+	__imp_CloseHandle @ 868 DATA
+	__imp_CreateEventW @ 869 DATA
+	__imp_CreateSemaphoreW @ 870 DATA
+	__imp_DeleteCriticalSection @ 871 DATA
+	__imp_EnterCriticalSection @ 872 DATA
+	__imp_FreeLibrary @ 873 DATA
+	__imp_GetConsoleMode @ 874 DATA
+	__imp_GetCurrentProcess @ 875 DATA
+	__imp_GetCurrentProcessId @ 876 DATA
+	__imp_GetCurrentThread @ 877 DATA
+	__imp_GetCurrentThreadId @ 878 DATA
+	__imp_GetLastError @ 879 DATA
+	__imp_GetModuleFileNameW @ 880 DATA
+	__imp_GetModuleHandleW @ 881 DATA
+	__imp_GetProcAddress @ 882 DATA
+	__imp_GetProcessAffinityMask @ 883 DATA
+	__imp_GetStdHandle @ 884 DATA
+	__imp_GetSystemTimeAsFileTime @ 885 DATA
+	__imp_GetThreadPriority @ 886 DATA
+	__imp_GetTickCount @ 887 DATA
+	__imp_InitializeCriticalSection @ 888 DATA
+	__imp_InitializeCriticalSectionAndSpinCount @ 889 DATA
+	__imp_IsDBCSLeadByteEx @ 890 DATA
+	__imp_LeaveCriticalSection @ 891 DATA
+	__imp_LoadLibraryW @ 892 DATA
+	__imp_MessageBoxW @ 893 DATA
+	__imp_MultiByteToWideChar @ 894 DATA
+	__imp_QueryPerformanceCounter @ 895 DATA
+	__imp_ReleaseSemaphore @ 896 DATA
+	__imp_RtlAddFunctionTable @ 897 DATA
+	__imp_RtlCaptureContext @ 898 DATA
+	__imp_RtlLookupFunctionEntry @ 899 DATA
+	__imp_RtlVirtualUnwind @ 900 DATA
+	__imp_SetEvent @ 901 DATA
+	__imp_SetThreadPriority @ 902 DATA
+	__imp_SetUnhandledExceptionFilter @ 903 DATA
+	__imp_Sleep @ 904 DATA
+	__imp_TerminateProcess @ 905 DATA
+	__imp_TlsGetValue @ 906 DATA
+	__imp_UnhandledExceptionFilter @ 907 DATA
+	__imp_VirtualProtect @ 908 DATA
+	__imp_VirtualQuery @ 909 DATA
+	__imp_WaitForSingleObject @ 910 DATA
+	__imp_WaitNamedPipeW @ 911 DATA
+	__imp_WideCharToMultiByte @ 912 DATA
+	__imp_WriteConsoleW @ 913 DATA
+	__imp____lc_codepage_func @ 914 DATA
+	__imp___dllonexit @ 915 DATA
+	__imp___doserrno @ 916 DATA
+	__imp___iob_func @ 917 DATA
+	__imp___mb_cur_max @ 918 DATA
+	__imp___pioinfo @ 919 DATA
+	__imp___setusermatherr @ 920 DATA
+	__imp__amsg_exit @ 921 DATA
+	__imp__beginthreadex @ 922 DATA
+	__imp__errno @ 923 DATA
+	__imp__exit @ 924 DATA
+	__imp__filelengthi64 @ 925 DATA
+	__imp__fileno @ 926 DATA
+	__imp__fstat64 @ 927 DATA
+	__imp__ftime64 @ 928 DATA
+	__imp__get_output_format @ 929 DATA
+	__imp__initterm @ 930 DATA
+	__imp__lock @ 931 DATA
+	__imp__lock_file @ 932 DATA
+	__imp__lseeki64 @ 933 DATA
+	__imp__onexit @ 934 DATA
+	__imp__set_output_format @ 935 DATA
+	__imp__snwprintf @ 936 DATA
+	__imp__stricmp @ 937 DATA
+	__imp__strnicmp @ 938 DATA
+	__imp__unlock @ 939 DATA
+	__imp__unlock_file @ 940 DATA
+	__imp__wfopen @ 941 DATA
+	__imp__wrename @ 942 DATA
+	__imp__write @ 943 DATA
+	__imp__wstat64 @ 944 DATA
+	__imp__wunlink @ 945 DATA
+	__imp_abort @ 946 DATA
+	__imp_calloc @ 947 DATA
+	__imp_fclose @ 948 DATA
+	__imp_fflush @ 949 DATA
+	__imp_fgetpos @ 950 DATA
+	__imp_fileno @ 951 DATA
+	__imp_fprintf @ 952 DATA
+	__imp_fputc @ 953 DATA
+	__imp_fputs @ 954 DATA
+	__imp_fread @ 955 DATA
+	__imp_free @ 956 DATA
+	__imp_fsetpos @ 957 DATA
+	__imp_fwprintf @ 958 DATA
+	__imp_fwrite @ 959 DATA
+	__imp_getc @ 960 DATA
+	__imp_getenv @ 961 DATA
+	__imp_islower @ 962 DATA
+	__imp_isspace @ 963 DATA
+	__imp_isupper @ 964 DATA
+	__imp_isxdigit @ 965 DATA
+	__imp_localeconv @ 966 DATA
+	__imp_log10 @ 967 DATA
+	__imp_malloc @ 968 DATA
+	__imp_memcpy @ 969 DATA
+	__imp_memmove @ 970 DATA
+	__imp_memset @ 971 DATA
+	__imp_raise @ 972 DATA
+	__imp_realloc @ 973 DATA
+	__imp_rewind @ 974 DATA
+	__imp_signal @ 975 DATA
+	__imp_strchr @ 976 DATA
+	__imp_strcmp @ 977 DATA
+	__imp_strcpy @ 978 DATA
+	__imp_strcspn @ 979 DATA
+	__imp_strdup @ 980 DATA
+	__imp_strerror @ 981 DATA
+	__imp_strlen @ 982 DATA
+	__imp_strncmp @ 983 DATA
+	__imp_strpbrk @ 984 DATA
+	__imp_strstr @ 985 DATA
+	__imp_strtok @ 986 DATA
+	__imp_strtol @ 987 DATA
+	__imp_strtoul @ 988 DATA
+	__imp_tolower @ 989 DATA
+	__imp_ungetc @ 990 DATA
+	__imp_vfprintf @ 991 DATA
+	__imp_wcscpy @ 992 DATA
+	__imp_wcslen @ 993 DATA
+	__increment_D2A @ 994
+	__iob_func @ 995
+	__lib64_libkernel32_a_iname @ 996 DATA
+	__lib64_libmsvcrt_a_iname @ 997 DATA
+	__lib64_libuser32_a_iname @ 998 DATA
+	__loader_flags__ @ 999 DATA
+	__logl_internal @ 1000
+	__lshift_D2A @ 1001
+	__main @ 1002
+	__major_image_version__ @ 1003 DATA
+	__major_os_version__ @ 1004 DATA
+	__major_subsystem_version__ @ 1005 DATA
+	__match_D2A @ 1006
+	__mingw_GetSectionCount @ 1007
+	__mingw_GetSectionForAddress @ 1008
+	__mingw_SEH_error_handler @ 1009
+	__mingw_TLScallback @ 1010
+	__mingw_enum_import_library_names @ 1011
+	__mingw_hexdig_init_D2A @ 1012
+	__mingw_init_ehandler @ 1013
+	__mingw_oldexcpt_handler @ 1014 DATA
+	__mingw_pformat @ 1015
+	__mingw_raise_matherr @ 1016
+	__mingw_setusermatherr @ 1017
+	__mingw_strtod @ 1018
+	__mingw_strtof @ 1019
+	__mingw_strtold @ 1020
+	__mingw_vfprintf @ 1021
+	__mingw_vfscanf @ 1022
+	__mingw_vsnprintf @ 1023
+	__mingw_vsprintf @ 1024
+	__mingw_vsscanf @ 1025
+	__minor_image_version__ @ 1026 DATA
+	__minor_os_version__ @ 1027 DATA
+	__minor_subsystem_version__ @ 1028 DATA
+	__mult_D2A @ 1029
+	__multadd_D2A @ 1030
+	__native_dllmain_reason @ 1031 DATA
+	__native_startup_lock @ 1032 DATA
+	__native_startup_state @ 1033 DATA
+	__native_vcclrit_reason @ 1034 DATA
+	__nrv_alloc_D2A @ 1035
+	__onexitbegin @ 1036 DATA
+	__onexitend @ 1037 DATA
+	__pow5mult_D2A @ 1038
+	__powi @ 1039
+	__quorem_D2A @ 1040
+	__ratio_D2A @ 1041
+	__report_gsfailure @ 1042
+	__rshift_D2A @ 1043
+	__rt_psrelocs_end @ 1044 DATA
+	__rt_psrelocs_size @ 1045 DATA
+	__rt_psrelocs_start @ 1046 DATA
+	__rv_alloc_D2A @ 1047
+	__s2b_D2A @ 1048
+	__section_alignment__ @ 1049 DATA
+	__security_cookie @ 1050 DATA
+	__security_cookie_complement @ 1051 DATA
+	__security_init_cookie @ 1052
+	__set_ones_D2A @ 1053
+	__setusermatherr @ 1054
+	__size_of_heap_commit__ @ 1055 DATA
+	__size_of_heap_reserve__ @ 1056 DATA
+	__size_of_stack_commit__ @ 1057 DATA
+	__size_of_stack_reserve__ @ 1058 DATA
+	__strcp_D2A @ 1059
+	__strtod @ 1060
+	__strtodg @ 1061
+	__strtof @ 1062
+	__strtold @ 1063
+	__subsystem__ @ 1064 DATA
+	__sum_D2A @ 1065
+	__tens_D2A @ 1066 DATA
+	__tinytens_D2A @ 1067 DATA
+	__tlregdtor @ 1068
+	__trailz_D2A @ 1069
+	__xc_a @ 1070 DATA
+	__xc_z @ 1071 DATA
+	__xi_a @ 1072 DATA
+	__xi_z @ 1073 DATA
+	__xl_a @ 1074 DATA
+	__xl_c @ 1075 DATA
+	__xl_d @ 1076 DATA
+	__xl_z @ 1077 DATA
+	_amsg_exit @ 1078
+	_assert @ 1079
+	_beginthreadex @ 1080 DATA
+	_decode_pointer @ 1081
+	_encode_pointer @ 1082
+	_errno @ 1083
+	_exit @ 1084
+	_filelengthi64 @ 1085
+	_fileno @ 1086
+	_flush @ 1087
+	_fpreset @ 1088
+	_fseeki64 @ 1089
+	_fstat64 @ 1090 DATA
+	_ftelli64 @ 1091
+	_ftime64 @ 1092 DATA
+	_get_output_format @ 1093
+	_gnu_exception_handler @ 1094
+	_head_lib64_libkernel32_a @ 1095 DATA
+	_head_lib64_libmsvcrt_a @ 1096 DATA
+	_head_lib64_libuser32_a @ 1097 DATA
+	_initterm @ 1098
+	_lock @ 1099
+	_lock_file @ 1100
+	_lseeki64 @ 1101
+	_matherr @ 1102
+	_onexit @ 1103 DATA
+	_pei386_runtime_relocator @ 1104
+	_set_output_format @ 1105
+	_snwprintf @ 1106
+	_stricmp @ 1107 DATA
+	_strnicmp @ 1108 DATA
+	_tls_end @ 1109 DATA
+	_tls_index @ 1110 DATA
+	_tls_start @ 1111 DATA
+	_tls_used @ 1112 DATA
+	_unlock @ 1113
+	_unlock_file @ 1114
+	_wassert @ 1115
+	_wfopen @ 1116 DATA
+	_wrename @ 1117 DATA
+	_write @ 1118
+	_wstat64 @ 1119 DATA
+	_wunlink @ 1120 DATA
+	abort @ 1121
+	atexit @ 1122
+	calloc @ 1123
+	exp @ 1124
+	exp2l @ 1125
+	fclose @ 1126
+	fflush @ 1127
+	fgetpos @ 1128
+	fileno @ 1129
+	fpreset @ 1130
+	fprintf @ 1131
+	fputc @ 1132
+	fputs @ 1133
+	fread @ 1134
+	free @ 1135
+	fseeko64 @ 1136
+	fsetpos @ 1137
+	ftello64 @ 1138
+	fwprintf @ 1139
+	fwrite @ 1140
+	getc @ 1141
+	getenv @ 1142
+	islower @ 1143
+	isspace @ 1144
+	isupper @ 1145
+	isxdigit @ 1146
+	ldexp @ 1147
+	localeconv @ 1148
+	log @ 1149
+	log10 @ 1150
+	log2 @ 1151
+	log2f @ 1152
+	log2l @ 1153
+	malloc @ 1154
+	mbrlen @ 1155
+	mbrtowc @ 1156
+	mbsrtowcs @ 1157
+	memcpy @ 1158
+	memmove @ 1159
+	memset @ 1160
+	mingw_app_type @ 1161 DATA
+	mingw_dosmaperr @ 1162
+	mingw_initltsdrot_force @ 1163 DATA
+	mingw_initltsdyn_force @ 1164 DATA
+	mingw_initltssuo_force @ 1165 DATA
+	mingw_onexit @ 1166
+	pcinit @ 1167 DATA
+	pow @ 1168
+	raise @ 1169
+	realloc @ 1170
+	rewind @ 1171
+	signal @ 1172
+	strchr @ 1173
+	strcmp @ 1174
+	strcpy @ 1175
+	strcspn @ 1176
+	strdup @ 1177
+	strerror @ 1178
+	strlen @ 1179
+	strncmp @ 1180
+	strnlen @ 1181
+	strpbrk @ 1182
+	strstr @ 1183
+	strtoimax @ 1184
+	strtok @ 1185
+	strtol @ 1186
+	strtoll @ 1187
+	strtoul @ 1188
+	strtoull @ 1189
+	strtoumax @ 1190
+	tolower @ 1191
+	ungetc @ 1192
+	vfprintf @ 1193
+	wcrtomb @ 1194
+	wcscpy @ 1195
+	wcslen @ 1196
+	wcsnlen @ 1197
+	wcsrtombs @ 1198
+	x264_adaptive_quant_frame @ 1199
+	x264_add16x16_idct8_avx @ 1200 DATA
+	x264_add16x16_idct8_sse2 @ 1201 DATA
+	x264_add16x16_idct_avx @ 1202 DATA
+	x264_add16x16_idct_avx2 @ 1203 DATA
+	x264_add16x16_idct_dc_avx @ 1204 DATA
+	x264_add16x16_idct_dc_avx2 @ 1205 DATA
+	x264_add16x16_idct_dc_mmx2 @ 1206 DATA
+	x264_add16x16_idct_dc_sse2 @ 1207 DATA
+	x264_add16x16_idct_dc_ssse3 @ 1208 DATA
+	x264_add16x16_idct_sse2 @ 1209 DATA
+	x264_add4x4_idct_avx @ 1210 DATA
+	x264_add4x4_idct_mmx @ 1211 DATA
+	x264_add4x4_idct_sse4 @ 1212 DATA
+	x264_add8x8_idct8_avx @ 1213 DATA
+	"x264_add8x8_idct8_avx.skip_prologue" @ 1214 DATA
+	x264_add8x8_idct8_sse2 @ 1215 DATA
+	"x264_add8x8_idct8_sse2.skip_prologue" @ 1216 DATA
+	x264_add8x8_idct_avx @ 1217 DATA
+	"x264_add8x8_idct_avx.skip_prologue" @ 1218 DATA
+	x264_add8x8_idct_avx2 @ 1219 DATA
+	"x264_add8x8_idct_avx2.skip_prologue" @ 1220 DATA
+	x264_add8x8_idct_avx512 @ 1221 DATA
+	x264_add8x8_idct_dc_mmx2 @ 1222 DATA
+	x264_add8x8_idct_dc_ssse3 @ 1223 DATA
+	x264_add8x8_idct_sse2 @ 1224 DATA
+	"x264_add8x8_idct_sse2.skip_prologue" @ 1225 DATA
+	x264_analyse_free_costs @ 1226
+	x264_analyse_init_costs @ 1227
+	x264_analyse_weight_frame @ 1228
+	x264_bit_depth @ 1229 DATA
+	x264_bitstream_init @ 1230
+	x264_cabac_block_residual_8x8_rd_c @ 1231
+	x264_cabac_block_residual_8x8_rd_internal_avx512 @ 1232 DATA
+	x264_cabac_block_residual_8x8_rd_internal_lzcnt @ 1233 DATA
+	x264_cabac_block_residual_8x8_rd_internal_sse2 @ 1234 DATA
+	x264_cabac_block_residual_8x8_rd_internal_ssse3 @ 1235 DATA
+	x264_cabac_block_residual_8x8_rd_internal_ssse3_lzcnt @ 1236 DATA
+	x264_cabac_block_residual_c @ 1237
+	x264_cabac_block_residual_internal_avx2 @ 1238 DATA
+	x264_cabac_block_residual_internal_avx512 @ 1239 DATA
+	x264_cabac_block_residual_internal_lzcnt @ 1240 DATA
+	x264_cabac_block_residual_internal_sse2 @ 1241 DATA
+	x264_cabac_block_residual_rd_c @ 1242
+	x264_cabac_block_residual_rd_internal_avx512 @ 1243 DATA
+	x264_cabac_block_residual_rd_internal_lzcnt @ 1244 DATA
+	x264_cabac_block_residual_rd_internal_sse2 @ 1245 DATA
+	x264_cabac_block_residual_rd_internal_ssse3 @ 1246 DATA
+	x264_cabac_block_residual_rd_internal_ssse3_lzcnt @ 1247 DATA
+	x264_cabac_context_init @ 1248
+	x264_cabac_contexts @ 1249 DATA
+	x264_cabac_encode_bypass_asm @ 1250
+	x264_cabac_encode_bypass_bmi2 @ 1251 DATA
+	x264_cabac_encode_bypass_c @ 1252
+	x264_cabac_encode_decision_asm @ 1253
+	x264_cabac_encode_decision_bmi2 @ 1254 DATA
+	x264_cabac_encode_decision_c @ 1255
+	x264_cabac_encode_flush @ 1256
+	x264_cabac_encode_init @ 1257
+	x264_cabac_encode_init_core @ 1258
+	x264_cabac_encode_terminal_asm @ 1259
+	x264_cabac_encode_terminal_c @ 1260
+	x264_cabac_encode_ue_bypass @ 1261
+	x264_cabac_entropy @ 1262 DATA
+	x264_cabac_init @ 1263
+	x264_cabac_mb_skip @ 1264
+	x264_cabac_range_lps @ 1265 DATA
+	x264_cabac_renorm_shift @ 1266 DATA
+	x264_cabac_size_unary @ 1267 DATA
+	x264_cabac_transition @ 1268 DATA
+	x264_cabac_transition_unary @ 1269 DATA
+	x264_cache_mv_func_table @ 1270 DATA
+	x264_cache_mvd_func_table @ 1271 DATA
+	x264_cache_ref_func_table @ 1272 DATA
+	x264_cavlc_init @ 1273
+	x264_chroma_format @ 1274 DATA
+	x264_chroma_inter_body_avx @ 1275 DATA
+	x264_chroma_inter_body_sse2 @ 1276 DATA
+	x264_chroma_intra_body_avx @ 1277 DATA
+	x264_chroma_intra_body_mmx2 @ 1278 DATA
+	x264_chroma_intra_body_sse2 @ 1279 DATA
+	x264_coeff0_token @ 1280 DATA
+	x264_coeff_abs_level_m1_offset @ 1281 DATA
+	x264_coeff_flag_offset_chroma_422_dc @ 1282 DATA
+	x264_coeff_last15_avx512 @ 1283 DATA
+	x264_coeff_last15_lzcnt @ 1284 DATA
+	x264_coeff_last15_sse2 @ 1285 DATA
+	x264_coeff_last16_avx512 @ 1286 DATA
+	x264_coeff_last16_lzcnt @ 1287 DATA
+	x264_coeff_last16_sse2 @ 1288 DATA
+	x264_coeff_last4_lzcnt @ 1289 DATA
+	x264_coeff_last4_mmx2 @ 1290 DATA
+	x264_coeff_last64_avx2 @ 1291 DATA
+	x264_coeff_last64_avx512 @ 1292 DATA
+	x264_coeff_last64_lzcnt @ 1293 DATA
+	x264_coeff_last64_sse2 @ 1294 DATA
+	x264_coeff_last8_avx512 @ 1295 DATA
+	x264_coeff_last8_lzcnt @ 1296 DATA
+	x264_coeff_last8_mmx2 @ 1297 DATA
+	x264_coeff_level_run15_avx2 @ 1298 DATA
+	x264_coeff_level_run15_lzcnt @ 1299 DATA
+	x264_coeff_level_run15_sse2 @ 1300 DATA
+	x264_coeff_level_run15_ssse3 @ 1301 DATA
+	x264_coeff_level_run15_ssse3_lzcnt @ 1302 DATA
+	x264_coeff_level_run16_avx2 @ 1303 DATA
+	x264_coeff_level_run16_lzcnt @ 1304 DATA
+	x264_coeff_level_run16_sse2 @ 1305 DATA
+	x264_coeff_level_run16_ssse3 @ 1306 DATA
+	x264_coeff_level_run16_ssse3_lzcnt @ 1307 DATA
+	x264_coeff_level_run4_lzcnt @ 1308 DATA
+	x264_coeff_level_run4_mmx2 @ 1309 DATA
+	x264_coeff_level_run4_ssse3 @ 1310 DATA
+	x264_coeff_level_run4_ssse3_lzcnt @ 1311 DATA
+	x264_coeff_level_run8_lzcnt @ 1312 DATA
+	x264_coeff_level_run8_mmx2 @ 1313 DATA
+	x264_coeff_level_run8_ssse3 @ 1314 DATA
+	x264_coeff_level_run8_ssse3_lzcnt @ 1315 DATA
+	x264_coeff_token @ 1316 DATA
+	x264_copy_column8 @ 1317
+	x264_count_cat_m1 @ 1318 DATA
+	x264_cpu_cpuid @ 1319
+	x264_cpu_detect @ 1320
+	x264_cpu_emms @ 1321 DATA
+	x264_cpu_names @ 1322 DATA
+	x264_cpu_num_processors @ 1323
+	x264_cpu_sfence @ 1324
+	x264_cpu_xgetbv @ 1325
+	x264_cqm_delete @ 1326
+	x264_cqm_init @ 1327
+	x264_cqm_parse_file @ 1328
+	x264_dct2x4dc_mmx2 @ 1329 DATA
+	x264_dct4_weight2_tab @ 1330 DATA
+	x264_dct4_weight_tab @ 1331 DATA
+	x264_dct4x4dc_mmx2 @ 1332 DATA
+	x264_dct4x4x4_internal_avx512 @ 1333 DATA
+	x264_dct8_weight2_tab @ 1334 DATA
+	x264_dct8_weight_tab @ 1335 DATA
+	x264_dct_init @ 1336
+	x264_deblock_h_chroma_422_avx @ 1337 DATA
+	x264_deblock_h_chroma_422_intra_avx @ 1338 DATA
+	x264_deblock_h_chroma_422_intra_sse2 @ 1339 DATA
+	x264_deblock_h_chroma_422_mmx2 @ 1340 DATA
+	x264_deblock_h_chroma_422_sse2 @ 1341 DATA
+	x264_deblock_h_chroma_avx @ 1342 DATA
+	x264_deblock_h_chroma_intra_avx @ 1343 DATA
+	x264_deblock_h_chroma_intra_mbaff_mmx2 @ 1344 DATA
+	x264_deblock_h_chroma_intra_sse2 @ 1345 DATA
+	x264_deblock_h_chroma_mbaff_sse2 @ 1346 DATA
+	x264_deblock_h_chroma_sse2 @ 1347 DATA
+	x264_deblock_h_luma_avx @ 1348 DATA
+	x264_deblock_h_luma_intra_avx @ 1349 DATA
+	x264_deblock_h_luma_intra_sse2 @ 1350 DATA
+	x264_deblock_h_luma_sse2 @ 1351 DATA
+	x264_deblock_init @ 1352
+	x264_deblock_strength_avx @ 1353 DATA
+	x264_deblock_strength_avx2 @ 1354 DATA
+	x264_deblock_strength_avx512 @ 1355 DATA
+	x264_deblock_strength_sse2 @ 1356 DATA
+	x264_deblock_strength_ssse3 @ 1357 DATA
+	x264_deblock_v_chroma_avx @ 1358 DATA
+	x264_deblock_v_chroma_intra_avx @ 1359 DATA
+	x264_deblock_v_chroma_intra_sse2 @ 1360 DATA
+	x264_deblock_v_chroma_sse2 @ 1361 DATA
+	x264_deblock_v_luma_avx @ 1362 DATA
+	x264_deblock_v_luma_intra_avx @ 1363 DATA
+	x264_deblock_v_luma_intra_sse2 @ 1364 DATA
+	x264_deblock_v_luma_sse2 @ 1365 DATA
+	x264_decimate_score15_avx512 @ 1366 DATA
+	x264_decimate_score15_sse2 @ 1367 DATA
+	x264_decimate_score15_ssse3 @ 1368 DATA
+	x264_decimate_score16_avx512 @ 1369 DATA
+	x264_decimate_score16_sse2 @ 1370 DATA
+	x264_decimate_score16_ssse3 @ 1371 DATA
+	x264_decimate_score64_avx2 @ 1372 DATA
+	x264_decimate_score64_avx512 @ 1373 DATA
+	x264_decimate_score64_sse2 @ 1374 DATA
+	x264_decimate_score64_ssse3 @ 1375 DATA
+	x264_decimate_table4 @ 1376 DATA
+	x264_decimate_table8 @ 1377 DATA
+	x264_deinterleave_shufd @ 1378 DATA
+	x264_denoise_dct_avx @ 1379 DATA
+	x264_denoise_dct_avx2 @ 1380 DATA
+	x264_denoise_dct_sse2 @ 1381 DATA
+	x264_denoise_dct_ssse3 @ 1382 DATA
+	x264_dequant_4x4_avx @ 1383 DATA
+	x264_dequant_4x4_avx2 @ 1384 DATA
+	x264_dequant_4x4_avx512 @ 1385 DATA
+	x264_dequant_4x4_flat16_avx2 @ 1386 DATA
+	x264_dequant_4x4_flat16_sse2 @ 1387 DATA
+	x264_dequant_4x4_sse2 @ 1388 DATA
+	x264_dequant_4x4_xop @ 1389 DATA
+	x264_dequant_4x4dc_avx @ 1390 DATA
+	x264_dequant_4x4dc_avx2 @ 1391 DATA
+	x264_dequant_4x4dc_sse2 @ 1392 DATA
+	x264_dequant_8x8_avx @ 1393 DATA
+	x264_dequant_8x8_avx2 @ 1394 DATA
+	x264_dequant_8x8_avx512 @ 1395 DATA
+	x264_dequant_8x8_flat16_avx2 @ 1396 DATA
+	x264_dequant_8x8_flat16_avx512 @ 1397 DATA
+	x264_dequant_8x8_flat16_sse2 @ 1398 DATA
+	x264_dequant_8x8_sse2 @ 1399 DATA
+	x264_dequant_8x8_xop @ 1400 DATA
+	x264_encoder_close @ 1401
+	x264_encoder_delayed_frames @ 1402
+	x264_encoder_encode @ 1403
+	x264_encoder_headers @ 1404
+	x264_encoder_intra_refresh @ 1405
+	x264_encoder_invalidate_reference @ 1406
+	x264_encoder_maximum_delayed_frames @ 1407
+	x264_encoder_open_152 @ 1408
+	x264_encoder_parameters @ 1409
+	x264_encoder_reconfig @ 1410
+	x264_encoder_reconfig_apply @ 1411
+	x264_exp2_lut @ 1412 DATA
+	x264_expand_border_mbpair @ 1413
+	x264_field_vsad @ 1414
+	x264_filler_write @ 1415
+	x264_fopen @ 1416
+	x264_frame_cond_broadcast @ 1417
+	x264_frame_cond_wait @ 1418
+	x264_frame_copy_picture @ 1419
+	x264_frame_deblock_row @ 1420
+	x264_frame_delete @ 1421
+	x264_frame_delete_list @ 1422
+	x264_frame_expand_border @ 1423
+	x264_frame_expand_border_chroma @ 1424
+	x264_frame_expand_border_filtered @ 1425
+	x264_frame_expand_border_lowres @ 1426
+	x264_frame_expand_border_mod16 @ 1427
+	x264_frame_filter @ 1428
+	x264_frame_init_lowres @ 1429
+	x264_frame_init_lowres_core_avx @ 1430 DATA
+	x264_frame_init_lowres_core_avx2 @ 1431 DATA
+	x264_frame_init_lowres_core_mmx2 @ 1432 DATA
+	x264_frame_init_lowres_core_sse2 @ 1433 DATA
+	x264_frame_init_lowres_core_ssse3 @ 1434 DATA
+	x264_frame_init_lowres_core_xop @ 1435 DATA
+	x264_frame_new_slice @ 1436
+	x264_frame_pop @ 1437
+	x264_frame_pop_blank_unused @ 1438
+	x264_frame_pop_unused @ 1439
+	x264_frame_push @ 1440
+	x264_frame_push_blank_unused @ 1441
+	x264_frame_push_unused @ 1442
+	x264_frame_shift @ 1443
+	x264_frame_unshift @ 1444
+	x264_free @ 1445
+	x264_hadamard_ac_2x2max_mmx2 @ 1446 DATA
+	x264_hadamard_ac_4x4_mmx2 @ 1447 DATA
+	x264_hadamard_ac_8x8_avx @ 1448 DATA
+	x264_hadamard_ac_8x8_avx2 @ 1449 DATA
+	x264_hadamard_ac_8x8_mmx2 @ 1450 DATA
+	x264_hadamard_ac_8x8_sse2 @ 1451 DATA
+	x264_hadamard_ac_8x8_sse4 @ 1452 DATA
+	x264_hadamard_ac_8x8_ssse3 @ 1453 DATA
+	x264_hadamard_ac_8x8_ssse3_atom @ 1454 DATA
+	x264_hadamard_ac_8x8_xop @ 1455 DATA
+	x264_hadamard_load @ 1456 DATA
+	x264_hpel_filter_avx @ 1457 DATA
+	x264_hpel_filter_avx2 @ 1458 DATA
+	x264_hpel_filter_c_mmx2 @ 1459
+	x264_hpel_filter_h_mmx2 @ 1460
+	x264_hpel_filter_h_sse2 @ 1461
+	x264_hpel_filter_sse2 @ 1462 DATA
+	x264_hpel_filter_ssse3 @ 1463 DATA
+	x264_hpel_filter_v_mmx2 @ 1464
+	x264_hpel_filter_v_sse2 @ 1465 DATA
+	x264_hpel_ref0 @ 1466 DATA
+	x264_hpel_ref1 @ 1467 DATA
+	x264_hrd_fullness @ 1468
+	x264_hsub_mul @ 1469 DATA
+	x264_idct4x4dc_mmx @ 1470 DATA
+	x264_idct_dequant_2x4_dc_avx @ 1471 DATA
+	x264_idct_dequant_2x4_dc_sse2 @ 1472 DATA
+	x264_idct_dequant_2x4_dconly_avx @ 1473 DATA
+	x264_idct_dequant_2x4_dconly_sse2 @ 1474 DATA
+	x264_integral_init4h_avx2 @ 1475 DATA
+	x264_integral_init4h_sse4 @ 1476 DATA
+	x264_integral_init4v_avx2 @ 1477 DATA
+	x264_integral_init4v_mmx @ 1478 DATA
+	x264_integral_init4v_sse2 @ 1479 DATA
+	x264_integral_init4v_ssse3 @ 1480 DATA
+	x264_integral_init8h_avx @ 1481 DATA
+	x264_integral_init8h_avx2 @ 1482 DATA
+	x264_integral_init8h_sse4 @ 1483 DATA
+	x264_integral_init8v_avx2 @ 1484 DATA
+	x264_integral_init8v_mmx @ 1485 DATA
+	x264_integral_init8v_sse2 @ 1486 DATA
+	x264_intra_sa8d_x3_8x8 @ 1487
+	x264_intra_sa8d_x3_8x8_sse2 @ 1488 DATA
+	x264_intra_sa8d_x9_8x8_avx @ 1489 DATA
+	x264_intra_sa8d_x9_8x8_sse4 @ 1490 DATA
+	x264_intra_sa8d_x9_8x8_ssse3 @ 1491 DATA
+	x264_intra_sad_x3_16x16 @ 1492
+	x264_intra_sad_x3_16x16_avx2 @ 1493 DATA
+	x264_intra_sad_x3_16x16_mmx2 @ 1494 DATA
+	x264_intra_sad_x3_16x16_sse2 @ 1495 DATA
+	x264_intra_sad_x3_16x16_ssse3 @ 1496 DATA
+	x264_intra_sad_x3_4x4 @ 1497
+	x264_intra_sad_x3_4x4_mmx2 @ 1498 DATA
+	x264_intra_sad_x3_8x16c @ 1499
+	x264_intra_sad_x3_8x16c_mmx2 @ 1500
+	x264_intra_sad_x3_8x16c_sse2 @ 1501
+	x264_intra_sad_x3_8x8 @ 1502
+	x264_intra_sad_x3_8x8_mmx2 @ 1503 DATA
+	x264_intra_sad_x3_8x8c @ 1504
+	x264_intra_sad_x3_8x8c_avx2 @ 1505 DATA
+	x264_intra_sad_x3_8x8c_mmx2 @ 1506 DATA
+	x264_intra_sad_x3_8x8c_ssse3 @ 1507 DATA
+	x264_intra_sad_x9_4x4_avx @ 1508 DATA
+	x264_intra_sad_x9_4x4_sse4 @ 1509 DATA
+	x264_intra_sad_x9_4x4_ssse3 @ 1510 DATA
+	x264_intra_sad_x9_8x8_avx @ 1511 DATA
+	x264_intra_sad_x9_8x8_avx2 @ 1512 DATA
+	x264_intra_sad_x9_8x8_sse4 @ 1513 DATA
+	x264_intra_sad_x9_8x8_ssse3 @ 1514 DATA
+	x264_intra_satd_x3_16x16 @ 1515
+	x264_intra_satd_x3_16x16_mmx2 @ 1516 DATA
+	x264_intra_satd_x3_16x16_ssse3 @ 1517 DATA
+	x264_intra_satd_x3_4x4 @ 1518
+	x264_intra_satd_x3_4x4_mmx2 @ 1519 DATA
+	x264_intra_satd_x3_4x4_ssse3 @ 1520 DATA
+	x264_intra_satd_x3_8x16c @ 1521
+	x264_intra_satd_x3_8x16c_avx @ 1522
+	x264_intra_satd_x3_8x16c_mmx2 @ 1523
+	x264_intra_satd_x3_8x16c_sse2 @ 1524
+	x264_intra_satd_x3_8x16c_sse4 @ 1525
+	x264_intra_satd_x3_8x16c_ssse3 @ 1526
+	x264_intra_satd_x3_8x16c_xop @ 1527
+	x264_intra_satd_x3_8x8c @ 1528
+	x264_intra_satd_x3_8x8c_mmx2 @ 1529 DATA
+	x264_intra_satd_x3_8x8c_ssse3 @ 1530 DATA
+	x264_intra_satd_x9_4x4_avx @ 1531 DATA
+	x264_intra_satd_x9_4x4_sse4 @ 1532 DATA
+	x264_intra_satd_x9_4x4_ssse3 @ 1533 DATA
+	x264_intra_satd_x9_4x4_xop @ 1534 DATA
+	x264_is_pipe @ 1535
+	x264_iter_kludge @ 1536 DATA
+	x264_lambda2_tab @ 1537 DATA
+	x264_lambda_tab @ 1538 DATA
+	x264_last_coeff_flag_offset @ 1539 DATA
+	x264_last_coeff_flag_offset_8x8 @ 1540 DATA
+	x264_level_token @ 1541 DATA
+	x264_levels @ 1542 DATA
+	x264_load_deinterleave_chroma_fdec_sse2 @ 1543 DATA
+	x264_load_deinterleave_chroma_fdec_ssse3 @ 1544 DATA
+	x264_load_deinterleave_chroma_fenc_avx2 @ 1545 DATA
+	x264_load_deinterleave_chroma_fenc_sse2 @ 1546 DATA
+	x264_load_deinterleave_chroma_fenc_ssse3 @ 1547 DATA
+	x264_log @ 1548
+	x264_log2_lut @ 1549 DATA
+	x264_log2_lz_lut @ 1550 DATA
+	x264_lookahead_delete @ 1551
+	x264_lookahead_get_frames @ 1552
+	x264_lookahead_init @ 1553
+	x264_lookahead_is_empty @ 1554
+	x264_lookahead_put_frame @ 1555
+	x264_macroblock_analyse @ 1556
+	x264_macroblock_bipred_init @ 1557
+	x264_macroblock_cache_allocate @ 1558
+	x264_macroblock_cache_free @ 1559
+	x264_macroblock_cache_load_interlaced @ 1560
+	x264_macroblock_cache_load_progressive @ 1561
+	x264_macroblock_cache_save @ 1562
+	x264_macroblock_deblock @ 1563
+	x264_macroblock_deblock_strength @ 1564
+	x264_macroblock_encode @ 1565
+	x264_macroblock_encode_p4x4 @ 1566
+	x264_macroblock_encode_p8x8 @ 1567
+	x264_macroblock_probe_skip @ 1568
+	x264_macroblock_slice_init @ 1569
+	x264_macroblock_thread_allocate @ 1570
+	x264_macroblock_thread_free @ 1571
+	x264_macroblock_thread_init @ 1572
+	x264_macroblock_tree_read @ 1573
+	x264_macroblock_write_cabac @ 1574
+	x264_macroblock_write_cavlc @ 1575
+	x264_malloc @ 1576
+	x264_mb_encode_chroma @ 1577
+	x264_mb_mc @ 1578
+	x264_mb_mc_8x8 @ 1579
+	x264_mb_predict_mv @ 1580
+	x264_mb_predict_mv_16x16 @ 1581
+	x264_mb_predict_mv_direct16x16 @ 1582
+	x264_mb_predict_mv_pskip @ 1583
+	x264_mb_predict_mv_ref16x16 @ 1584
+	x264_mbtree_fix8_pack_avx2 @ 1585 DATA
+	x264_mbtree_fix8_pack_ssse3 @ 1586 DATA
+	x264_mbtree_fix8_unpack_avx2 @ 1587 DATA
+	x264_mbtree_fix8_unpack_ssse3 @ 1588 DATA
+	x264_mbtree_propagate_cost_avx @ 1589 DATA
+	x264_mbtree_propagate_cost_avx2 @ 1590 DATA
+	x264_mbtree_propagate_cost_avx512 @ 1591 DATA
+	x264_mbtree_propagate_cost_fma4 @ 1592 DATA
+	x264_mbtree_propagate_cost_sse2 @ 1593 DATA
+	x264_mbtree_propagate_list_internal_avx @ 1594
+	x264_mbtree_propagate_list_internal_avx2 @ 1595
+	x264_mbtree_propagate_list_internal_avx512 @ 1596
+	x264_mbtree_propagate_list_internal_ssse3 @ 1597
+	x264_mc_chroma_avx @ 1598 DATA
+	x264_mc_chroma_avx2 @ 1599 DATA
+	x264_mc_chroma_cache64_ssse3 @ 1600 DATA
+	x264_mc_chroma_mmx2 @ 1601 DATA
+	x264_mc_chroma_sse2 @ 1602 DATA
+	x264_mc_chroma_ssse3 @ 1603 DATA
+	x264_mc_copy_w16_aligned_sse @ 1604 DATA
+	x264_mc_copy_w16_mmx @ 1605
+	x264_mc_copy_w16_sse @ 1606
+	x264_mc_copy_w4_mmx @ 1607
+	x264_mc_copy_w8_mmx @ 1608
+	x264_mc_init @ 1609
+	x264_mc_init_mmx @ 1610
+	x264_mc_offsetadd_w12_mmx2 @ 1611
+	x264_mc_offsetadd_w12_sse2 @ 1612 DATA
+	x264_mc_offsetadd_w16_mmx2 @ 1613
+	x264_mc_offsetadd_w16_sse2 @ 1614
+	x264_mc_offsetadd_w20_mmx2 @ 1615
+	x264_mc_offsetadd_w20_sse2 @ 1616
+	x264_mc_offsetadd_w4_mmx2 @ 1617
+	x264_mc_offsetadd_w8_mmx2 @ 1618
+	x264_mc_offsetsub_w12_mmx2 @ 1619
+	x264_mc_offsetsub_w12_sse2 @ 1620 DATA
+	x264_mc_offsetsub_w16_mmx2 @ 1621
+	x264_mc_offsetsub_w16_sse2 @ 1622
+	x264_mc_offsetsub_w20_mmx2 @ 1623
+	x264_mc_offsetsub_w20_sse2 @ 1624
+	x264_mc_offsetsub_w4_mmx2 @ 1625
+	x264_mc_offsetsub_w8_mmx2 @ 1626
+	x264_mc_weight_w12_mmx2 @ 1627
+	x264_mc_weight_w16_avx2 @ 1628
+	x264_mc_weight_w16_mmx2 @ 1629
+	x264_mc_weight_w16_sse2 @ 1630
+	x264_mc_weight_w16_ssse3 @ 1631
+	x264_mc_weight_w20_avx2 @ 1632
+	x264_mc_weight_w20_mmx2 @ 1633
+	x264_mc_weight_w20_sse2 @ 1634
+	x264_mc_weight_w20_ssse3 @ 1635
+	x264_mc_weight_w4_mmx2 @ 1636
+	x264_mc_weight_w4_ssse3 @ 1637
+	x264_mc_weight_w8_avx2 @ 1638
+	x264_mc_weight_w8_mmx2 @ 1639
+	x264_mc_weight_w8_sse2 @ 1640
+	x264_mc_weight_w8_ssse3 @ 1641
+	x264_mdate @ 1642
+	x264_me_refine_bidir_rd @ 1643
+	x264_me_refine_bidir_satd @ 1644
+	x264_me_refine_qpel @ 1645
+	x264_me_refine_qpel_rd @ 1646
+	x264_me_refine_qpel_refdupe @ 1647
+	x264_me_search_ref @ 1648
+	x264_memcpy_aligned_avx @ 1649 DATA
+	x264_memcpy_aligned_avx512 @ 1650 DATA
+	x264_memcpy_aligned_sse @ 1651 DATA
+	x264_memzero_aligned_avx @ 1652 DATA
+	x264_memzero_aligned_avx512 @ 1653 DATA
+	x264_memzero_aligned_sse @ 1654 DATA
+	x264_nal_encode @ 1655
+	x264_nal_escape_avx2 @ 1656 DATA
+	x264_nal_escape_mmx2 @ 1657 DATA
+	x264_nal_escape_sse2 @ 1658 DATA
+	x264_noise_reduction_update @ 1659
+	x264_opencl_close_library @ 1660
+	x264_opencl_finalize_cost @ 1661
+	x264_opencl_flush @ 1662
+	x264_opencl_frame_delete @ 1663
+	x264_opencl_load_library @ 1664
+	x264_opencl_lookahead_delete @ 1665
+	x264_opencl_lookahead_init @ 1666
+	x264_opencl_lowres_init @ 1667
+	x264_opencl_motionsearch @ 1668
+	x264_opencl_precalculate_frame_cost @ 1669
+	x264_opencl_slicetype_end @ 1670
+	x264_opencl_slicetype_prep @ 1671
+	x264_optimize_chroma_2x2_dc_avx @ 1672 DATA
+	x264_optimize_chroma_2x2_dc_sse2 @ 1673 DATA
+	x264_optimize_chroma_2x2_dc_sse4 @ 1674 DATA
+	x264_optimize_chroma_2x2_dc_ssse3 @ 1675 DATA
+	x264_param2string @ 1676
+	x264_param_apply_fastfirstpass @ 1677
+	x264_param_apply_profile @ 1678
+	x264_param_default @ 1679
+	x264_param_default_preset @ 1680
+	x264_param_parse @ 1681
+	x264_pb_0 @ 1682 DATA
+	x264_pb_01 @ 1683 DATA
+	x264_pb_1 @ 1684 DATA
+	x264_pb_3 @ 1685 DATA
+	x264_pb_a1 @ 1686 DATA
+	x264_pb_shuf8x8c @ 1687 DATA
+	x264_pb_unpackbd1 @ 1688 DATA
+	x264_pb_unpackbd2 @ 1689 DATA
+	x264_pd_0123 @ 1690 DATA
+	x264_pd_1 @ 1691 DATA
+	x264_pd_1024 @ 1692 DATA
+	x264_pd_32 @ 1693 DATA
+	x264_pd_4567 @ 1694 DATA
+	x264_pd_8 @ 1695 DATA
+	x264_pd_ffff @ 1696 DATA
+	x264_picture_alloc @ 1697
+	x264_picture_clean @ 1698
+	x264_picture_init @ 1699
+	x264_pixel_ads1_avx @ 1700 DATA
+	x264_pixel_ads1_avx2 @ 1701 DATA
+	x264_pixel_ads1_mmx2 @ 1702 DATA
+	x264_pixel_ads1_sse2 @ 1703 DATA
+	x264_pixel_ads1_ssse3 @ 1704 DATA
+	x264_pixel_ads2_avx @ 1705 DATA
+	x264_pixel_ads2_avx2 @ 1706 DATA
+	x264_pixel_ads2_mmx2 @ 1707 DATA
+	x264_pixel_ads2_sse2 @ 1708 DATA
+	x264_pixel_ads2_ssse3 @ 1709 DATA
+	x264_pixel_ads4_avx @ 1710 DATA
+	x264_pixel_ads4_avx2 @ 1711 DATA
+	x264_pixel_ads4_mmx2 @ 1712 DATA
+	x264_pixel_ads4_sse2 @ 1713 DATA
+	x264_pixel_ads4_ssse3 @ 1714 DATA
+	x264_pixel_ads_mvs_mmx @ 1715 DATA
+	x264_pixel_ads_mvs_ssse3 @ 1716 DATA
+	x264_pixel_asd8_sse2 @ 1717 DATA
+	x264_pixel_asd8_ssse3 @ 1718 DATA
+	x264_pixel_avg2_w12_cache64_mmx2 @ 1719 DATA
+	x264_pixel_avg2_w12_mmx2 @ 1720
+	x264_pixel_avg2_w16_cache64_sse2 @ 1721
+	x264_pixel_avg2_w16_cache64_ssse3 @ 1722
+	x264_pixel_avg2_w16_mmx2 @ 1723
+	x264_pixel_avg2_w16_sse2 @ 1724
+	x264_pixel_avg2_w20_avx2 @ 1725
+	x264_pixel_avg2_w20_cache64_sse2 @ 1726
+	x264_pixel_avg2_w20_mmx2 @ 1727
+	x264_pixel_avg2_w20_sse2 @ 1728
+	x264_pixel_avg2_w4_mmx2 @ 1729
+	x264_pixel_avg2_w8_cache64_mmx2 @ 1730
+	x264_pixel_avg2_w8_mmx2 @ 1731
+	x264_pixel_avg_16x16_avx2 @ 1732 DATA
+	x264_pixel_avg_16x16_avx512 @ 1733 DATA
+	x264_pixel_avg_16x16_mmx2 @ 1734 DATA
+	x264_pixel_avg_16x16_sse2 @ 1735 DATA
+	x264_pixel_avg_16x16_ssse3 @ 1736 DATA
+	x264_pixel_avg_16x8_avx2 @ 1737 DATA
+	x264_pixel_avg_16x8_avx512 @ 1738 DATA
+	x264_pixel_avg_16x8_mmx2 @ 1739 DATA
+	x264_pixel_avg_16x8_sse2 @ 1740 DATA
+	x264_pixel_avg_16x8_ssse3 @ 1741 DATA
+	x264_pixel_avg_4x16_mmx2 @ 1742 DATA
+	x264_pixel_avg_4x16_ssse3 @ 1743 DATA
+	x264_pixel_avg_4x2_mmx2 @ 1744 DATA
+	x264_pixel_avg_4x2_ssse3 @ 1745 DATA
+	x264_pixel_avg_4x4_mmx2 @ 1746 DATA
+	x264_pixel_avg_4x4_ssse3 @ 1747 DATA
+	x264_pixel_avg_4x8_mmx2 @ 1748 DATA
+	x264_pixel_avg_4x8_ssse3 @ 1749 DATA
+	x264_pixel_avg_8x16_avx512 @ 1750 DATA
+	x264_pixel_avg_8x16_mmx2 @ 1751 DATA
+	x264_pixel_avg_8x16_sse2 @ 1752 DATA
+	x264_pixel_avg_8x16_ssse3 @ 1753 DATA
+	x264_pixel_avg_8x4_avx512 @ 1754 DATA
+	x264_pixel_avg_8x4_mmx2 @ 1755 DATA
+	x264_pixel_avg_8x4_sse2 @ 1756 DATA
+	x264_pixel_avg_8x4_ssse3 @ 1757 DATA
+	x264_pixel_avg_8x8_avx512 @ 1758 DATA
+	x264_pixel_avg_8x8_mmx2 @ 1759 DATA
+	x264_pixel_avg_8x8_sse2 @ 1760 DATA
+	x264_pixel_avg_8x8_ssse3 @ 1761 DATA
+	x264_pixel_avg_w16_avx2 @ 1762 DATA
+	x264_pixel_avg_w16_mmx2 @ 1763 DATA
+	x264_pixel_avg_w16_sse2 @ 1764 DATA
+	x264_pixel_avg_w4_mmx2 @ 1765 DATA
+	x264_pixel_avg_w8_mmx2 @ 1766 DATA
+	x264_pixel_avg_weight_w16_avx2 @ 1767 DATA
+	x264_pixel_avg_weight_w16_avx512 @ 1768 DATA
+	x264_pixel_avg_weight_w16_mmx2 @ 1769 DATA
+	x264_pixel_avg_weight_w16_sse2 @ 1770 DATA
+	x264_pixel_avg_weight_w16_ssse3 @ 1771 DATA
+	x264_pixel_avg_weight_w4_mmx2 @ 1772 DATA
+	x264_pixel_avg_weight_w4_ssse3 @ 1773 DATA
+	x264_pixel_avg_weight_w8_avx512 @ 1774 DATA
+	x264_pixel_avg_weight_w8_mmx2 @ 1775 DATA
+	x264_pixel_avg_weight_w8_sse2 @ 1776 DATA
+	x264_pixel_avg_weight_w8_ssse3 @ 1777 DATA
+	x264_pixel_hadamard_ac_16x16_avx @ 1778 DATA
+	x264_pixel_hadamard_ac_16x16_avx2 @ 1779 DATA
+	x264_pixel_hadamard_ac_16x16_mmx2 @ 1780 DATA
+	x264_pixel_hadamard_ac_16x16_sse2 @ 1781 DATA
+	x264_pixel_hadamard_ac_16x16_sse4 @ 1782 DATA
+	x264_pixel_hadamard_ac_16x16_ssse3 @ 1783 DATA
+	x264_pixel_hadamard_ac_16x16_ssse3_atom @ 1784 DATA
+	x264_pixel_hadamard_ac_16x16_xop @ 1785 DATA
+	x264_pixel_hadamard_ac_16x8_avx @ 1786 DATA
+	x264_pixel_hadamard_ac_16x8_avx2 @ 1787 DATA
+	x264_pixel_hadamard_ac_16x8_mmx2 @ 1788 DATA
+	x264_pixel_hadamard_ac_16x8_sse2 @ 1789 DATA
+	x264_pixel_hadamard_ac_16x8_sse4 @ 1790 DATA
+	x264_pixel_hadamard_ac_16x8_ssse3 @ 1791 DATA
+	x264_pixel_hadamard_ac_16x8_ssse3_atom @ 1792 DATA
+	x264_pixel_hadamard_ac_16x8_xop @ 1793 DATA
+	x264_pixel_hadamard_ac_8x16_avx @ 1794 DATA
+	x264_pixel_hadamard_ac_8x16_mmx2 @ 1795 DATA
+	x264_pixel_hadamard_ac_8x16_sse2 @ 1796 DATA
+	x264_pixel_hadamard_ac_8x16_sse4 @ 1797 DATA
+	x264_pixel_hadamard_ac_8x16_ssse3 @ 1798 DATA
+	x264_pixel_hadamard_ac_8x16_ssse3_atom @ 1799 DATA
+	x264_pixel_hadamard_ac_8x16_xop @ 1800 DATA
+	x264_pixel_hadamard_ac_8x8_avx @ 1801 DATA
+	x264_pixel_hadamard_ac_8x8_mmx2 @ 1802 DATA
+	x264_pixel_hadamard_ac_8x8_sse2 @ 1803 DATA
+	x264_pixel_hadamard_ac_8x8_sse4 @ 1804 DATA
+	x264_pixel_hadamard_ac_8x8_ssse3 @ 1805 DATA
+	x264_pixel_hadamard_ac_8x8_ssse3_atom @ 1806 DATA
+	x264_pixel_hadamard_ac_8x8_xop @ 1807 DATA
+	x264_pixel_init @ 1808
+	x264_pixel_sa8d_16x16_avx @ 1809 DATA
+	x264_pixel_sa8d_16x16_sse2 @ 1810 DATA
+	x264_pixel_sa8d_16x16_sse4 @ 1811 DATA
+	x264_pixel_sa8d_16x16_ssse3 @ 1812 DATA
+	x264_pixel_sa8d_16x16_ssse3_atom @ 1813 DATA
+	x264_pixel_sa8d_16x16_xop @ 1814 DATA
+	x264_pixel_sa8d_8x8_avx @ 1815 DATA
+	x264_pixel_sa8d_8x8_avx2 @ 1816 DATA
+	x264_pixel_sa8d_8x8_avx512 @ 1817 DATA
+	x264_pixel_sa8d_8x8_internal_avx @ 1818 DATA
+	x264_pixel_sa8d_8x8_internal_avx2 @ 1819 DATA
+	x264_pixel_sa8d_8x8_internal_sse2 @ 1820 DATA
+	x264_pixel_sa8d_8x8_internal_sse4 @ 1821 DATA
+	x264_pixel_sa8d_8x8_internal_ssse3 @ 1822 DATA
+	x264_pixel_sa8d_8x8_internal_ssse3_atom @ 1823 DATA
+	x264_pixel_sa8d_8x8_internal_xop @ 1824 DATA
+	x264_pixel_sa8d_8x8_sse2 @ 1825 DATA
+	x264_pixel_sa8d_8x8_sse4 @ 1826 DATA
+	x264_pixel_sa8d_8x8_ssse3 @ 1827 DATA
+	x264_pixel_sa8d_8x8_ssse3_atom @ 1828 DATA
+	x264_pixel_sa8d_8x8_xop @ 1829 DATA
+	x264_pixel_sa8d_satd_16x16_avx @ 1830 DATA
+	x264_pixel_sa8d_satd_16x16_avx2 @ 1831 DATA
+	x264_pixel_sa8d_satd_16x16_sse2 @ 1832 DATA
+	x264_pixel_sa8d_satd_16x16_sse4 @ 1833 DATA
+	x264_pixel_sa8d_satd_16x16_ssse3 @ 1834 DATA
+	x264_pixel_sa8d_satd_16x16_ssse3_atom @ 1835 DATA
+	x264_pixel_sa8d_satd_16x16_xop @ 1836 DATA
+	x264_pixel_sa8d_satd_8x8_internal_avx @ 1837 DATA
+	x264_pixel_sa8d_satd_8x8_internal_avx2 @ 1838 DATA
+	x264_pixel_sa8d_satd_8x8_internal_sse2 @ 1839 DATA
+	x264_pixel_sa8d_satd_8x8_internal_sse4 @ 1840 DATA
+	x264_pixel_sa8d_satd_8x8_internal_ssse3 @ 1841 DATA
+	x264_pixel_sa8d_satd_8x8_internal_ssse3_atom @ 1842 DATA
+	x264_pixel_sa8d_satd_8x8_internal_xop @ 1843 DATA
+	x264_pixel_sad_16x16_avx512 @ 1844 DATA
+	x264_pixel_sad_16x16_cache64_ssse3 @ 1845 DATA
+	x264_pixel_sad_16x16_mmx2 @ 1846 DATA
+	x264_pixel_sad_16x16_sse2 @ 1847 DATA
+	x264_pixel_sad_16x16_sse2_aligned @ 1848 DATA
+	x264_pixel_sad_16x16_sse3 @ 1849 DATA
+	x264_pixel_sad_16x8_avx512 @ 1850 DATA
+	x264_pixel_sad_16x8_cache64_ssse3 @ 1851 DATA
+	x264_pixel_sad_16x8_mmx2 @ 1852 DATA
+	x264_pixel_sad_16x8_sse2 @ 1853 DATA
+	x264_pixel_sad_16x8_sse2_aligned @ 1854 DATA
+	x264_pixel_sad_16x8_sse3 @ 1855 DATA
+	x264_pixel_sad_4x16_avx512 @ 1856 DATA
+	x264_pixel_sad_4x16_mmx2 @ 1857 DATA
+	x264_pixel_sad_4x4_avx512 @ 1858 DATA
+	x264_pixel_sad_4x4_mmx2 @ 1859 DATA
+	x264_pixel_sad_4x8_avx512 @ 1860 DATA
+	x264_pixel_sad_4x8_mmx2 @ 1861 DATA
+	x264_pixel_sad_8x16_avx512 @ 1862 DATA
+	x264_pixel_sad_8x16_cache64_mmx2 @ 1863 DATA
+	x264_pixel_sad_8x16_mmx2 @ 1864
+	x264_pixel_sad_8x16_sse2 @ 1865
+	x264_pixel_sad_8x4_avx512 @ 1866 DATA
+	x264_pixel_sad_8x4_cache64_mmx2 @ 1867 DATA
+	x264_pixel_sad_8x4_mmx2 @ 1868 DATA
+	x264_pixel_sad_8x8_avx512 @ 1869 DATA
+	x264_pixel_sad_8x8_cache64_mmx2 @ 1870 DATA
+	x264_pixel_sad_8x8_mmx2 @ 1871 DATA
+	x264_pixel_sad_x3_16x16_avx @ 1872 DATA
+	x264_pixel_sad_x3_16x16_avx2 @ 1873 DATA
+	x264_pixel_sad_x3_16x16_avx512 @ 1874 DATA
+	x264_pixel_sad_x3_16x16_cache64_ssse3 @ 1875 DATA
+	x264_pixel_sad_x3_16x16_mmx2 @ 1876 DATA
+	x264_pixel_sad_x3_16x16_sse2 @ 1877 DATA
+	x264_pixel_sad_x3_16x16_sse3 @ 1878 DATA
+	x264_pixel_sad_x3_16x16_ssse3 @ 1879 DATA
+	x264_pixel_sad_x3_16x8_avx @ 1880 DATA
+	x264_pixel_sad_x3_16x8_avx2 @ 1881 DATA
+	x264_pixel_sad_x3_16x8_avx512 @ 1882 DATA
+	x264_pixel_sad_x3_16x8_cache64_ssse3 @ 1883 DATA
+	x264_pixel_sad_x3_16x8_mmx2 @ 1884 DATA
+	x264_pixel_sad_x3_16x8_sse2 @ 1885 DATA
+	x264_pixel_sad_x3_16x8_sse3 @ 1886 DATA
+	x264_pixel_sad_x3_16x8_ssse3 @ 1887 DATA
+	x264_pixel_sad_x3_4x4_avx512 @ 1888 DATA
+	x264_pixel_sad_x3_4x4_mmx2 @ 1889 DATA
+	x264_pixel_sad_x3_4x8_avx512 @ 1890 DATA
+	x264_pixel_sad_x3_4x8_mmx2 @ 1891 DATA
+	x264_pixel_sad_x3_8x16_avx512 @ 1892 DATA
+	x264_pixel_sad_x3_8x16_cache64_mmx2 @ 1893 DATA
+	x264_pixel_sad_x3_8x16_cache64_sse2 @ 1894 DATA
+	x264_pixel_sad_x3_8x16_mmx2 @ 1895 DATA
+	x264_pixel_sad_x3_8x16_sse2 @ 1896 DATA
+	x264_pixel_sad_x3_8x4_avx512 @ 1897 DATA
+	x264_pixel_sad_x3_8x4_mmx2 @ 1898 DATA
+	x264_pixel_sad_x3_8x4_sse2 @ 1899 DATA
+	x264_pixel_sad_x3_8x8_avx512 @ 1900 DATA
+	x264_pixel_sad_x3_8x8_cache64_mmx2 @ 1901 DATA
+	x264_pixel_sad_x3_8x8_mmx2 @ 1902 DATA
+	x264_pixel_sad_x3_8x8_sse2 @ 1903 DATA
+	x264_pixel_sad_x4_16x16_avx @ 1904 DATA
+	x264_pixel_sad_x4_16x16_avx2 @ 1905 DATA
+	x264_pixel_sad_x4_16x16_avx512 @ 1906 DATA
+	x264_pixel_sad_x4_16x16_cache64_ssse3 @ 1907 DATA
+	x264_pixel_sad_x4_16x16_mmx2 @ 1908 DATA
+	x264_pixel_sad_x4_16x16_sse2 @ 1909 DATA
+	x264_pixel_sad_x4_16x16_sse3 @ 1910 DATA
+	x264_pixel_sad_x4_16x16_ssse3 @ 1911 DATA
+	x264_pixel_sad_x4_16x8_avx @ 1912 DATA
+	x264_pixel_sad_x4_16x8_avx2 @ 1913 DATA
+	x264_pixel_sad_x4_16x8_avx512 @ 1914 DATA
+	x264_pixel_sad_x4_16x8_cache64_ssse3 @ 1915 DATA
+	x264_pixel_sad_x4_16x8_mmx2 @ 1916 DATA
+	x264_pixel_sad_x4_16x8_sse2 @ 1917 DATA
+	x264_pixel_sad_x4_16x8_sse3 @ 1918 DATA
+	x264_pixel_sad_x4_16x8_ssse3 @ 1919 DATA
+	x264_pixel_sad_x4_4x4_avx512 @ 1920 DATA
+	x264_pixel_sad_x4_4x4_mmx2 @ 1921 DATA
+	x264_pixel_sad_x4_4x8_avx512 @ 1922 DATA
+	x264_pixel_sad_x4_4x8_mmx2 @ 1923 DATA
+	x264_pixel_sad_x4_8x16_avx512 @ 1924 DATA
+	x264_pixel_sad_x4_8x16_cache64_mmx2 @ 1925 DATA
+	x264_pixel_sad_x4_8x16_cache64_sse2 @ 1926 DATA
+	x264_pixel_sad_x4_8x16_mmx2 @ 1927 DATA
+	x264_pixel_sad_x4_8x16_sse2 @ 1928 DATA
+	x264_pixel_sad_x4_8x16_ssse3 @ 1929 DATA
+	x264_pixel_sad_x4_8x4_avx512 @ 1930 DATA
+	x264_pixel_sad_x4_8x4_mmx2 @ 1931 DATA
+	x264_pixel_sad_x4_8x4_sse2 @ 1932 DATA
+	x264_pixel_sad_x4_8x4_ssse3 @ 1933 DATA
+	x264_pixel_sad_x4_8x8_avx512 @ 1934 DATA
+	x264_pixel_sad_x4_8x8_cache64_mmx2 @ 1935 DATA
+	x264_pixel_sad_x4_8x8_mmx2 @ 1936 DATA
+	x264_pixel_sad_x4_8x8_sse2 @ 1937 DATA
+	x264_pixel_sad_x4_8x8_ssse3 @ 1938 DATA
+	x264_pixel_satd_16x16_avx @ 1939
+	x264_pixel_satd_16x16_avx2 @ 1940 DATA
+	x264_pixel_satd_16x16_avx512 @ 1941 DATA
+	x264_pixel_satd_16x16_mmx2 @ 1942
+	x264_pixel_satd_16x16_sse2 @ 1943
+	x264_pixel_satd_16x16_sse4 @ 1944
+	x264_pixel_satd_16x16_ssse3 @ 1945
+	x264_pixel_satd_16x16_ssse3_atom @ 1946
+	x264_pixel_satd_16x16_xop @ 1947
+	x264_pixel_satd_16x4_internal_mmx2 @ 1948 DATA
+	x264_pixel_satd_16x8_avx @ 1949
+	x264_pixel_satd_16x8_avx2 @ 1950 DATA
+	x264_pixel_satd_16x8_avx512 @ 1951 DATA
+	x264_pixel_satd_16x8_internal_avx2 @ 1952 DATA
+	x264_pixel_satd_16x8_internal_avx512 @ 1953 DATA
+	x264_pixel_satd_16x8_mmx2 @ 1954
+	x264_pixel_satd_16x8_sse2 @ 1955
+	x264_pixel_satd_16x8_sse4 @ 1956
+	x264_pixel_satd_16x8_ssse3 @ 1957
+	x264_pixel_satd_16x8_ssse3_atom @ 1958
+	x264_pixel_satd_16x8_xop @ 1959
+	x264_pixel_satd_4x16_avx @ 1960 DATA
+	x264_pixel_satd_4x16_avx512 @ 1961 DATA
+	x264_pixel_satd_4x16_mmx2 @ 1962 DATA
+	x264_pixel_satd_4x16_sse2 @ 1963 DATA
+	x264_pixel_satd_4x16_sse4 @ 1964 DATA
+	x264_pixel_satd_4x16_ssse3 @ 1965 DATA
+	x264_pixel_satd_4x16_ssse3_atom @ 1966 DATA
+	x264_pixel_satd_4x16_xop @ 1967 DATA
+	x264_pixel_satd_4x4_avx @ 1968
+	x264_pixel_satd_4x4_avx512 @ 1969 DATA
+	x264_pixel_satd_4x4_mmx2 @ 1970
+	x264_pixel_satd_4x4_sse4 @ 1971
+	x264_pixel_satd_4x4_ssse3 @ 1972
+	x264_pixel_satd_4x4_xop @ 1973
+	x264_pixel_satd_4x8_avx @ 1974
+	x264_pixel_satd_4x8_avx512 @ 1975 DATA
+	x264_pixel_satd_4x8_internal_avx512 @ 1976 DATA
+	x264_pixel_satd_4x8_mmx2 @ 1977
+	x264_pixel_satd_4x8_sse2 @ 1978
+	x264_pixel_satd_4x8_sse4 @ 1979
+	x264_pixel_satd_4x8_ssse3 @ 1980
+	x264_pixel_satd_4x8_ssse3_atom @ 1981
+	x264_pixel_satd_4x8_xop @ 1982
+	x264_pixel_satd_8x16_avx @ 1983
+	x264_pixel_satd_8x16_avx2 @ 1984 DATA
+	x264_pixel_satd_8x16_avx512 @ 1985 DATA
+	x264_pixel_satd_8x16_mmx2 @ 1986
+	x264_pixel_satd_8x16_sse2 @ 1987
+	x264_pixel_satd_8x16_sse4 @ 1988
+	x264_pixel_satd_8x16_ssse3 @ 1989
+	x264_pixel_satd_8x16_ssse3_atom @ 1990
+	x264_pixel_satd_8x16_xop @ 1991
+	x264_pixel_satd_8x4_avx @ 1992
+	x264_pixel_satd_8x4_avx512 @ 1993 DATA
+	x264_pixel_satd_8x4_mmx2 @ 1994
+	x264_pixel_satd_8x4_sse2 @ 1995
+	x264_pixel_satd_8x4_sse4 @ 1996
+	x264_pixel_satd_8x4_ssse3 @ 1997
+	x264_pixel_satd_8x4_ssse3_atom @ 1998
+	x264_pixel_satd_8x4_xop @ 1999
+	x264_pixel_satd_8x8_avx @ 2000
+	x264_pixel_satd_8x8_avx2 @ 2001 DATA
+	x264_pixel_satd_8x8_avx512 @ 2002 DATA
+	x264_pixel_satd_8x8_internal_avx @ 2003 DATA
+	x264_pixel_satd_8x8_internal_avx2 @ 2004 DATA
+	x264_pixel_satd_8x8_internal_avx512 @ 2005 DATA
+	x264_pixel_satd_8x8_internal_mmx2 @ 2006 DATA
+	x264_pixel_satd_8x8_internal_sse2 @ 2007 DATA
+	x264_pixel_satd_8x8_internal_sse4 @ 2008 DATA
+	x264_pixel_satd_8x8_internal_ssse3 @ 2009 DATA
+	x264_pixel_satd_8x8_internal_ssse3_atom @ 2010 DATA
+	x264_pixel_satd_8x8_internal_xop @ 2011 DATA
+	x264_pixel_satd_8x8_mmx2 @ 2012
+	x264_pixel_satd_8x8_sse2 @ 2013
+	x264_pixel_satd_8x8_sse4 @ 2014
+	x264_pixel_satd_8x8_ssse3 @ 2015
+	x264_pixel_satd_8x8_ssse3_atom @ 2016
+	x264_pixel_satd_8x8_xop @ 2017
+	x264_pixel_ssd_16x16_avx @ 2018 DATA
+	x264_pixel_ssd_16x16_avx2 @ 2019 DATA
+	x264_pixel_ssd_16x16_mmx @ 2020 DATA
+	x264_pixel_ssd_16x16_sse2 @ 2021 DATA
+	x264_pixel_ssd_16x16_sse2slow @ 2022 DATA
+	x264_pixel_ssd_16x16_ssse3 @ 2023 DATA
+	x264_pixel_ssd_16x16_xop @ 2024 DATA
+	x264_pixel_ssd_16x8_avx @ 2025 DATA
+	x264_pixel_ssd_16x8_avx2 @ 2026 DATA
+	x264_pixel_ssd_16x8_mmx @ 2027 DATA
+	x264_pixel_ssd_16x8_sse2 @ 2028 DATA
+	x264_pixel_ssd_16x8_sse2slow @ 2029 DATA
+	x264_pixel_ssd_16x8_ssse3 @ 2030 DATA
+	x264_pixel_ssd_16x8_xop @ 2031 DATA
+	x264_pixel_ssd_4x16_mmx @ 2032 DATA
+	x264_pixel_ssd_4x16_ssse3 @ 2033 DATA
+	x264_pixel_ssd_4x4_mmx @ 2034 DATA
+	x264_pixel_ssd_4x4_ssse3 @ 2035 DATA
+	x264_pixel_ssd_4x8_mmx @ 2036 DATA
+	x264_pixel_ssd_4x8_ssse3 @ 2037 DATA
+	x264_pixel_ssd_8x16_avx @ 2038 DATA
+	x264_pixel_ssd_8x16_mmx @ 2039 DATA
+	x264_pixel_ssd_8x16_sse2 @ 2040 DATA
+	x264_pixel_ssd_8x16_sse2slow @ 2041 DATA
+	x264_pixel_ssd_8x16_ssse3 @ 2042 DATA
+	x264_pixel_ssd_8x16_xop @ 2043 DATA
+	x264_pixel_ssd_8x4_avx @ 2044 DATA
+	x264_pixel_ssd_8x4_mmx @ 2045 DATA
+	x264_pixel_ssd_8x4_sse2 @ 2046 DATA
+	x264_pixel_ssd_8x4_sse2slow @ 2047 DATA
+	x264_pixel_ssd_8x4_ssse3 @ 2048 DATA
+	x264_pixel_ssd_8x4_xop @ 2049 DATA
+	x264_pixel_ssd_8x8_avx @ 2050 DATA
+	x264_pixel_ssd_8x8_mmx @ 2051 DATA
+	x264_pixel_ssd_8x8_sse2 @ 2052 DATA
+	x264_pixel_ssd_8x8_sse2slow @ 2053 DATA
+	x264_pixel_ssd_8x8_ssse3 @ 2054 DATA
+	x264_pixel_ssd_8x8_xop @ 2055 DATA
+	x264_pixel_ssd_nv12 @ 2056
+	x264_pixel_ssd_nv12_core_avx @ 2057 DATA
+	x264_pixel_ssd_nv12_core_avx2 @ 2058 DATA
+	x264_pixel_ssd_nv12_core_sse2 @ 2059 DATA
+	x264_pixel_ssd_nv12_core_xop @ 2060 DATA
+	x264_pixel_ssd_wxh @ 2061
+	x264_pixel_ssim_4x4x2_core_avx @ 2062 DATA
+	x264_pixel_ssim_4x4x2_core_sse2 @ 2063 DATA
+	x264_pixel_ssim_end4_avx @ 2064 DATA
+	x264_pixel_ssim_end4_sse2 @ 2065 DATA
+	x264_pixel_ssim_wxh @ 2066
+	x264_pixel_var2_8x16_avx2 @ 2067 DATA
+	x264_pixel_var2_8x16_avx512 @ 2068 DATA
+	x264_pixel_var2_8x16_sse2 @ 2069 DATA
+	x264_pixel_var2_8x16_ssse3 @ 2070 DATA
+	x264_pixel_var2_8x8_avx2 @ 2071 DATA
+	x264_pixel_var2_8x8_avx512 @ 2072 DATA
+	x264_pixel_var2_8x8_sse2 @ 2073 DATA
+	x264_pixel_var2_8x8_ssse3 @ 2074 DATA
+	x264_pixel_var2_internal_ssse3 @ 2075 DATA
+	x264_pixel_var_16x16_avx @ 2076 DATA
+	x264_pixel_var_16x16_avx2 @ 2077 DATA
+	x264_pixel_var_16x16_avx512 @ 2078 DATA
+	x264_pixel_var_16x16_sse2 @ 2079 DATA
+	x264_pixel_var_8x16_avx @ 2080 DATA
+	x264_pixel_var_8x16_avx512 @ 2081 DATA
+	x264_pixel_var_8x16_sse2 @ 2082 DATA
+	x264_pixel_var_8x8_avx @ 2083 DATA
+	x264_pixel_var_8x8_avx512 @ 2084 DATA
+	x264_pixel_var_8x8_sse2 @ 2085 DATA
+	x264_pixel_vsad_sse2 @ 2086 DATA
+	x264_plane_copy_c @ 2087
+	x264_plane_copy_core_avx @ 2088
+	x264_plane_copy_core_sse @ 2089
+	x264_plane_copy_deinterleave_avx2 @ 2090
+	x264_plane_copy_deinterleave_c @ 2091
+	x264_plane_copy_deinterleave_rgb_avx2 @ 2092 DATA
+	x264_plane_copy_deinterleave_rgb_sse2 @ 2093 DATA
+	x264_plane_copy_deinterleave_rgb_ssse3 @ 2094 DATA
+	x264_plane_copy_deinterleave_sse2 @ 2095
+	x264_plane_copy_deinterleave_ssse3 @ 2096
+	x264_plane_copy_interleave_c @ 2097
+	x264_plane_copy_interleave_core_mmx2 @ 2098
+	x264_plane_copy_interleave_core_sse2 @ 2099
+	x264_plane_copy_swap_c @ 2100
+	x264_plane_copy_swap_core_avx2 @ 2101
+	x264_plane_copy_swap_core_ssse3 @ 2102
+	x264_popcnt_table @ 2103 DATA
+	x264_pps_init @ 2104
+	x264_pps_write @ 2105
+	x264_predict_16x16_dc_avx2 @ 2106 DATA
+	x264_predict_16x16_dc_c @ 2107
+	x264_predict_16x16_dc_left_avx2 @ 2108 DATA
+	x264_predict_16x16_dc_left_internal @ 2109 DATA
+	x264_predict_16x16_dc_left_sse2 @ 2110 DATA
+	x264_predict_16x16_dc_sse2 @ 2111 DATA
+	x264_predict_16x16_dc_top_avx2 @ 2112 DATA
+	x264_predict_16x16_dc_top_sse2 @ 2113 DATA
+	x264_predict_16x16_h_c @ 2114
+	x264_predict_16x16_h_mmx2 @ 2115 DATA
+	x264_predict_16x16_h_ssse3 @ 2116
+	x264_predict_16x16_init @ 2117
+	x264_predict_16x16_init_mmx @ 2118
+	x264_predict_16x16_p_c @ 2119
+	x264_predict_16x16_p_core_avx @ 2120
+	x264_predict_16x16_p_core_avx2 @ 2121
+	x264_predict_16x16_p_core_sse2 @ 2122
+	x264_predict_16x16_v_c @ 2123
+	x264_predict_16x16_v_mmx2 @ 2124 DATA
+	x264_predict_16x16_v_sse @ 2125 DATA
+	x264_predict_4x4_dc_c @ 2126
+	x264_predict_4x4_dc_mmx2 @ 2127 DATA
+	x264_predict_4x4_ddl_mmx2 @ 2128 DATA
+	x264_predict_4x4_ddr_mmx2 @ 2129 DATA
+	x264_predict_4x4_ddr_ssse3 @ 2130 DATA
+	x264_predict_4x4_h_c @ 2131
+	x264_predict_4x4_hd_mmx2 @ 2132 DATA
+	x264_predict_4x4_hd_ssse3 @ 2133 DATA
+	x264_predict_4x4_hu_mmx2 @ 2134 DATA
+	x264_predict_4x4_init @ 2135
+	x264_predict_4x4_init_mmx @ 2136
+	x264_predict_4x4_v_c @ 2137
+	x264_predict_4x4_vl_mmx2 @ 2138 DATA
+	x264_predict_4x4_vr_cache64_ssse3 @ 2139 DATA
+	x264_predict_4x4_vr_mmx2 @ 2140 DATA
+	x264_predict_4x4_vr_ssse3 @ 2141 DATA
+	x264_predict_8x16c_dc_c @ 2142
+	x264_predict_8x16c_dc_mmx2 @ 2143
+	x264_predict_8x16c_dc_top_mmx2 @ 2144 DATA
+	x264_predict_8x16c_h_c @ 2145
+	x264_predict_8x16c_h_mmx2 @ 2146
+	x264_predict_8x16c_h_ssse3 @ 2147 DATA
+	x264_predict_8x16c_init @ 2148
+	x264_predict_8x16c_init_mmx @ 2149
+	x264_predict_8x16c_p_c @ 2150
+	x264_predict_8x16c_p_core_avx @ 2151
+	x264_predict_8x16c_p_core_avx2 @ 2152
+	x264_predict_8x16c_p_core_sse2 @ 2153
+	x264_predict_8x16c_v_c @ 2154
+	x264_predict_8x16c_v_mmx @ 2155
+	x264_predict_8x8_dc_c @ 2156
+	x264_predict_8x8_dc_left_mmx2 @ 2157 DATA
+	x264_predict_8x8_dc_mmx2 @ 2158 DATA
+	x264_predict_8x8_dc_top_mmx2 @ 2159 DATA
+	x264_predict_8x8_ddl_avx @ 2160 DATA
+	x264_predict_8x8_ddl_sse2 @ 2161 DATA
+	x264_predict_8x8_ddl_ssse3 @ 2162 DATA
+	x264_predict_8x8_ddr_avx @ 2163 DATA
+	x264_predict_8x8_ddr_sse2 @ 2164 DATA
+	x264_predict_8x8_filter_mmx2 @ 2165 DATA
+	x264_predict_8x8_filter_ssse3 @ 2166 DATA
+	x264_predict_8x8_h_c @ 2167
+	x264_predict_8x8_h_mmx2 @ 2168 DATA
+	x264_predict_8x8_hd_avx @ 2169 DATA
+	x264_predict_8x8_hd_mmx2 @ 2170 DATA
+	x264_predict_8x8_hd_sse2 @ 2171 DATA
+	x264_predict_8x8_hu_sse2 @ 2172 DATA
+	x264_predict_8x8_hu_ssse3 @ 2173 DATA
+	x264_predict_8x8_init @ 2174
+	x264_predict_8x8_init_mmx @ 2175
+	x264_predict_8x8_v_c @ 2176
+	x264_predict_8x8_v_mmx2 @ 2177 DATA
+	x264_predict_8x8_vl_avx @ 2178 DATA
+	x264_predict_8x8_vl_mmx2 @ 2179 DATA
+	x264_predict_8x8_vl_sse2 @ 2180 DATA
+	x264_predict_8x8_vr_avx @ 2181 DATA
+	x264_predict_8x8_vr_sse2 @ 2182 DATA
+	x264_predict_8x8_vr_ssse3 @ 2183 DATA
+	x264_predict_8x8c_dc_c @ 2184
+	x264_predict_8x8c_dc_mmx2 @ 2185 DATA
+	x264_predict_8x8c_dc_top_mmx2 @ 2186 DATA
+	x264_predict_8x8c_h_c @ 2187
+	x264_predict_8x8c_h_mmx2 @ 2188 DATA
+	x264_predict_8x8c_h_ssse3 @ 2189 DATA
+	x264_predict_8x8c_init @ 2190
+	x264_predict_8x8c_init_mmx @ 2191
+	x264_predict_8x8c_p_c @ 2192
+	x264_predict_8x8c_p_core_avx @ 2193
+	x264_predict_8x8c_p_core_avx2 @ 2194
+	x264_predict_8x8c_p_core_sse2 @ 2195
+	x264_predict_8x8c_v_c @ 2196
+	x264_predict_8x8c_v_mmx @ 2197 DATA
+	x264_predict_lossless_16x16 @ 2198
+	x264_predict_lossless_4x4 @ 2199
+	x264_predict_lossless_8x8 @ 2200
+	x264_predict_lossless_chroma @ 2201
+	x264_prefetch_fenc @ 2202
+	x264_prefetch_fenc_420_mmx2 @ 2203 DATA
+	x264_prefetch_fenc_422_mmx2 @ 2204 DATA
+	x264_prefetch_ref_mmx2 @ 2205 DATA
+	x264_pthread_cond_broadcast @ 2206
+	x264_pthread_cond_destroy @ 2207
+	x264_pthread_cond_init @ 2208
+	x264_pthread_cond_signal @ 2209
+	x264_pthread_cond_wait @ 2210
+	x264_pthread_create @ 2211
+	x264_pthread_join @ 2212
+	x264_pthread_mutex_destroy @ 2213
+	x264_pthread_mutex_init @ 2214
+	x264_pthread_mutex_lock @ 2215
+	x264_pthread_mutex_unlock @ 2216
+	x264_pthread_num_processors_np @ 2217
+	x264_pw_00ff @ 2218 DATA
+	x264_pw_0to15 @ 2219 DATA
+	x264_pw_1 @ 2220 DATA
+	x264_pw_16 @ 2221 DATA
+	x264_pw_2 @ 2222 DATA
+	x264_pw_256 @ 2223 DATA
+	x264_pw_32 @ 2224 DATA
+	x264_pw_32_0 @ 2225 DATA
+	x264_pw_3fff @ 2226 DATA
+	x264_pw_4 @ 2227 DATA
+	x264_pw_512 @ 2228 DATA
+	x264_pw_64 @ 2229 DATA
+	x264_pw_8 @ 2230 DATA
+	x264_pw_8000 @ 2231 DATA
+	x264_pw_ff00 @ 2232 DATA
+	x264_pw_m2 @ 2233 DATA
+	x264_pw_pixel_max @ 2234 DATA
+	x264_pw_pmmpzzzz @ 2235 DATA
+	x264_pw_pmpmpmpm @ 2236 DATA
+	x264_pw_ppmmppmm @ 2237 DATA
+	x264_pw_ppppmmmm @ 2238 DATA
+	x264_quant_2x2_dc_mmx2 @ 2239 DATA
+	x264_quant_2x2_dc_ssse3 @ 2240 DATA
+	x264_quant_4x4_avx2 @ 2241 DATA
+	x264_quant_4x4_dc_avx2 @ 2242 DATA
+	x264_quant_4x4_dc_sse2 @ 2243 DATA
+	x264_quant_4x4_dc_sse4 @ 2244 DATA
+	x264_quant_4x4_dc_ssse3 @ 2245 DATA
+	x264_quant_4x4_sse2 @ 2246 DATA
+	x264_quant_4x4_sse4 @ 2247 DATA
+	x264_quant_4x4_ssse3 @ 2248 DATA
+	x264_quant_4x4_trellis @ 2249
+	x264_quant_4x4x4_avx2 @ 2250 DATA
+	x264_quant_4x4x4_sse2 @ 2251 DATA
+	x264_quant_4x4x4_ssse3 @ 2252 DATA
+	x264_quant_8x8_avx2 @ 2253 DATA
+	x264_quant_8x8_sse2 @ 2254 DATA
+	x264_quant_8x8_sse4 @ 2255 DATA
+	x264_quant_8x8_ssse3 @ 2256 DATA
+	x264_quant_8x8_trellis @ 2257
+	x264_quant_chroma_dc_trellis @ 2258
+	x264_quant_init @ 2259
+	x264_quant_luma_dc_trellis @ 2260
+	x264_ratecontrol_delete @ 2261
+	x264_ratecontrol_end @ 2262
+	x264_ratecontrol_init_reconfigurable @ 2263
+	x264_ratecontrol_mb @ 2264
+	x264_ratecontrol_mb_qp @ 2265
+	x264_ratecontrol_new @ 2266
+	x264_ratecontrol_qp @ 2267
+	x264_ratecontrol_set_weights @ 2268
+	x264_ratecontrol_slice_type @ 2269
+	x264_ratecontrol_start @ 2270
+	x264_ratecontrol_summary @ 2271
+	x264_ratecontrol_zone_init @ 2272
+	x264_rc_analyse_slice @ 2273
+	x264_rd_cost_part @ 2274
+	x264_rdo_init @ 2275
+	x264_reduce_fraction @ 2276
+	x264_reduce_fraction64 @ 2277
+	x264_reference_build_list_optimal @ 2278
+	x264_rename @ 2279
+	x264_run_before @ 2280 DATA
+	x264_sei_avcintra_umid_write @ 2281
+	x264_sei_avcintra_vanc_write @ 2282
+	x264_sei_buffering_period_write @ 2283
+	x264_sei_dec_ref_pic_marking_write @ 2284
+	x264_sei_frame_packing_write @ 2285
+	x264_sei_pic_timing_write @ 2286
+	x264_sei_recovery_point_write @ 2287
+	x264_sei_version_write @ 2288
+	x264_sei_write @ 2289
+	x264_significant_coeff_flag_offset @ 2290 DATA
+	x264_significant_coeff_flag_offset_8x8 @ 2291 DATA
+	x264_slicetype_analyse @ 2292
+	x264_slicetype_decide @ 2293
+	x264_slurp_file @ 2294
+	x264_sps_init @ 2295
+	x264_sps_init_reconfigurable @ 2296
+	x264_sps_write @ 2297
+	x264_stack_align @ 2298 DATA
+	x264_stat @ 2299
+	x264_store_interleave_chroma_mmx2 @ 2300 DATA
+	x264_store_interleave_chroma_sse2 @ 2301 DATA
+	x264_sub16x16_dct8_avx @ 2302 DATA
+	x264_sub16x16_dct8_avx2 @ 2303 DATA
+	x264_sub16x16_dct8_sse2 @ 2304 DATA
+	x264_sub16x16_dct8_ssse3 @ 2305 DATA
+	x264_sub16x16_dct_avx @ 2306 DATA
+	x264_sub16x16_dct_avx2 @ 2307 DATA
+	x264_sub16x16_dct_avx512 @ 2308 DATA
+	x264_sub16x16_dct_sse2 @ 2309 DATA
+	x264_sub16x16_dct_ssse3 @ 2310 DATA
+	x264_sub16x16_dct_xop @ 2311 DATA
+	x264_sub4x4_dct_avx512 @ 2312 DATA
+	x264_sub4x4_dct_mmx @ 2313 DATA
+	x264_sub4x4_dct_ssse3 @ 2314 DATA
+	x264_sub8x16_dct_dc_avx512 @ 2315 DATA
+	x264_sub8x16_dct_dc_sse2 @ 2316 DATA
+	x264_sub8x16_dct_dc_ssse3 @ 2317 DATA
+	x264_sub8x8_dct8_avx @ 2318 DATA
+	"x264_sub8x8_dct8_avx.skip_prologue" @ 2319 DATA
+	x264_sub8x8_dct8_sse2 @ 2320 DATA
+	"x264_sub8x8_dct8_sse2.skip_prologue" @ 2321 DATA
+	x264_sub8x8_dct8_ssse3 @ 2322 DATA
+	"x264_sub8x8_dct8_ssse3.skip_prologue" @ 2323 DATA
+	x264_sub8x8_dct8_xop @ 2324 DATA
+	"x264_sub8x8_dct8_xop.skip_prologue" @ 2325 DATA
+	x264_sub8x8_dct_avx @ 2326 DATA
+	"x264_sub8x8_dct_avx.skip_prologue" @ 2327 DATA
+	x264_sub8x8_dct_avx2 @ 2328 DATA
+	x264_sub8x8_dct_avx512 @ 2329 DATA
+	x264_sub8x8_dct_dc_avx512 @ 2330 DATA
+	x264_sub8x8_dct_dc_mmx2 @ 2331 DATA
+	x264_sub8x8_dct_dc_sse2 @ 2332 DATA
+	x264_sub8x8_dct_sse2 @ 2333 DATA
+	"x264_sub8x8_dct_sse2.skip_prologue" @ 2334 DATA
+	x264_sub8x8_dct_ssse3 @ 2335 DATA
+	"x264_sub8x8_dct_ssse3.skip_prologue" @ 2336 DATA
+	x264_sub8x8_dct_xop @ 2337 DATA
+	"x264_sub8x8_dct_xop.skip_prologue" @ 2338 DATA
+	x264_sw_64 @ 2339 DATA
+	x264_sync_frame_list_delete @ 2340
+	x264_sync_frame_list_init @ 2341
+	x264_sync_frame_list_pop @ 2342
+	x264_sync_frame_list_push @ 2343
+	x264_thread_sync_ratecontrol @ 2344
+	x264_threading_init @ 2345
+	x264_threadpool_delete @ 2346
+	x264_threadpool_init @ 2347
+	x264_threadpool_run @ 2348
+	x264_threadpool_wait @ 2349
+	x264_threads_distribute_ratecontrol @ 2350
+	x264_threads_merge_ratecontrol @ 2351
+	x264_threadslice_cond_broadcast @ 2352
+	x264_threadslice_cond_wait @ 2353
+	x264_total_zeros @ 2354 DATA
+	x264_total_zeros_2x2_dc @ 2355 DATA
+	x264_total_zeros_2x4_dc @ 2356 DATA
+	x264_trellis_bnode_0 @ 2357 DATA
+	x264_trellis_bnode_1 @ 2358 DATA
+	x264_trellis_cabac_4x4_psy_sse2 @ 2359 DATA
+	x264_trellis_cabac_4x4_psy_ssse3 @ 2360 DATA
+	x264_trellis_cabac_4x4_sse2 @ 2361 DATA
+	x264_trellis_cabac_4x4_ssse3 @ 2362 DATA
+	x264_trellis_cabac_8x8_psy_sse2 @ 2363 DATA
+	x264_trellis_cabac_8x8_psy_ssse3 @ 2364 DATA
+	x264_trellis_cabac_8x8_sse2 @ 2365 DATA
+	x264_trellis_cabac_8x8_ssse3 @ 2366 DATA
+	x264_trellis_cabac_chroma_422_dc_sse2 @ 2367 DATA
+	x264_trellis_cabac_chroma_422_dc_ssse3 @ 2368 DATA
+	x264_trellis_cabac_dc_sse2 @ 2369 DATA
+	x264_trellis_cabac_dc_ssse3 @ 2370 DATA
+	x264_trellis_coef0_0 @ 2371 DATA
+	x264_trellis_coef0_1 @ 2372 DATA
+	x264_trellis_coef1 @ 2373 DATA
+	x264_trellis_coefn @ 2374 DATA
+	x264_validate_levels @ 2375
+	x264_vfprintf @ 2376
+	x264_weight_none @ 2377 DATA
+	x264_weight_scale_plane @ 2378
+	x264_weights_analyse @ 2379
+	x264_win32_threading_destroy @ 2380
+	x264_win32_threading_init @ 2381
+	x264_zigzag_init @ 2382
+	x264_zigzag_interleave_8x8_cavlc_avx @ 2383 DATA
+	x264_zigzag_interleave_8x8_cavlc_avx2 @ 2384 DATA
+	x264_zigzag_interleave_8x8_cavlc_avx512 @ 2385 DATA
+	x264_zigzag_interleave_8x8_cavlc_mmx @ 2386 DATA
+	x264_zigzag_interleave_8x8_cavlc_sse2 @ 2387 DATA
+	x264_zigzag_scan_4x4_field_avx512 @ 2388 DATA
+	x264_zigzag_scan_4x4_field_sse @ 2389 DATA
+	x264_zigzag_scan_4x4_frame_avx @ 2390 DATA
+	x264_zigzag_scan_4x4_frame_avx512 @ 2391 DATA
+	x264_zigzag_scan_4x4_frame_mmx @ 2392 DATA
+	x264_zigzag_scan_4x4_frame_ssse3 @ 2393 DATA
+	x264_zigzag_scan_4x4_frame_xop @ 2394 DATA
+	x264_zigzag_scan_8x8_field_avx512 @ 2395 DATA
+	x264_zigzag_scan_8x8_field_mmx2 @ 2396 DATA
+	x264_zigzag_scan_8x8_field_xop @ 2397 DATA
+	x264_zigzag_scan_8x8_frame_avx512 @ 2398 DATA
+	x264_zigzag_scan_8x8_frame_mmx2 @ 2399 DATA
+	x264_zigzag_scan_8x8_frame_sse2 @ 2400 DATA
+	x264_zigzag_scan_8x8_frame_ssse3 @ 2401 DATA
+	x264_zigzag_scan_8x8_frame_xop @ 2402 DATA
+	x264_zigzag_sub_4x4_field_avx @ 2403 DATA
+	x264_zigzag_sub_4x4_field_ssse3 @ 2404 DATA
+	x264_zigzag_sub_4x4_frame_avx @ 2405 DATA
+	x264_zigzag_sub_4x4_frame_ssse3 @ 2406 DATA
+	x264_zigzag_sub_4x4ac_field_avx @ 2407 DATA
+	x264_zigzag_sub_4x4ac_field_ssse3 @ 2408 DATA
+	x264_zigzag_sub_4x4ac_frame_avx @ 2409 DATA
+	x264_zigzag_sub_4x4ac_frame_ssse3 @ 2410 DATA
