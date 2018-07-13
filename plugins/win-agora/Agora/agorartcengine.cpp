@@ -639,3 +639,16 @@ void AgoraRtcEngine::joinedChannelSuccess(const char* channel, unsigned int uid,
 {
 	
 }
+
+int AgoraRtcEngine::AddPublishStreamUrl(const char *url, bool transcodingEnabled)
+{
+	return m_rtcEngine->addPublishStreamUrl(url, transcodingEnabled);
+}
+int AgoraRtcEngine::RemovePublishStreamUrl(const char *url)
+{
+	return m_rtcEngine->removePublishStreamUrl(url);
+}
+int AgoraRtcEngine::SetLiveTranscoding(const LiveTranscoding &transcoding)
+{
+	return m_rtcEngine->setLiveTranscoding(transcoding);
+}

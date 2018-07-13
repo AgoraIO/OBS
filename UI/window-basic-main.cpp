@@ -6289,6 +6289,10 @@ void OBSBasic::InitAgoraServiceSettings()
 void OBSBasic::on_agoraPKButton_clicked()
 {
 	if (agoraOutputHandler->AgoraActive()){
+		std::string rtmp_url = "";
+		if (GetObsRtmpUrl(rtmp_url) && !rtmp_url.empty()){
+			obs_service_agora_remove_publish_stream_url(GetAgoraService(), rtmp_url.c_str());
+		}
 		agoraOutputHandler->StopAgora();
 		SetControlWhenPK(false);
 		SetPreviewPK(false);
@@ -6347,6 +6351,7 @@ void OBSBasic::SetControlWhenPK(bool bPK)
 		signal_handler_connect(obs_service_get_signal_handler(agoraService), "firstRemoteVideoDecoded", AgoraFirstRemoteVideoDecoded, &params);
 		signal_handler_connect(obs_service_get_signal_handler(agoraService), "userJoined", AgoraUserJoined, &params);
 		signal_handler_connect(obs_service_get_signal_handler(agoraService), "userOffline", AgoraUserOffline, &params);
+		signal_handler_connect(obs_service_get_signal_handler(agoraService), "joinChannelSuccess", AgoraJoinChannelSuccess, &params);
 
 		obsColorFormatReplacedByAgora = config_get_string(basicConfig, "Video", "ColorFormat");
 		if (obsColorFormatReplacedByAgora.empty())
@@ -6360,6 +6365,24 @@ void OBSBasic::SetControlWhenPK(bool bPK)
 	}
 
 	ResetVideo();
+}
+
+bool OBSBasic::GetObsRtmpUrl(std::string& rtmp_url)
+{
+	const char* type = obs_service_get_type(service);
+	if (strcmp(type, "rtmp_custom") != 0)
+		return false;
+
+	obs_data_t* settings = obs_service_get_settings(service);
+	const char* server = obs_data_get_string(settings, "server");
+	const char* url = obs_data_get_string(settings, "key");
+
+	if (strlen(server) == 0
+		|| strlen(url) == 0){
+		return false;
+	}
+	rtmp_url = server; rtmp_url += url;
+	return false;
 }
 
 void OBSBasic::CreateAgoraRemoteVideo()
@@ -6411,8 +6434,10 @@ void OBSBasic::AgoraJoinChannelSuccess(void* data, calldata_t* params)
 	calldata_get_int(params, "elapsed", &elapsed);
 	std::string agora_channel = calldata_string(params, "channel");
 
-	QMetaObject::invokeMethod(App()->GetMainWindow(), "OnJoinChannelSuccess", 
-		Q_ARG(std::string, agora_channel, long long, uid, long long, elapsed));
+	QMetaObject::invokeMethod(App()->GetMainWindow(), "OnJoinChannelSuccess",
+		Q_ARG(QString, agora_channel.c_str()),
+		Q_ARG(long long, uid), Q_ARG(long long, elapsed));
+		//Q_ARG(std::string, agora_channel, long long, uid, long long, elapsed));
 }
 
 void OBSBasic::AgoraError(void* data, calldata_t* params)
@@ -6442,9 +6467,12 @@ void OBSBasic::OnUserJoined(long long uid)
 	m_lstUids.push_back(uid);
 }
 
-void OBSBasic::OnJoinChannelSuccess(std::string channel, long long uid, long long elapsed)
+void OBSBasic::OnJoinChannelSuccess(QString channel, long long uid, long long elapsed)
 {
-
+	std::string rtmp_url = "";
+	if (GetObsRtmpUrl(rtmp_url) && !rtmp_url.empty()){
+		obs_service_agora_add_publish_stream_url(GetAgoraService(), rtmp_url.c_str(), false);
+	}
 }
 
 void OBSBasic::OnError(int err, const char* msg)
