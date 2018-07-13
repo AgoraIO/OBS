@@ -21,6 +21,7 @@ static const char *service_signals[] = {
 	"void firstRemoteVideoDecoded()",
 	"void userJoined()",
 	"void userOffline()",
+	"int joinChannelSuccess()",
 	NULL
 };
 // end
@@ -419,5 +420,27 @@ bool obs_service_agora_setup_remote_video(const obs_service_t* service, unsigned
 
 	if (service->info.setup_agora_remote_video)
 		return service->info.setup_agora_remote_video(uid, view);
+	return false;
+}
+
+bool obs_service_agora_add_publish_stream_url(const obs_service_t* service, const char* url, bool transcoding)
+{
+	if (!obs_service_valid(service, "obs_service_agora_add_publish_stream_url"))
+		return false;
+
+	if (service->info.add_agora_publish_stream_url)
+		return service->info.add_agora_publish_stream_url(url, transcoding);
+
+	return false;
+}
+
+bool obs_service_agora_remove_publish_stream_url(const obs_service_t* service, const char* url)
+{
+	if (!obs_service_valid(service, "obs_service_agora_remove_publish_stream_url"))
+		return false;
+
+	if (service->info.add_agora_publish_stream_url)
+		return service->info.remove_agora_publish_stream_url(url);
+
 	return false;
 }

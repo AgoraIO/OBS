@@ -8,9 +8,6 @@ CExtendAudioFrameObserver::CExtendAudioFrameObserver()
 {
 	this->pCircleBuffer = new CicleBuffer(44100 * 2 * 2, 0);
 	pPlayerData = new BYTE[0x800000];
-// 	DeleteFile(_T("./V6room/MusicDest.pcm"));
-// 	DeleteFile(_T("./V6room/FrameMix.pcm"));
-// 	DeleteFile(_T("./V6room/PlayOut.pcm"));
 }
 
 CExtendAudioFrameObserver::~CExtendAudioFrameObserver()
@@ -75,22 +72,6 @@ bool CExtendAudioFrameObserver::onRecordAudioFrame(AudioFrame& audioFrame)
 bool CExtendAudioFrameObserver::onPlaybackAudioFrame(AudioFrame& audioFrame)
 {
 	SIZE_T nSize = audioFrame.channels*audioFrame.samples * 2;
-//	CAudioPlayPackageQueue::GetInstance()->PushAudioPackage(audioFrame.buffer, nSize);
-// 	FILE * recordf = fopen("d:/playback.pcm", "ab+");
-// 	fwrite(audioFrame.buffer, 1, nSize, recordf);
-// 	fclose(recordf);
-#if 0
-	if (bIsDebugMode)
-	{
-		FILE* outfile1 = fopen("./V6room/PlayOut.pcm", "ab+");
-		if (outfile1)
-		{
-			fwrite(this->pPlayerData, 1, nSize, outfile1);
-			fclose(outfile1);
-			outfile1 = NULL;
-		}
-	}
-#endif
 	
 	return true;
 }

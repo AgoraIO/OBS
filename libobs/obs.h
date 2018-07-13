@@ -1870,6 +1870,9 @@ EXPORT const char *obs_service_get_output_type(const obs_service_t *service);
 //add by agora
 EXPORT signal_handler_t *obs_service_get_signal_handler(const obs_service_t *service);
 EXPORT bool obs_service_agora_setup_remote_video(const obs_service_t* service, unsigned int uid, void* view);
+//agora server publish rtmp to cdn
+EXPORT bool obs_service_agora_add_publish_stream_url(const obs_service_t* service, const char* url, bool transcoding);
+EXPORT bool obs_service_agora_remove_publish_stream_url(const obs_service_t* service, const char* url);
 //end
 /* ------------------------------------------------------------------------- */
 /* Source frame allocation functions */

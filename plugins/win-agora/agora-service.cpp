@@ -58,8 +58,6 @@ void *AgoraService_Create(obs_data_t *settings, obs_service_t *service)
 {
 	if (AgoraRtcEngine::GetInstance() == NULL)
 		return nullptr;
-	//if (!AgoraRtcEngine::GetInstance()->InitEngine("aab8b8f5a8cd4469a63042fcfafe7063"))
-	//	return nullptr;
 
 	struct agora_data* data = static_cast<struct agora_data*>(bzalloc(sizeof(struct agora_data)));
 	AgoraService_Update((void*)data, settings);
@@ -156,6 +154,16 @@ bool AgoraSetupRemoteVideo(uint32_t uid, void* view)
 	return AgoraRtcEngine::GetInstance()->setupRemoteVideo(uid, view) == 0;
 }
 
+bool AgoraAddPublishStreamUrl(const char* url, bool transcoding)
+{
+	return AgoraRtcEngine::GetInstance()->AddPublishStreamUrl(url, transcoding) == 0;
+}
+
+bool AgoraRemovePublishStreamUrl(const char* url)
+{
+	return AgoraRtcEngine::GetInstance()->RemovePublishStreamUrl(url) == 0;
+}
+
 void RegisterAgoraService()
 {
 	obs_service_info info = {};
@@ -168,5 +176,7 @@ void RegisterAgoraService()
 	info.deactivate = AgoraService_Deactivate;
 	info.initialize = AgoraService_Initialize;
 	info.setup_agora_remote_video = AgoraSetupRemoteVideo;
+	info.add_agora_publish_stream_url = AgoraAddPublishStreamUrl;
+	info.remove_agora_publish_stream_url = AgoraRemovePublishStreamUrl;
 	obs_register_service(&info);
 }

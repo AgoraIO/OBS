@@ -751,6 +751,7 @@ public:
 private:
 	void SetControlWhenPK(bool bPK);
 	void SetPreviewPK(bool bPK);
+	bool GetObsRtmpUrl(std::string& rtmp_url);
 	OBSService agoraService;
 	std::unique_ptr<AgoraOutputHandler> agoraOutputHandler;
 
@@ -767,7 +768,7 @@ private slots:
 	void SetupRempteVideo(long long  uid);
 	void OnUserOffline(long long uid);
 	void OnUserJoined(long long uid);
-	void OnJoinChannelSuccess(std::string channel, long long uid, long long elapsed);
+	void OnJoinChannelSuccess(QString channel, long long uid, long long elapsed);
 	void OnError(int err, const char* msg);
 	// end agora
 };

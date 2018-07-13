@@ -68,6 +68,10 @@ public:
 	int SetVideoCompositingLayout(const VideoCompositingLayout& sei);
 	int ClearVideoCompositingLayout();
 
+	int AddPublishStreamUrl(const char *url, bool transcodingEnabled);
+	int RemovePublishStreamUrl(const char *url);
+	int SetLiveTranscoding(const LiveTranscoding &transcoding);
+
 	//…Ë±∏
 	int getRecordingDeviceVolume();
 	int getPalyoutDeviceVolume();
