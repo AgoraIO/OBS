@@ -1,4 +1,4 @@
-# OBBS Studio Integration
+# OBS Studio Integration
 
 * Based on win32
 * agora sdk version 2.2.1
