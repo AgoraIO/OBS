@@ -1,6 +1,6 @@
 # obs-studio for HQ
 
-*中文: [中文](README.zh.md)*
+*中文: [中文](readme.zh.md)*
 
 **Build guideline**
 
