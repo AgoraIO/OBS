@@ -84,7 +84,7 @@ void RegisterAgoraAudioEncoder()
 	agora_pcm_encoder.codec    = "PCM";
 	agora_pcm_encoder.get_name = AgoraGetAudioEncoderName;
 	agora_pcm_encoder.create   = AgoraPCM_Create;
-	agora_pcm_encoder.destroy  = AgoraPCM_Destroy;
+	agora_pcm_encoder.destroy  = AgoraPCM_Destroy;	
 	agora_pcm_encoder.encode   = AgoraPCM_Encode;
 	agora_pcm_encoder.get_defaults   = AgoraPCM_GetDefaults;
 //	agora_pcm_encoder.get_properties = AgoraPCM_GetProperties;
