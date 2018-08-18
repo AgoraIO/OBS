@@ -6,8 +6,8 @@ Unicode true
 !define APPNAME "OBS Studio"
 
 !ifndef APPVERSION
-!define APPVERSION "21.1.0"
-!define SHORTVERSION "21.1.0"
+!define APPVERSION "17.0.2"
+!define SHORTVERSION "17.0.2"
 !endif
 
 !define APPNAMEANDVERSION "OBS Studio ${SHORTVERSION}"
@@ -22,7 +22,6 @@ Unicode true
 Name "${APPNAMEANDVERSION}"
 InstallDir "$PROGRAMFILES32\obs-studio"
 InstallDirRegKey HKLM "Software\${APPNAME}" ""
-
 !ifdef FULL
 OutFile "OBS-Studio-${SHORTVERSION}-Full-Installer.exe"
 !else
@@ -88,12 +87,24 @@ Function PreReqCheck
 		strcmps $1 "HotFixID=KB971512" gotPatch
 			MessageBox MB_YESNO|MB_ICONEXCLAMATION "${APPNAME} requires the Windows Vista Platform Update. Would you like to download it?" IDYES putrue IDNO pufalse
 			putrue:
-				; 32 bit
-			    ExecShell "open" "http://www.microsoft.com/en-us/download/details.aspx?id=3274"
+				${If} ${RunningX64}
+					; 64 bit
+					ExecShell "open" "http://www.microsoft.com/en-us/download/details.aspx?id=4390"
+				${Else}
+					; 32 bit
+					ExecShell "open" "http://www.microsoft.com/en-us/download/details.aspx?id=3274"
+				${EndIf}GetDLLVersion
 			pufalse:
 			Quit
 		gotPatch:
 	${EndIf}
+
+	; 32 bit Visual Studio 2013 runtime check
+	ClearErrors
+	GetDLLVersion "MSVCR120.DLL" $R0 $R1
+	GetDLLVersion "MSVCP120.DLL" $R0 $R1
+	IfErrors vs2013Missing vs2013OK1
+	
 
 	; DirectX Version Check
 	ClearErrors
@@ -160,14 +171,16 @@ Function PreReqCheck
 		Quit
 	notRunning1:
 
-
-	OBSInstallerUtils::IsProcessRunning "obs64.exe"
-	IntCmp $R0 1 0 notRunning2
-		MessageBox MB_OK|MB_ICONEXCLAMATION "${APPNAME} is already running. Please close it first before installing a new version." /SD IDOK
-		Quit
-	notRunning2:
+	${if} ${RunningX64}
+		OBSInstallerUtils::IsProcessRunning "obs64.exe"
+		IntCmp $R0 1 0 notRunning2
+			MessageBox MB_OK|MB_ICONEXCLAMATION "${APPNAME} is already running. Please close it first before installing a new version." /SD IDOK
+			Quit
+		notRunning2:
+	${endif}
 
 	OBSInstallerUtils::AddInUseFileCheck "$INSTDIR\data\obs-plugins\win-capture\graphics-hook32.dll"
+	OBSInstallerUtils::AddInUseFileCheck "$INSTDIR\data\obs-plugins\win-capture\graphics-hook64.dll"
 	OBSInstallerUtils::GetAppNameForInUseFiles
 	StrCmp $R0 "" gameCaptureNotRunning
 		MessageBox MB_OK|MB_ICONEXCLAMATION "Game Capture is still in use by the following applications:$\r$\n$\r$\n$R0$\r$\nPlease close these applications before installing a new version of OBS." /SD IDOK
@@ -180,9 +193,11 @@ Function filesInUse
 FunctionEnd
 
 Function LaunchOBS
-
-	Exec '"$WINDIR\explorer.exe" "$SMPROGRAMS\OBS Studio\OBS Studio (32bit).lnk"'
-	
+	${if} ${RunningX64}
+		Exec '"$WINDIR\explorer.exe" "$SMPROGRAMS\OBS Studio\OBS Studio (64bit).lnk"'
+	${else}
+		Exec '"$WINDIR\explorer.exe" "$SMPROGRAMS\OBS Studio\OBS Studio (32bit).lnk"'
+	${endif}
 FunctionEnd
 
 Var outputErrors
@@ -200,11 +215,11 @@ Section "OBS Studio" SecCore
 	SetOutPath "$INSTDIR"
 	OBSInstallerUtils::KillProcess "obs-plugins\32bit\cef-bootstrap.exe"
 	OBSInstallerUtils::KillProcess "obs-plugins\64bit\cef-bootstrap.exe"
-	File /r "D:\project\AgoraIO\obs-studio\ARD-Agora-with-OBS\UI\data"
+	File /r "new\core\data"
 	SetOutPath "$INSTDIR\bin"
-	File /r "D:\project\AgoraIO\obs-studio\ARD-Agora-with-OBS\vs2013\rundir\Release\bin\32bit"
+	File /r "new\core\bin\32bit"
 	SetOutPath "$INSTDIR\obs-plugins"
-	File /r "D:\project\AgoraIO\obs-studio\ARD-Agora-with-OBS\vs2013\rundir\Release\obs-plugins\32bit"
+	File /r "new\core\obs-plugins\32bit"
 
 	ClearErrors
 
@@ -220,14 +235,23 @@ Section "OBS Studio" SecCore
 	${if} ${RunningX64}
 		Delete "$SMPROGRAMS\OBS Multiplatform\OBS Multiplatform (64bit).lnk"
 	${endif}
-    ;only 32bit
-	SetOutPath "$INSTDIR\bin\32bit"
-	CreateShortCut "$DESKTOP\OBS Studio.lnk" "$INSTDIR\bin\32bit\obs32.exe"
 
+	${if} ${RunningX64}
+		SetOutPath "$INSTDIR\bin\64bit"
+		CreateShortCut "$DESKTOP\OBS Studio.lnk" "$INSTDIR\bin\64bit\obs64.exe"
+	${else}
+		SetOutPath "$INSTDIR\bin\32bit"
+		CreateShortCut "$DESKTOP\OBS Studio.lnk" "$INSTDIR\bin\32bit\obs32.exe"
+	${endif}
 	SetOutPath "$INSTDIR\bin\32bit"
 	CreateDirectory "$SMPROGRAMS\OBS Studio"
 	CreateShortCut "$SMPROGRAMS\OBS Studio\OBS Studio (32bit).lnk" "$INSTDIR\bin\32bit\obs32.exe"
 	CreateShortCut "$SMPROGRAMS\OBS Studio\Uninstall.lnk" "$INSTDIR\uninstall.exe"
+
+	${if} ${RunningX64}
+		SetOutPath "$INSTDIR\bin\64bit"
+		CreateShortCut "$SMPROGRAMS\OBS Studio\OBS Studio (64bit).lnk" "$INSTDIR\bin\64bit\obs64.exe"
+	${endif}
 
 	SetOutPath "$INSTDIR\bin\32bit"
 
@@ -247,6 +271,11 @@ SectionGroup /e "Plugins" SecPlugins
 		OBSInstallerUtils::KillProcess "32bit\cef-bootstrap.exe"
 		File /r "new\obs-browser\obs-plugins\32bit"
 
+		${if} ${RunningX64}
+			OBSInstallerUtils::KillProcess "64bit\cef-bootstrap.exe"
+			File /r "new\obs-browser\obs-plugins\64bit"
+		${endif}
+
 		SetOutPath "$INSTDIR\bin\32bit"
 	SectionEnd
 
@@ -258,6 +287,10 @@ SectionGroup /e "Plugins" SecPlugins
 
 		SetOutPath "$INSTDIR\obs-plugins"
 		File /r "new\realsense\obs-plugins\32bit"
+
+		${if} ${RunningX64}
+			File /r "new\realsense\obs-plugins\64bit"
+		${endif}
 
 		SetOutPath "$INSTDIR\data\obs-plugins"
 		File /r "new\realsense\data\obs-plugins\win-ivcam"
