@@ -6282,7 +6282,7 @@ void OBSBasic::InitAgoraServiceSettings()
 	obs_data_set_int(settings, "agora_uid", loacal_uid);
 	obs_data_set_string(settings, "agora_channel", agora_channel.c_str());
 	obs_data_set_string(settings, "agora_appid", agora_appid.c_str());
-
+	obs_data_set_bool(settings, "enableWebSdkInteroperability", true);//‘ –Ì”Îwebsdkª•Õ®
 	obs_service_update(agoraService, settings);
 }
 
