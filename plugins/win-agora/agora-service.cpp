@@ -11,6 +11,7 @@ struct agora_data
 	int fps;
 	int video_bitrate;
 	std::map<uint32_t, std::pair<int, int>> user_out_resolution;
+	bool enableWebSdkInteroperability;
 };
 
 const char * AgoraService_GetName(void *type_data)
@@ -46,7 +47,7 @@ void AgoraService_Update(void *data, obs_data_t *settings)
 	service->out_cy = obs_data_get_int(settings, "agora_out_cy");
 	service->fps    = obs_data_get_int(settings, "fps");
 	service->video_bitrate = obs_data_get_int(settings, "agora_video_bitrate");
-
+	service->enableWebSdkInteroperability = obs_data_get_bool(settings, "enableWebSdkInteroperability");
 	AgoraRtcEngine* agora = AgoraRtcEngine::GetInstance();
 	agora->agora_fps = service->fps;
 	agora->agora_out_cx = service->out_cx;
@@ -100,7 +101,7 @@ void AgoraService_Activate(void *data, obs_data_t *settings)
 {
 	struct agora_data* service_data = static_cast<struct agora_data*>(data);
 	AgoraRtcEngine* agora_engine = AgoraRtcEngine::GetInstance();
-	
+	agora_engine->EnableWebSdkInteroperability(service_data->enableWebSdkInteroperability);
 	agora_engine->setVideoProfileEx(service_data->out_cx, service_data->out_cy, service_data->fps, service_data->video_bitrate);
 	agora_engine->setAudioProfile(44100, 2, 1024 * 4);//agora_pcm_encoder
 	agora_engine->joinChannel("", service_data->channel_name, service_data->uid);
