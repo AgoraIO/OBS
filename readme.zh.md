@@ -107,24 +107,24 @@ agora-pcm-encoder.cpp和agora-yuv-encoder.cpp分别实现了音频和视频编�
 
 ####如何添加一个声网sdk接口
 
-* obs-service.h中，为obs_service_info添加新的成员函数声明
-* 在agora-service.cpp中，为agora_service添加一个成员，该成员是个函数，会调用声网对应的接口。
-* 在obs.h中，声明该接口，接口第一个参数为obs_service_t*
+* obs-service.h中，为obs\_service\_info添加新的成员函数声明
+* 在agora-service.cpp中，为agora\_service添加一个成员，该成员是个函数，会调用声网对应的接口。
+* 在obs.h中，声明该接口，接口第一个参数为obs\_service\_t*
 * 在obs.cpp中，实现该接口。接口中会调用在agora service中新添加的成员。
 * 应用层调用新声明的接口即可。
 
-可以参考setupRemoteVideo，具体实现obs_service_info.setup_agora_remote_video和obs接口obs_service_agora_setup_remote_video
+可以参考setupRemoteVideo，具体实现obs_service_info.setup_agora_remote_video和obs接口obs\_service\_agora\_setup\_remote\_video
 
 ####如何添加声网的回调函数
 
  业务逻辑有时候要等到回调函数之后再进行下一步操作，比如：收到onUserJoined回调函数之后才会设置远端的视频画布，用来显示远端的视频。
 
 * 在obs-service.c中，常量字符串数组service_signals中添加响应函数对应的信号声明，包括函数返回类型和函数名。
-* agorartcengine.cpp，声网回调函数想应用层发出signal，调用signal_handler_signal，通过calldata结构体设置多个参数。
+* agorartcengine.cpp，声网回调函数想应用层发出signal，调用signal\_handler\_signal，通过calldata结构体设置多个参数。
 
 下面是应用层需要做的：
 
-* 调用signal_handler_connect将声明的信号和对应的应用层声明的响应函数相关联。注意，关联的回调函数为静态函数，需要通过应用层的消息机制传给主线程（界面线程）做最后处理
+* 调用signal\_handler\_connect将声明的信号和对应的应用层声明的响应函数相关联。注意，关联的回调函数为静态函数，需要通过应用层的消息机制传给主线程（界面线程）做最后处理
 
 **以onUserJoined为例，添加回调函数：**
 
