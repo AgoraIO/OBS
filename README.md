@@ -13,6 +13,13 @@
    
     * visual studio 2013 
     
+    * QT 5.8(msvc2013) if you need UI
+
+* Version
+
+    * agora sdk windows version 2.2.1 and above(x86).
+    * obs studio 21.1b and above(x86).
+    
 * Build project with CMake-gui：
 
     * Start CMake-gui, select source code and project path, then configure
@@ -21,14 +28,43 @@
         * DepsPath 
 
                The path where win32 is located after decompressing dedependencies2013.zip 
-        
-        * Uncheck Enable\_UI and ENABLE\_SCRIPTING
-        * After configure is ok, vs project can be generated.
+        * QTDir
 
+               The path where win32 is loacted after installed QT 5.8
+        * Uncheck ENABLE\_SCRIPTING
+
+        * After configure is ok,then click generate, vs project can be generated.
 
 ## How to use agora sdk in your own obs studio
 
 In order to use agora sdk in your own obs studio, there's statement about compile and source code.
+
+###Initialize Agora Service Settings In Application
+
+You can reference source code in window-basic-main.cpp file(OBSBasic::InitAgoraServiceSettings).
+
+* agora\_video\_bitrate
+
+    video bitrate
+* fps
+
+    video frame rate
+* agora\_out\_cx and agora\_out\_cy
+
+    video output resolution width and height
+* agora\_appid
+    
+    agora appid
+* agora\_uid
+
+    agora user uid used when calling joinChannel
+* agora\_channel
+
+    agora channel used when calling joinChannel 
+
+* enableWebSdkInteroperability
+
+    whether enable web sdk interoperability with windows/ios/android native sdk
 
 ### How to create win-agora plugin
 
@@ -50,7 +86,11 @@ Audio and Video encoders are implemented in agora-pcm-encoder.cpp and agora-yuv-
 
 * agora ouput is actually a null output.It's used to start or stop agora communication. OBS studio library associated encoder and service with agora output. agora\_service is implemented in agora-output.cpp  
 
-#### Agora sdk            
+#### Agora sdk   
+
+Download zip file   [download](https://www.agora.io/en/download/). 
+
+Decompress zip file,you'll find dll， include and lib folders in sdk.
 
 * dll  copy agora\_rtc\_sdk.dll and agora\_sig\_sdk.dll to dependencies2013\win32\bin
 * lib  copy agora\_rtc\_sdk.lib to dependencies2013\win32\bin
