@@ -59,12 +59,10 @@ struct encoder_packet* packet, bool *receive_packet)
 		memcpy(videoObserver->m_lpImageBuffer, frame->data[0], agora->agora_out_cx *agora->agora_out_cy * 3 / 2);
 		char buf[MAX_PATH] = { 0 };
 		
-		sprintf(buf, "framewidth=%d,agorawidth=%d,agoraheight=%d", frame->linesize[0], agora->agora_out_cx, agora->agora_out_cy);
+		//sprintf(buf, "framewidth=%d,agorawidth=%d,agoraheight=%d", frame->linesize[0], agora->agora_out_cx, agora->agora_out_cy);
 		OutputDebugStringA("\nAgoraYUV_Encode:\n");
 		OutputDebugStringA(buf);
 	}
-	//Cut_I420(frame->data[0], 0, 0, 960, 540, videoObserver->m_lpImageBuffer, 480, 270);
-	//	AgoraRtcEngine::GetInstance()->AgoraVideoObserver_Encode(data, frame, packet, receive_packet);
 	return true;
 }
 
