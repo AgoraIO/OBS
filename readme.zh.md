@@ -1,10 +1,10 @@
-#obs stduio集成声网sdk
+# obs stduio集成声网sdk
 
 * 基于win32
 * agora sdk版本2.2.1
 * obs stduio 版本21.1
 
-##编译环境
+## 编译环境
 
 * CMake 2.8.12以上
 * vs2013
@@ -13,10 +13,10 @@
 配好环境，CMake上选择源码路径和生成路径，编译器选择vs2013，编译即可生成vs解决方案。
 
 
-##如何在自己的obs studio中集成声网sdk
+## 如何在自己的obs studio中集成声网sdk
 上面大概介绍了一些obs studio集成agora sdkd的基本原理和使用，接下来从脚本和代码层面做一些说明作为参考，以便用户在自己的obs studio库中集成声网sdk。
 
-###在应用层初始化 Agora Service Settings
+### 在应用层初始化 Agora Service Settings
 
 可以参考 window-basic-main.cpp 文件中的源码(OBSBasic::InitAgoraServiceSettings).
 
@@ -43,12 +43,12 @@
 
    允许web sdk和windows/ios/android sdk互通
 
-###如何创建win-agora插件
+### 如何创建win-agora插件
 * 源码
 * 声网sdk
 * 编译配置
 
-####实现插件的源码
+#### 实现插件的源码
  （1）在plugins下创建win-agora文件夹，在目录下创建agora-plugin.cpp文件，obs.dll会自动加载plugins下的所有插件（生成目录下的plugins）。
 
 （2） 包含头文件obs-module.h，OBS_DECLARE_MODULE用来声明插件，obs_load_module函数中注册agora_pcm、agora_yuv、agora_service、agora_output，在obs.dll加载win-agora.dll时，会注册这些插件。
@@ -61,7 +61,7 @@ agora-pcm-encoder.cpp和agora-yuv-encoder.cpp分别实现了音频和视频编�
 
 （5）agora ouput，实际上就是一个null output，主要用来控制整个连麦过程的开始结束。obs studio库最后会操作与agora output相关联的encoder和service。agora-output.cpp
 
-###声网sdk
+### 声网sdk
 
 
 * dll  动态库拷贝obs studio依赖库到dependencies2013\win32\bin
@@ -70,7 +70,7 @@ agora-pcm-encoder.cpp和agora-yuv-encoder.cpp分别实现了音频和视频编�
 
 注意： 注意头文件要包含IAgoraRtcEngine2.h用来自定义输出分辨率的接口
 
-####编译选项配置
+#### 编译选项配置
 
 * 创建win-agora编译配置文件FindAgora.cmake，主要用来找到win-agora依赖的库以及配置一些编译环境变量。放在CMake\Modules文件夹目录下
 * CMakeLists.txt 插件源码win-agora目录下的CMakeLists.txt，用来配置要编译的源码文件
@@ -78,7 +78,7 @@ agora-pcm-encoder.cpp和agora-yuv-encoder.cpp分别实现了音频和视频编�
 
 
 
-###总结
+### 总结
 
 总结一下，用户如何利用声网提供的demo：
 
@@ -105,7 +105,7 @@ agora-pcm-encoder.cpp和agora-yuv-encoder.cpp分别实现了音频和视频编�
 * onUserJoined
 * onFirstRemoteVideoDecoded
 
-####如何添加一个声网sdk接口
+#### 如何添加一个声网sdk接口
 
 * obs-service.h中，为obs\_service\_info添加新的成员函数声明
 * 在agora-service.cpp中，为agora\_service添加一个成员，该成员是个函数，会调用声网对应的接口。
@@ -115,7 +115,7 @@ agora-pcm-encoder.cpp和agora-yuv-encoder.cpp分别实现了音频和视频编�
 
 可以参考setupRemoteVideo，具体实现obs_service_info.setup_agora_remote_video和obs接口obs\_service\_agora\_setup\_remote\_video
 
-####如何添加声网的回调函数
+#### 如何添加声网的回调函数
 
  业务逻辑有时候要等到回调函数之后再进行下一步操作，比如：收到onUserJoined回调函数之后才会设置远端的视频画布，用来显示远端的视频。
 
