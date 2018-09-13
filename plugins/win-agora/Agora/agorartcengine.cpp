@@ -652,3 +652,8 @@ int AgoraRtcEngine::SetLiveTranscoding(const LiveTranscoding &transcoding)
 {
 	return m_rtcEngine->setLiveTranscoding(transcoding);
 }
+
+int AgoraRtcEngine::EnableWebSdkInteroperability(bool enabled)
+{
+	return m_rtcEngine->enableWebSdkInteroperability(true);
+}
