@@ -14,7 +14,7 @@
 
 
 ## 如何在自己的obs studio中集成声网sdk
-上面大概介绍了一些obs studio集成agora sdkd的基本原理和使用，接下来从脚本和代码层面做一些说明作为参考，以便用户在自己的obs studio库中集成声网sdk。
+上面大概介绍了一些obs studio集成agora sdk的编译环境，接下来从脚本和代码层面做一些说明作为参考，以便用户在自己的obs studio库中集成声网sdk。
 
 ### 在应用层初始化 Agora Service Settings
 
