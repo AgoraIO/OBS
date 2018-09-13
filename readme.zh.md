@@ -1,6 +1,6 @@
 # obs stduio集成声网sdk
 
-*English: [English](readme.md)*
+*English: [English](README.md)*
 
 * 基于win32
 * agora sdk版本2.2.1
