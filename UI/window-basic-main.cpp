@@ -6282,7 +6282,7 @@ void OBSBasic::InitAgoraServiceSettings()
 	obs_data_set_int(settings, "agora_uid", loacal_uid);
 	obs_data_set_string(settings, "agora_channel", agora_channel.c_str());
 	obs_data_set_string(settings, "agora_appid", agora_appid.c_str());
-
+	obs_data_set_bool(settings, "enableWebSdkInteroperability", true);//允许与websdk互通
 	obs_service_update(agoraService, settings);
 }
 
@@ -6319,9 +6319,10 @@ void OBSBasic::on_agoraPKButton_clicked()
 		}
 	
 		ui->agoraPKButton->setText(QTStr("Starting PK"));
+		SetControlWhenPK(true);
 		if (!agoraOutputHandler->StartAgora(agoraService))
 			ui->agoraPKButton->setText(QTStr("Agora PK"));
-		SetControlWhenPK(true);
+		
 	}
 }
 
@@ -6447,6 +6448,9 @@ void OBSBasic::AgoraError(void* data, calldata_t* params)
 
 void OBSBasic::SetupRempteVideo(long long  uid)
 {
+	if (remote_uid != 0 && remote_uid != uid)//已经显示远端画面了
+		return;
+	remote_uid = uid;
 	SetPreviewPK(true);
 	obs_service_agora_setup_remote_video(agoraService, uid,(void*) remoteVideo->winId());
 }
@@ -6456,7 +6460,10 @@ void OBSBasic::OnUserOffline(long long uid)
 	for (auto iter = m_lstUids.begin(); iter != m_lstUids.end(); ++iter){
 		if (*iter == uid){
 			m_lstUids.erase(iter);
-			SetPreviewPK(false);
+			if (remote_uid == uid){
+				remote_uid = 0;
+				SetPreviewPK(false);
+			}
 			break;
 		}
 	}
