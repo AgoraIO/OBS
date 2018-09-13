@@ -72,6 +72,7 @@ public:
 	int RemovePublishStreamUrl(const char *url);
 	int SetLiveTranscoding(const LiveTranscoding &transcoding);
 
+	int EnableWebSdkInteroperability(bool enabled);
 	//…Ë±∏
 	int getRecordingDeviceVolume();
 	int getPalyoutDeviceVolume();
