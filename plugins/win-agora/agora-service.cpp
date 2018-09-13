@@ -47,7 +47,7 @@ void AgoraService_Update(void *data, obs_data_t *settings)
 	service->out_cy = obs_data_get_int(settings, "agora_out_cy");
 	service->fps    = obs_data_get_int(settings, "fps");
 	service->video_bitrate = obs_data_get_int(settings, "agora_video_bitrate");
-
+	service->enableWebSdkInteroperability = obs_data_get_bool(settings, "enableWebSdkInteroperability");
 	AgoraRtcEngine* agora = AgoraRtcEngine::GetInstance();
 	agora->agora_fps = service->fps;
 	agora->agora_out_cx = service->out_cx;
