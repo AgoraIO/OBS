@@ -6349,11 +6349,12 @@ void OBSBasic::SetControlWhenPK(bool bPK)
 
 	if (bPK){
 		calldata_t params = { 0 };
+		signal_handler_connect(obs_service_get_signal_handler(agoraService), "initRtcEngineFailed", AgoraInitRtcEngineFailed, &params);
 		signal_handler_connect(obs_service_get_signal_handler(agoraService), "firstRemoteVideoDecoded", AgoraFirstRemoteVideoDecoded, &params);
 		signal_handler_connect(obs_service_get_signal_handler(agoraService), "userJoined", AgoraUserJoined, &params);
 		signal_handler_connect(obs_service_get_signal_handler(agoraService), "userOffline", AgoraUserOffline, &params);
 		signal_handler_connect(obs_service_get_signal_handler(agoraService), "joinChannelSuccess", AgoraJoinChannelSuccess, &params);
-
+		
 		obsColorFormatReplacedByAgora = config_get_string(basicConfig, "Video", "ColorFormat");
 		if (obsColorFormatReplacedByAgora.empty())
 			obsColorFormatReplacedByAgora = "NV12";
@@ -6394,6 +6395,14 @@ void OBSBasic::CreateAgoraRemoteVideo()
 		remoteVideo->setSizePolicy(QSizePolicy::Expanding,
 			QSizePolicy::Expanding);
 	}
+}
+
+void OBSBasic::AgoraInitRtcEngineFailed(void *data, calldata_t *params)
+{
+	long long error = 0;
+	calldata_get_int(params, "error", &error);
+
+	QMetaObject::invokeMethod(App()->GetMainWindow(), "OnInitRtcEngineFailed", Q_ARG(long long, error)); 
 }
 
 void OBSBasic::AgoraFirstRemoteVideoDecoded(void *data, calldata_t *params)
@@ -6444,6 +6453,20 @@ void OBSBasic::AgoraJoinChannelSuccess(void* data, calldata_t* params)
 void OBSBasic::AgoraError(void* data, calldata_t* params)
 {
 
+}
+
+void OBSBasic::OnInitRtcEngineFailed(long long code)
+{
+	if (code == -1){//aapidÎª¿Õ
+		OBSMessageBox::information(this,
+			QString("Agora"),
+			QString("Appid Is Empty"));
+	}
+	else if (code == -2){//initengineÊ§°Ü
+		OBSMessageBox::information(this,
+			QString("Agora"),
+			QString("Init Agora Engine Failed"));
+	}
 }
 
 void OBSBasic::SetupRempteVideo(long long  uid)

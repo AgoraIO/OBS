@@ -22,6 +22,7 @@ static const char *service_signals[] = {
 	"void userJoined()",
 	"void userOffline()",
 	"int joinChannelSuccess()",
+	"void initRtcEngineFailed()",
 	NULL
 };
 // end
