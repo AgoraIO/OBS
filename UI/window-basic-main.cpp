@@ -6467,6 +6467,8 @@ void OBSBasic::OnInitRtcEngineFailed(long long code)
 			QString("Agora"),
 			QString("Init Agora Engine Failed"));
 	}
+	SetControlWhenPK(false);
+	SetPreviewPK(false);
 }
 
 void OBSBasic::SetupRempteVideo(long long  uid)
