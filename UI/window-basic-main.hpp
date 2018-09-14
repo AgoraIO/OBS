@@ -741,6 +741,7 @@ public:
 	void SetAgoraService(obs_service_t* service);
 	void ResetAgoraOutput();
 
+	static void AgoraInitRtcEngineFailed(void *data, calldata_t *params);
 	static void AgoraFirstRemoteVideoDecoded(void *data, calldata_t *params);
 	static void AgoraUserJoined(void *data, calldata_t *params);
 	static void AgoraUserOffline(void *data, calldata_t *params);
@@ -770,5 +771,6 @@ private slots:
 	void OnUserJoined(long long uid);
 	void OnJoinChannelSuccess(QString channel, long long uid, long long elapsed);
 	void OnError(int err, const char* msg);
+	void OnInitRtcEngineFailed(long long code);
 	// end agora
 };

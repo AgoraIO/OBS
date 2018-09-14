@@ -13,7 +13,7 @@ AgoraInitWidget::AgoraInitWidget(QWidget *parent)
 	ui->setupUi(this);
 	
 	installEventFilter(CreateShortcutFilter());
-
+	
 // 	ui->textEdit_appid->setText(app_id);
 // 	ui->textEdit_channel->setText(QT_UTF8(channel));
 // 	ui->textEdit_uid->setText(QT_UTF8(text_uid.c_str()));
@@ -25,9 +25,16 @@ AgoraInitWidget::~AgoraInitWidget()
 }
 void AgoraInitWidget::on_saveButton_clicked()
 {
-	std::string input_uid = QT_TO_UTF8(ui->textEdit_uid->toPlainText());
-	std::string input_appid = QT_TO_UTF8(ui->textEdit_appid->toPlainText());
-	std::string input_channel = QT_TO_UTF8(ui->textEdit_channel->toPlainText());
+	QString strUid = ui->textEdit_uid->text();
+	QString strAppid = ui->textEdit_appid->text();
+	QString strChannel = ui->textEdit_channel->text();
+	strUid.trimmed();
+	strAppid.trimmed();
+	strChannel.trimmed();
+
+	std::string input_uid = QT_TO_UTF8(strUid);
+	std::string input_appid = QT_TO_UTF8(strAppid);
+	std::string input_channel = QT_TO_UTF8(strChannel);
 	
 	if (input_channel.empty()){
 		QMessageBox::warning(this, QString("agora warning"), QString("please input agora channel"));

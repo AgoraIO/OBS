@@ -130,14 +130,19 @@ bool AgoraRtcEngine::InitEngine(std::string appid)
 	agora::rtc::RtcEngineContext context;
 	context.eventHandler = m_eventHandler.get();
 	context.appId = appid.c_str();
-	//strcpy(context.appId, appid);
-	if (*context.appId == '\0')
-	{
+	struct calldata params;
+	calldata_init(&params);
+
+	if (*context.appId == '\0'){
+		calldata_set_int(&params, "error", -1);//
+		signal_handler_signal(obs_service_get_signal_handler(agoraService), "initRtcEngineFailed", &params);
 		return false;
 	}
-	if (0 != m_rtcEngine->initialize(context))
+	if (0 != m_rtcEngine->initialize(context)){
+		calldata_set_int(&params, "error", -2);
+		signal_handler_signal(obs_service_get_signal_handler(agoraService), "initRtcEngineFailed", &params);
 		return false;
-
+	}
 	return true;
 }
 
