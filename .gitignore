@@ -16,6 +16,7 @@
 /debug32/
 /debug64/
 /builds/
+/vs2013/
 *.o.d
 *.ninja
 .ninja*
