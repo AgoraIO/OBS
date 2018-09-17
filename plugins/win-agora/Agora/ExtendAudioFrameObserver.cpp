@@ -64,14 +64,18 @@ bool CExtendAudioFrameObserver::onRecordAudioFrame(AudioFrame& audioFrame)
 	{
 		int nMixLen = datalen > nSize ? nSize : datalen;
 		int len = nMixLen / sizeof(int16_t);
-		for (int i = 0; i < nMixLen/sizeof(int16_t); i++){
+		for (int i = 0; i < len; i++){
 			int16_t* buffer = (int16_t*)(audioFrame.buffer) + i*sizeof(int16_t);
 			int16_t* obsbuffer = (int16_t*)(pPlayerData)+i*sizeof(int16_t);
-			*obsbuffer = *buffer + *obsbuffer;
+			int mix = *buffer + *obsbuffer;
+			if (mix > 32767)
+				*obsbuffer = 32767;
+			else if (mix < -32767)
+				*obsbuffer = -32767;
+			else
+				*obsbuffer = mix;
 		}
-
-	//		*((int16_t*)(audioFrame.buffer) + i*sizeof(int16_t)) += *((int16_t*)pPlayerData);
-		memcpy((int16_t*)audioFrame.buffer, (int16_t*)pPlayerData, nMixLen);
+		memcpy(audioFrame.buffer, pPlayerData, nMixLen);
 	}
 
 	return true;
