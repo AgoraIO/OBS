@@ -753,6 +753,7 @@ private:
 	void SetControlWhenPK(bool bPK);
 	void SetPreviewPK(bool bPK);
 	bool GetObsRtmpUrl(std::string& rtmp_url);
+	void MuteAudioDevice(bool bMute);
 	OBSService agoraService;
 	std::unique_ptr<AgoraOutputHandler> agoraOutputHandler;
 

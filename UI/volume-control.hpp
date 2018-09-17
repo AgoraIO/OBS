@@ -253,6 +253,6 @@ public:
 
 	QString GetName() const;
 	void SetName(const QString &newName);
-
+	void MuteVolume(bool bMuted);
 	void SetMeterDecayRate(qreal q);
 };

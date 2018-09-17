@@ -31,6 +31,14 @@ CExtendVideoFrameObserver::~CExtendVideoFrameObserver()
 int timeinc = 0;
 bool CExtendVideoFrameObserver::onCaptureVideoFrame(VideoFrame& videoFrame)
 {
+	if ((int*)m_lpImageBuffer == (int*)0xfeeefeee){
+		m_lpImageBuffer = NULL;
+		return false;
+	}
+
+	if (!m_lpImageBuffer)
+		return false;
+		
 	SIZE_T nBufferSize = 0x800000;
 	int nUvLen = videoFrame.height * videoFrame.width / 4;
 	int nYLen = nUvLen * 4;

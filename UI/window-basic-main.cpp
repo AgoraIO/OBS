@@ -6286,6 +6286,21 @@ void OBSBasic::InitAgoraServiceSettings()
 	obs_service_update(agoraService, settings);
 }
 
+void OBSBasic::MuteAudioDevice(bool bMute)
+{
+	for (int i = 0; i < volumes.size(); i++)	{
+		VolControl* pControl = volumes[i];
+		OBSSource source = pControl->GetSource();
+		std::string name = obs_source_get_id(source);
+		if (name.compare("wasapi_input_capture") == 0){
+			pControl->MuteVolume(bMute);
+		}
+		else if(name.compare("wasapi_output_capture")== 0){
+			pControl->MuteVolume(bMute);
+		}
+	}
+}
+
 void OBSBasic::on_agoraPKButton_clicked()
 {
 	if (agoraOutputHandler->AgoraActive()){
@@ -6295,6 +6310,7 @@ void OBSBasic::on_agoraPKButton_clicked()
 		}
 		agoraOutputHandler->StopAgora();
 		SetControlWhenPK(false);
+		MuteAudioDevice(false);
 		SetPreviewPK(false);
 	}
 	else{
@@ -6320,6 +6336,7 @@ void OBSBasic::on_agoraPKButton_clicked()
 	
 		ui->agoraPKButton->setText(QTStr("Starting PK"));
 		SetControlWhenPK(true);
+		MuteAudioDevice(true);
 		if (!agoraOutputHandler->StartAgora(agoraService))
 			ui->agoraPKButton->setText(QTStr("Agora PK"));
 		
