@@ -70,8 +70,8 @@ bool CExtendAudioFrameObserver::onRecordAudioFrame(AudioFrame& audioFrame)
 			int mix = *buffer + *obsbuffer;
 			if (mix > 32767)
 				*obsbuffer = 32767;
-			else if (mix < -32767)
-				*obsbuffer = -32767;
+			else if (mix < -32768)
+				*obsbuffer = -32768;
 			else
 				*obsbuffer = mix;
 		}
