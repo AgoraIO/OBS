@@ -24,6 +24,11 @@ using namespace std;
 
 QWeakPointer<VolumeMeterTimer> VolumeMeter::updateTimer;
 
+void VolControl::MuteVolume(bool bMuted)
+{
+	mute->setChecked(bMuted);
+	SetMuted(bMuted);
+}
 void VolControl::OBSVolumeChanged(void *data, float db)
 {
 	Q_UNUSED(db);

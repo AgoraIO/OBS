@@ -56,13 +56,21 @@ BOOL mixAudioData(char* psrc, char* pdst, int datalen)
 
 bool CExtendAudioFrameObserver::onRecordAudioFrame(AudioFrame& audioFrame)
 {
-	SIZE_T nSize = audioFrame.channels*audioFrame.samples * 2;
+	SIZE_T nSize = audioFrame.channels*audioFrame.samples * audioFrame.bytesPerSample;
 	unsigned int datalen = 0;
 	pCircleBuffer->readBuffer(this->pPlayerData, nSize, &datalen);
-
+	
 	if (nSize > 0 && datalen > 0)
 	{
 		int nMixLen = datalen > nSize ? nSize : datalen;
+		int len = nMixLen / sizeof(int16_t);
+		for (int i = 0; i < nMixLen/sizeof(int16_t); i++){
+			int16_t* buffer = (int16_t*)(audioFrame.buffer) + i*sizeof(int16_t);
+			int16_t* obsbuffer = (int16_t*)(pPlayerData)+i*sizeof(int16_t);
+			*obsbuffer = *buffer + *obsbuffer;
+		}
+
+	//		*((int16_t*)(audioFrame.buffer) + i*sizeof(int16_t)) += *((int16_t*)pPlayerData);
 		memcpy((int16_t*)audioFrame.buffer, (int16_t*)pPlayerData, nMixLen);
 	}
 

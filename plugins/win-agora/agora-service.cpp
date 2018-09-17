@@ -87,13 +87,14 @@ bool AgoraService_Initialize(void *data, obs_output_t *output)
 			return false;
 		agora_engine->bInit = true;
 	}
+
+	
 	agora_engine->enableVideo(true);
 	agora_engine->setChannelProfile(agora::rtc::CHANNEL_PROFILE_LIVE_BROADCASTING);
 	agora_engine->setClientRole(agora::rtc::CLIENT_ROLE_BROADCASTER);
 	agora_engine->enableLocalCameara(false);// stop agora camera capture
 	agora_engine->enableLocalRender(false); // stop agora local render
 	agora_engine->keepPreRotation(false);
-	
 	return true;
 }
 
