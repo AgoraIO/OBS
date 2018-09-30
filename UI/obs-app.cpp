@@ -659,13 +659,12 @@ bool OBSApp::InitGlobalConfig()
 }
 
 bool OBSApp::InitLocale()
-{
+{ 
 	ProfileScope("OBSApp::InitLocale");
 	const char *lang = config_get_string(globalConfig, "General",
 			"Language");
 
 	locale = lang;
-
 	string englishPath;
 	if (!GetDataFilePath("locale/" DEFAULT_LANG ".ini", englishPath)) {
 		OBSErrorBox(NULL, "Failed to find locale/" DEFAULT_LANG ".ini");
@@ -882,7 +881,6 @@ static void move_basic_to_scene_collections(void)
 void OBSApp::AppInit()
 {
 	ProfileScope("OBSApp::AppInit");
-
 	if (!InitApplicationBundle())
 		throw "Failed to initialize application bundle";
 	if (!MakeUserDirs())

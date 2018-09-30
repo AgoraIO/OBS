@@ -1,13 +1,10 @@
-# obs-studio for HQ
+# obs-studio with Agora SDK
 
 *中文: [中文](readme.zh.md)*
 
 **Build guideline**
 
 * Requirements for using obs-studio for building HQ on windows
-    * dependencies2013.zip
-    
-        Download link：[dependencies2013.zip](https://obsproject.com/downloads/dependencies2013.zip)
    
     * Cmake of Windows version
    
