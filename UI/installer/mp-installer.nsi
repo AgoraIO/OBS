@@ -200,7 +200,7 @@ Section "OBS Studio" SecCore
 	SetOutPath "$INSTDIR"
 	OBSInstallerUtils::KillProcess "obs-plugins\32bit\cef-bootstrap.exe"
 	OBSInstallerUtils::KillProcess "obs-plugins\64bit\cef-bootstrap.exe"
-	File /r "D:\project\AgoraIO\obs-studio\ARD-Agora-with-OBS\UI\data"
+	File /r "D:\project\AgoraIO\obs-studio\ARD-Agora-with-OBS\vs2013\rundir\Release\data"
 	SetOutPath "$INSTDIR\bin"
 	File /r "D:\project\AgoraIO\obs-studio\ARD-Agora-with-OBS\vs2013\rundir\Release\bin\32bit"
 	SetOutPath "$INSTDIR\obs-plugins"
