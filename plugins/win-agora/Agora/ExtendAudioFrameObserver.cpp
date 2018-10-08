@@ -13,6 +13,9 @@ CExtendAudioFrameObserver::CExtendAudioFrameObserver()
 CExtendAudioFrameObserver::~CExtendAudioFrameObserver()
 {
 	delete[] pPlayerData;
+	pPlayerData = NULL; 
+	delete pCircleBuffer;
+	pCircleBuffer = NULL;
 }
 
 static inline int16_t MixerAddS16(int16_t var1, int16_t var2) {
@@ -56,6 +59,9 @@ BOOL mixAudioData(char* psrc, char* pdst, int datalen)
 
 bool CExtendAudioFrameObserver::onRecordAudioFrame(AudioFrame& audioFrame)
 {
+	if (!pPlayerData || !pCircleBuffer)
+		return true;
+	
 	SIZE_T nSize = audioFrame.channels*audioFrame.samples * audioFrame.bytesPerSample;
 	unsigned int datalen = 0;
 	pCircleBuffer->readBuffer(this->pPlayerData, nSize, &datalen);
@@ -77,6 +83,8 @@ bool CExtendAudioFrameObserver::onRecordAudioFrame(AudioFrame& audioFrame)
 		}
 		memcpy(audioFrame.buffer, pPlayerData, nMixLen);
 	}
+
+	//if (nSize >0 && )
 
 	return true;
 }

@@ -57,11 +57,6 @@ struct encoder_packet* packet, bool *receive_packet)
 	if (agora->agora_out_cx && agora->agora_out_cy && agora->agora_out_cx == frame->linesize[0])
 	{
 		memcpy(videoObserver->m_lpImageBuffer, frame->data[0], agora->agora_out_cx *agora->agora_out_cy * 3 / 2);
-		char buf[MAX_PATH] = { 0 };
-		
-		//sprintf(buf, "framewidth=%d,agorawidth=%d,agoraheight=%d", frame->linesize[0], agora->agora_out_cx, agora->agora_out_cy);
-		OutputDebugStringA("\nAgoraYUV_Encode:\n");
-		OutputDebugStringA(buf);
 	}
 	return true;
 }
