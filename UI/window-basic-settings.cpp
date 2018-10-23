@@ -4393,7 +4393,15 @@ void OBSBasicSettings::SaveAgoraSettings()
 		obs_data_set_int(settings, "agora_out_cy", output_cy);
 	}
 
-	bool update = stream1Changed | outputsChanged | videoChanged;
+	if (audioChanged){
+		int sampleRate = config_get_int(main->Config(), "Audio", "SampleRate");
+		int audioChannel = config_get_int(main->Config(), "Audio", "ChannelSetup");
+
+		obs_data_set_int(settings, "agora_sample_rate", sampleRate);
+		obs_data_set_int(settings, "agora_audio_channel", audioChannel);
+	}
+
+	bool update = stream1Changed | outputsChanged | videoChanged | audioChanged;
 
 	if (update)
 		obs_service_update(main->GetAgoraService(), settings);

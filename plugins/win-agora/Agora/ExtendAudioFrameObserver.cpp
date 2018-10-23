@@ -6,7 +6,9 @@ extern AgoraRtcEngine*	pAgoraManager;
 
 CExtendAudioFrameObserver::CExtendAudioFrameObserver()
 {
-	this->pCircleBuffer = new CicleBuffer(44100 * 2 * 2, 0);
+	int rate = AgoraRtcEngine::GetInstance()->sampleRate;
+	int channel = AgoraRtcEngine::GetInstance()->audioChannel;
+	this->pCircleBuffer = new CicleBuffer(rate* channel * 2, 0);//(44100 * 2 * 2, 0);
 	pPlayerData = new BYTE[0x800000];
 }
 
@@ -60,16 +62,26 @@ BOOL mixAudioData(char* psrc, char* pdst, int datalen)
 bool CExtendAudioFrameObserver::onRecordAudioFrame(AudioFrame& audioFrame)
 {
 	if (!pPlayerData || !pCircleBuffer)
-		return true;
+		return false;
 	
 	SIZE_T nSize = audioFrame.channels*audioFrame.samples * audioFrame.bytesPerSample;
 	unsigned int datalen = 0;
 	pCircleBuffer->readBuffer(this->pPlayerData, nSize, &datalen);
-	
-	if (nSize > 0 && datalen > 0)
+
+/*	TCHAR szBuf[MAX_PATH] = { 0 };
+	if (nSize > datalen){
+		_stprintf_s(szBuf, MAX_PATH, _T("*************** nSize=%d datalen=%d \n"), nSize, datalen);
+		OutputDebugString(szBuf);
+	}	
+	else{
+		_stprintf_s(szBuf, MAX_PATH, _T("############## nSize=%d datalen=%d \n"), nSize, datalen);
+		OutputDebugString(szBuf);
+	}
+	*/
+	if (nSize > 0 && datalen == nSize)
 	{
-		int nMixLen = datalen > nSize ? nSize : datalen;
-		int len = nMixLen / sizeof(int16_t);
+		//int nMixLen = datalen > nSize ? nSize : datalen;
+		int len = datalen / sizeof(int16_t);
 		for (int i = 0; i < len; i++){
 			int16_t* buffer = (int16_t*)(audioFrame.buffer) + i*sizeof(int16_t);
 			int16_t* obsbuffer = (int16_t*)(pPlayerData)+i*sizeof(int16_t);
@@ -81,11 +93,9 @@ bool CExtendAudioFrameObserver::onRecordAudioFrame(AudioFrame& audioFrame)
 			else
 				*obsbuffer = mix;
 		}
-		memcpy(audioFrame.buffer, pPlayerData, nMixLen);
+		memcpy(audioFrame.buffer, pPlayerData, datalen);
 	}
-
-	//if (nSize >0 && )
-
+	
 	return true;
 }
 
