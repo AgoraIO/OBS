@@ -59,7 +59,15 @@ class OBSBasicStats;
 #define SIMPLE_ENCODER_AMD                     "amd"
 
 #define PREVIEW_EDGE_SIZE 10
+#define REMOTE_VIDEO_COUNT 16
+#define REMOTE_VIDEO_ROW   4
+#define REMOTE_VIDEO_COL   4
 
+typedef struct tagRemoteVideoInfo{
+	int iRemoteVideoHLayout = -1;
+	QWidget* remoteVideo;
+	long long uid;
+}RemoteVideoInfo, *PRemoteVideoInfo;
 struct BasicOutputHandler;
 struct AgoraOutputHandler;
 enum class QtDataRole {
@@ -748,27 +756,40 @@ public:
 	static void AgoraJoinChannelSuccess(void* data, calldata_t* params);
 	static void AgoraError(void* data, calldata_t* params);
 	void CreateAgoraRemoteVideo();
-
+	void CreateRemoteVideos();
+	void DestroyRemoteVideos();
+	void UpdateAgoraClientRole(int role);// 1 »ò2
+	void UpdateAgoraLogPath(std::string filePath);//valid path utf-8
 private:
 	void SetControlWhenPK(bool bPK);
 	void SetPreviewPK(bool bPK);
 	bool GetObsRtmpUrl(std::string& rtmp_url);
 	void MuteAudioDevice(bool bMute);
+	void ClearRemoteVideos();
+	void SetupRemoteVideos();
+	void ResetRemoteVideoWidget(int index);
 	OBSService agoraService;
 	std::unique_ptr<AgoraOutputHandler> agoraOutputHandler;
 
 	std::string agoraColorFormat = "I420";
 	std::string obsColorFormatReplacedByAgora = "NV12";
 	QWidget* remoteVideo = nullptr;
+	//QWidget* remoteVideos[REMOTE_VIDEO_COUNT];
+	RemoteVideoInfo remoteVideoInfos[REMOTE_VIDEO_COUNT];
+	QVBoxLayout* remoteVideoLayout;
+	QHBoxLayout* remoteVideoHLayout[REMOTE_VIDEO_ROW];//4*4
 	std::list<uint32_t> m_lstUids;
+	std::list<uint32_t> m_lstRemoteVideoUids;
 	uint32_t remote_uid = 0;
 	uint32_t loacal_uid = 0;
 	std::string agora_channel = "agora-obs-channel";
 	std::string agora_appid = "";
 	uint32_t input_uid = 0;
+	std::map<unsigned int, QWidget*> m_mapUidWidget;
 private slots:
-	void SetupRempteVideo(long long  uid);
+	void SetupRemoteVideo(long long  uid);
 	void OnUserOffline(long long uid);
+	void OnFirstRemoteVideoDecoded(long long uid, long long width, long long height, long long elapsed);
 	void OnUserJoined(long long uid);
 	void OnJoinChannelSuccess(QString channel, long long uid, long long elapsed);
 	void OnError(int err, const char* msg);

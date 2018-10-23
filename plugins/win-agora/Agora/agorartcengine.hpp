@@ -33,6 +33,7 @@ public:
 
 	bool InitEngine(std::string appid);
 
+	BOOL setLogPath(std::string path);
 	BOOL setClientRole(CLIENT_ROLE_TYPE role, LPCSTR lpPermissionKey = NULL);
 	int  setChannelProfile(CHANNEL_PROFILE_TYPE profile);
 
@@ -55,7 +56,7 @@ public:
 	bool  AgoraVideoObserver_Encode(void* data, struct encoder_frame* frame,
 	    struct encoder_packet* packet, bool *receive_packet);
 
-	bool setAudioProfile(int nSampleRate, int nChannels, int nSamplesPerCall);
+	bool setRecordingAudioFrameParameters(int nSampleRate, int nChannels, int nSamplesPerCall);
 	bool setExternalAudioSource(bool bEnabled, int nSampleRate, int nChannels);
 	bool enableExtendPlayDevice(bool bEnable);
 
@@ -90,8 +91,11 @@ public:
 	int agora_out_cx = 640;
 	int agora_out_cy = 360;
 	int agora_video_bitrate = 500;
+	
     void joinedChannelSuccess(const char* channel, unsigned int uid, int elapsed);
 	
+	int audioChannel = 2;
+	int sampleRate = 44100;
 //public slots:
 private:
     friend class AgoraRtcEngineEvent;

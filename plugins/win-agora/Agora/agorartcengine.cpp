@@ -146,6 +146,13 @@ bool AgoraRtcEngine::InitEngine(std::string appid)
 	return true;
 }
 
+BOOL AgoraRtcEngine::setLogPath(std::string path)
+{
+	RtcEngineParameters rep(*m_rtcEngine);
+	int ret = rep.setLogFile(path.c_str());
+	return ret == 0 ? TRUE : FALSE;
+}
+
 BOOL AgoraRtcEngine::setClientRole(CLIENT_ROLE_TYPE role, LPCSTR lpPermissionKey)
 {
 	int nRet = m_rtcEngine->setClientRole(role);
@@ -342,7 +349,7 @@ bool AgoraRtcEngine::setExternalAudioSource(bool bEnabled, int nSampleRate, int 
 	return nRet == 0 ? true : false;
 }
 
-bool AgoraRtcEngine::setAudioProfile(int nSampleRate, int nChannels, int nSamplesPerCall)
+bool AgoraRtcEngine::setRecordingAudioFrameParameters(int nSampleRate, int nChannels, int nSamplesPerCall)
 {
 	RtcEngineParameters rep(m_rtcEngine.get());
 	int ret = rep.setRecordingAudioFrameParameters(nSampleRate, nChannels,  RAW_AUDIO_FRAME_OP_MODE_READ_WRITE, nSamplesPerCall);
@@ -389,7 +396,10 @@ int AgoraRtcEngine::enableVideo(bool enabled)
 int AgoraRtcEngine::setupRemoteVideo(unsigned int uid, void* view)
 {
 	agora::rtc::view_t v = reinterpret_cast<agora::rtc::view_t>(view);
-	VideoCanvas canvas(v, RENDER_MODE_FIT, uid);
+	VideoCanvas canvas;// (v, RENDER_MODE_FIT, uid);
+	canvas.view = v;
+	canvas.renderMode = RENDER_MODE_FIT;
+	canvas.uid = uid;
     return m_rtcEngine->setupRemoteVideo(canvas);
 }
 

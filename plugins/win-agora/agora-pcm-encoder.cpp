@@ -1,7 +1,7 @@
 #include <obs-module.h>
 #include <obs-encoder.h>
 #include "Agora/agorartcengine.hpp"
-
+#include <tchar.h>
 static const char *AgoraGetAudioEncoderName(void*)
 {
 	return obs_module_text("AgoraAudioEnc");
@@ -9,6 +9,8 @@ static const char *AgoraGetAudioEncoderName(void*)
 
 static void* AgoraPCM_Create(obs_data_t* settings, obs_encoder_t* encoder )
 {
+	AgoraRtcEngine::GetInstance()->audioChannel = obs_data_get_int(settings, "ChannelSetup");
+	AgoraRtcEngine::GetInstance()->sampleRate = obs_data_get_int(settings, "SampleRate");
 	return AgoraRtcEngine::GetInstance()->AgoraAudioObserver_Create();
 }
 
@@ -18,14 +20,16 @@ static void AgoraPCM_Destroy(void* data)
 }
 
 static bool AgoraPCM_Encode(void* data, struct encoder_frame* frame,
-    struct encoder_packet* packet, bool *receive_packet)
+struct encoder_packet* packet, bool *receive_packet)
 {
 	CExtendAudioFrameObserver* audioObserver = static_cast<CExtendAudioFrameObserver*>(data);
-	
-	int dataLen = frame->frames * 2 * 2;//
+
+	int dataLen = frame->frames * 2 * AgoraRtcEngine::GetInstance()->audioChannel;//
+
+	TCHAR szBuf[MAX_PATH] = { 0 };
+	_stprintf_s(szBuf, MAX_PATH, _T("AgoraPCM_Encode: datalen=%d \n"), dataLen);
+	OutputDebugString(szBuf);
 	audioObserver->pCircleBuffer->writeBuffer(frame->data[0], dataLen);
-	//struct encoder_frame
-	//AgoraRtcEngine::GetInstance()->AgoraAudioObserver_Encode(data, frame, packet, receive_packet);
 	return true;
 }
 
@@ -66,8 +70,11 @@ static bool AgoraPCM_GetExtraData(void *data, uint8_t **extra_data, size_t *size
 static void AgoraPCM_GetAudioInfo(void *, struct audio_convert_info *info)
 {
 	info->format          = AUDIO_FORMAT_16BIT;
-	info->samples_per_sec = 44100;
-	info->speakers        = SPEAKERS_STEREO;
+	info->samples_per_sec = AgoraRtcEngine::GetInstance()->sampleRate;
+	if (AgoraRtcEngine::GetInstance()->audioChannel == 2)
+		info->speakers = SPEAKERS_STEREO;
+	else
+		info->speakers = SPEAKERS_MONO;
 }
 
 static size_t AgoraPCM_GetFrameSize(void *data)
