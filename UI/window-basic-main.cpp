@@ -280,6 +280,7 @@ OBSBasic::OBSBasic(QWidget *parent)
 	ui->toggleTransitions->setChecked(false);
 	ui->toggleControls->setChecked(false);
 
+	CreateRemoteVideos();
 	//restore parent window geometry
 	const char *geometry = config_get_string(App()->GlobalConfig(),
 			"BasicWindow", "geometry");
@@ -1885,6 +1886,7 @@ void OBSBasic::ClearHotkeys()
 
 OBSBasic::~OBSBasic()
 {
+	DestroyRemoteVideos();
 	if (updateCheckThread && updateCheckThread->isRunning())
 		updateCheckThread->wait();
 
@@ -6279,10 +6281,16 @@ void OBSBasic::InitAgoraServiceSettings()
 	obs_data_set_int(settings, "agora_out_cy", out_cy);
 
 	obs_data_set_int(settings, "fps", 15);
+	obs_data_set_int(settings, "agora_client_role", 1);
 	obs_data_set_int(settings, "agora_uid", loacal_uid);
 	obs_data_set_string(settings, "agora_channel", agora_channel.c_str());
 	obs_data_set_string(settings, "agora_appid", agora_appid.c_str());
 	obs_data_set_bool(settings, "enableWebSdkInteroperability", true);//允许与websdk互通
+
+	struct obs_audio_info ai;
+	obs_get_audio_info(&ai);
+	obs_data_set_int(settings, "agora_sample_rate", ai.samples_per_sec);
+	obs_data_set_int(settings, "agora_audio_channel", ai.speakers);//
 	obs_service_update(agoraService, settings);
 }
 
@@ -6309,6 +6317,9 @@ void OBSBasic::on_agoraPKButton_clicked()
 			obs_service_agora_remove_publish_stream_url(GetAgoraService(), rtmp_url.c_str());
 		}
 		agoraOutputHandler->StopAgora();
+		ClearRemoteVideos();
+		m_lstUids.clear();
+		m_lstRemoteVideoUids.clear();
 		SetControlWhenPK(false);
 		MuteAudioDevice(false);
 		SetPreviewPK(false);
@@ -6325,7 +6336,7 @@ void OBSBasic::on_agoraPKButton_clicked()
 		agora_appid = agoraWidget.app_id;
 
 		InitAgoraServiceSettings();
-
+		
 		if (outputHandler->StreamingActive()){
 			StopStreaming();
 		}
@@ -6339,8 +6350,31 @@ void OBSBasic::on_agoraPKButton_clicked()
 		MuteAudioDevice(true);
 		if (!agoraOutputHandler->StartAgora(agoraService))
 			ui->agoraPKButton->setText(QTStr("Agora PK"));
-		
+		//for test
+		//UpdateAgoraClientRole(2);
+		//QString strLogFile = QString("D:/agora_sdk_log.log");
+		//UpdateAgoraLogPath(QT_TO_UTF8(strLogFile));
+		// end
 	}
+}
+
+void OBSBasic::UpdateAgoraClientRole(int role)
+{
+	if (role != 1 && role != 2){
+		return;
+	}
+	obs_data_t* settings = obs_service_get_settings(agoraService);
+	obs_data_set_int(settings, "agora_client_role", role);
+	obs_service_update(agoraService, settings);
+}
+
+void OBSBasic::UpdateAgoraLogPath(std::string filePath)
+{
+	if (filePath.empty())
+		return;
+	obs_data_t* settings = obs_service_get_settings(agoraService);
+	obs_data_set_string(settings, "agora_log_path", filePath.c_str());
+	obs_service_update(agoraService, settings);
 }
 
 void OBSBasic::SetPreviewPK(bool bPK)
@@ -6414,6 +6448,49 @@ void OBSBasic::CreateAgoraRemoteVideo()
 	}
 }
 
+void OBSBasic::CreateRemoteVideos()
+{
+	for (int i = 0; i < REMOTE_VIDEO_COUNT; i++){
+		remoteVideoInfos[i].remoteVideo = new QWidget;
+		//remoteVideos[i] = new QWidget;
+		remoteVideoInfos[i].remoteVideo->setSizePolicy(QSizePolicy::Expanding,
+			QSizePolicy::Expanding);
+		remoteVideoInfos[i].uid = 0;
+		remoteVideoInfos[i].iRemoteVideoHLayout = -1;
+	}
+
+	remoteVideoLayout = new QVBoxLayout();
+	for (int i = 0; i < REMOTE_VIDEO_ROW; i++){
+		remoteVideoHLayout[i] = new QHBoxLayout();
+		remoteVideoLayout->addLayout(remoteVideoHLayout[i]);
+	/*	for (int col = 0; col < REMOTE_VIDEO_COL; col++){
+			remoteVideoHLayout[i]->addWidget(remoteVideoInfos[i*REMOTE_VIDEO_COL + col].remoteVideo);
+		}*/
+	}
+
+	ui->previewLayout->addLayout(remoteVideoLayout);
+}
+
+void OBSBasic::DestroyRemoteVideos()
+{
+	for (int row = 0; row < REMOTE_VIDEO_ROW; row++){
+		for (int col = 0; col < REMOTE_VIDEO_COL; col++){
+			int i = row* REMOTE_VIDEO_COL + col;
+			if (remoteVideoInfos[i].remoteVideo){
+				remoteVideoHLayout[row]->removeWidget(remoteVideoInfos[i].remoteVideo);
+			}
+		}
+	}
+
+	for (int i = 0; i < REMOTE_VIDEO_ROW; i++){
+		delete remoteVideoHLayout[i];
+		remoteVideoHLayout[i] = nullptr;
+	}
+
+	delete remoteVideoLayout;
+	remoteVideoLayout = nullptr;
+}
+
 void OBSBasic::AgoraInitRtcEngineFailed(void *data, calldata_t *params)
 {
 	long long error = 0;
@@ -6433,7 +6510,9 @@ void OBSBasic::AgoraFirstRemoteVideoDecoded(void *data, calldata_t *params)
 	calldata_get_int(params, "height", &height);
 	calldata_get_int(params, "elapsed", &elapsed);
 	
-	QMetaObject::invokeMethod(App()->GetMainWindow(), "SetupRempteVideo", Q_ARG(long long, uid));
+	//QMetaObject::invokeMethod(App()->GetMainWindow(), "SetupRemoteVideo", Q_ARG(long long, uid));
+	QMetaObject::invokeMethod(App()->GetMainWindow(), "OnFirstRemoteVideoDecoded",
+		Q_ARG(long long, uid), Q_ARG(long long, width), Q_ARG(long long, height), Q_ARG(long long, elapsed));
 }
 
 void OBSBasic::AgoraUserJoined(void *data, calldata_t *params)
@@ -6485,10 +6564,10 @@ void OBSBasic::OnInitRtcEngineFailed(long long code)
 			QString("Init Agora Engine Failed"));
 	}
 	SetControlWhenPK(false);
-	SetPreviewPK(false);
+	//SetPreviewPK(false);
 }
 
-void OBSBasic::SetupRempteVideo(long long  uid)
+void OBSBasic::SetupRemoteVideo(long long  uid)
 {
 	if (remote_uid != 0 && remote_uid != uid)//已经显示远端画面了
 		return;
@@ -6497,18 +6576,172 @@ void OBSBasic::SetupRempteVideo(long long  uid)
 	obs_service_agora_setup_remote_video(agoraService, uid,(void*) remoteVideo->winId());
 }
 
+void OBSBasic::ResetRemoteVideoWidget(int index)
+{
+	remoteVideoHLayout[remoteVideoInfos[index].iRemoteVideoHLayout]->removeWidget(remoteVideoInfos[index].remoteVideo);
+	delete remoteVideoInfos[index].remoteVideo;
+	remoteVideoInfos[index].remoteVideo = new QWidget;
+	remoteVideoInfos[index].remoteVideo->setSizePolicy(QSizePolicy::Expanding,
+		QSizePolicy::Expanding);
+	remoteVideoInfos[index].iRemoteVideoHLayout = -1;
+	remoteVideoInfos[index].uid = 0;
+}
+
+void OBSBasic::ClearRemoteVideos()
+{
+	for (int i = 0; i < REMOTE_VIDEO_COUNT; ++i){
+		int index = remoteVideoInfos[i].iRemoteVideoHLayout;
+		if (index >= 0 && remoteVideoInfos[i].uid > 0){
+			ResetRemoteVideoWidget(i);
+		}
+	}
+}
+
 void OBSBasic::OnUserOffline(long long uid)
 {
 	for (auto iter = m_lstUids.begin(); iter != m_lstUids.end(); ++iter){
 		if (*iter == uid){
 			m_lstUids.erase(iter);
-			if (remote_uid == uid){
-				remote_uid = 0;
-				SetPreviewPK(false);
-			}
 			break;
 		}
 	}
+
+	int idx = -1;
+	bool bFind = false;
+	for (auto iter = m_lstRemoteVideoUids.begin(); iter != m_lstRemoteVideoUids.end(); ++iter){
+		idx++;
+		if (*iter == uid){
+			bFind = true;
+			m_lstRemoteVideoUids.erase(iter);
+			break;
+		}
+	}
+
+	if (!bFind)
+		return;
+
+	if (idx >= REMOTE_VIDEO_COUNT)
+		return;
+
+	int count = m_lstRemoteVideoUids.size() > REMOTE_VIDEO_COUNT ? REMOTE_VIDEO_COUNT : m_lstRemoteVideoUids.size();
+	if (count == 0){
+		obs_service_agora_setup_remote_video(agoraService, remoteVideoInfos[count].uid, (void*)nullptr);
+		ResetRemoteVideoWidget(count);
+		return;
+	}
+
+	int row = 1;
+	int col = 1;
+	if (count == 2){
+		col = 2;
+	}
+	else if (count == 3 || count == 4){
+		row = 2;
+		col = 2;
+	}
+	else if (count == 5 || count == 6){
+		row = 2;
+		col = 3;
+	}
+	else if (count > 6 && count <= 9){
+		row = 3;
+		col = 3;
+	}
+	else if (count > 9 && count <= 12){
+		row = 3;
+		col = 4;
+	}
+	else if (count > 12){
+		row = 4;
+		col = 4;
+	}
+
+	if (count == 4 || count == 9){
+		ClearRemoteVideos();
+		auto iter = m_lstRemoteVideoUids.begin();
+		for (int i = 0; i < row; i++){
+			for (int j = 0; j < col; j++){
+				int index = i*col + j;
+				remoteVideoInfos[index].iRemoteVideoHLayout = i;
+				remoteVideoInfos[index].uid = *iter;
+				obs_service_agora_setup_remote_video(agoraService, *iter, (void*)remoteVideoInfos[index].remoteVideo->winId());
+				remoteVideoHLayout[i]->addWidget(remoteVideoInfos[index].remoteVideo);
+				++iter;
+			}
+		}
+	}
+	else{
+		for (int i = idx; i < count; i++){
+			remoteVideoInfos[i].uid = remoteVideoInfos[i + 1].uid;
+			obs_service_agora_setup_remote_video(agoraService, remoteVideoInfos[i].uid, (void*)remoteVideoInfos[i].remoteVideo->winId());
+		}
+	
+		ResetRemoteVideoWidget(count);
+		if (m_lstRemoteVideoUids.size() >= REMOTE_VIDEO_COUNT){
+			auto iter = m_lstRemoteVideoUids.begin();
+			for (int i = 0; i < REMOTE_VIDEO_COUNT; i++){
+				++iter;
+			}
+		
+			remoteVideoInfos[REMOTE_VIDEO_COUNT - 1].uid = *iter;
+			remoteVideoInfos[REMOTE_VIDEO_COUNT - 1].iRemoteVideoHLayout = row - 1;
+			obs_service_agora_setup_remote_video(agoraService, remoteVideoInfos[REMOTE_VIDEO_COUNT - 1].uid, (void*)remoteVideoInfos[REMOTE_VIDEO_COUNT - 1].remoteVideo->winId()); 
+			remoteVideoHLayout[row - 1]->addWidget(remoteVideoInfos[REMOTE_VIDEO_COUNT - 1].remoteVideo);
+		}
+	}
+}
+
+void OBSBasic::OnFirstRemoteVideoDecoded(long long uid, long long width, long long height, long long elapsed)
+{
+	m_lstRemoteVideoUids.push_back(uid);
+	int count = m_lstRemoteVideoUids.size();
+	if (count > REMOTE_VIDEO_COUNT)
+		return;
+
+	if (count == 5 || count == 10){
+		ClearRemoteVideos();
+		int row = 2;
+		int col = 3;
+		if (count == 5){
+			row = 2;
+			col = 3;
+		}
+		else if (count == 10){
+			row = 3;
+			col = 4;
+		}
+			
+		auto iter = m_lstRemoteVideoUids.begin();
+		for (int i = 0; i < row; i++){
+			for (int j = 0; j < col; j++){
+				int index = i*col + j;
+				if (index >= m_lstRemoteVideoUids.size())
+					break;
+				remoteVideoInfos[index].iRemoteVideoHLayout = i;
+				remoteVideoInfos[index].uid = *iter;
+				obs_service_agora_setup_remote_video(agoraService, *iter, (void*)remoteVideoInfos[index].remoteVideo->winId());
+				remoteVideoHLayout[i]->addWidget(remoteVideoInfos[index].remoteVideo);
+				++iter;
+			}
+		}
+	}
+	else{
+		int row = 1;
+		if (count > 2 && count <=6){
+			row = 2;
+		}
+		else if (count > 6 && count <= 12)
+			row = 3;
+		else if (count > 12)
+			row = 4;
+
+		remoteVideoHLayout[row-1]->addWidget(remoteVideoInfos[count - 1].remoteVideo);
+		remoteVideoInfos[count - 1].iRemoteVideoHLayout = row-1;
+		remoteVideoInfos[count - 1].uid = uid;
+		obs_service_agora_setup_remote_video(agoraService, uid, (void*)remoteVideoInfos[count - 1].remoteVideo->winId());
+		//if (count < REMOTE_VIDEO_COUNT)
+	}
+
 }
 
 void OBSBasic::OnUserJoined(long long uid)

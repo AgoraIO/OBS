@@ -62,6 +62,10 @@ void AgoraOutput::Update()
 	obs_data_t *yuvSettings = obs_data_create();
 	obs_data_t *pcmSettings = obs_data_create();
 
+	struct obs_audio_info ai;
+	obs_get_audio_info(&ai);
+	uint32_t sampleRate = ai.samples_per_sec;
+	int channelSetup = ai.speakers;
 // 	obs_data_set_string(h264Settings, "rate_control", "CBR");
 // 		obs_data_set_int(yuvSettings, "bitrate", videoBitrate);
 // 	
@@ -78,6 +82,9 @@ void AgoraOutput::Update()
 	if (format != VIDEO_FORMAT_NV12 && format != VIDEO_FORMAT_I420)
 		obs_encoder_set_preferred_video_format(yuvStreaming,
 		VIDEO_FORMAT_NV12);
+
+	obs_data_set_int(pcmSettings, "SampleRate", sampleRate);
+	obs_data_set_int(pcmSettings, "ChannelSetup", channelSetup);
 	
 	obs_encoder_update(yuvStreaming, yuvSettings);
 	obs_encoder_update(pcmStreaming, pcmSettings);

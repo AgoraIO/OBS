@@ -12,6 +12,9 @@ struct agora_data
 	int video_bitrate;
 	std::map<uint32_t, std::pair<int, int>> user_out_resolution;
 	bool enableWebSdkInteroperability;
+	int audio_channel, sample_rate;
+	agora::rtc::CLIENT_ROLE_TYPE client_role;
+	std::string log_path;
 };
 
 const char * AgoraService_GetName(void *type_data)
@@ -48,6 +51,25 @@ void AgoraService_Update(void *data, obs_data_t *settings)
 	service->fps    = obs_data_get_int(settings, "fps");
 	service->video_bitrate = obs_data_get_int(settings, "agora_video_bitrate");
 	service->enableWebSdkInteroperability = obs_data_get_bool(settings, "enableWebSdkInteroperability");
+
+	service->sample_rate = obs_data_get_int(settings, "agora_sample_rate");
+	service->audio_channel = obs_data_get_int(settings, "agora_audio_channel");//
+	agora::rtc::CLIENT_ROLE_TYPE role = (agora::rtc::CLIENT_ROLE_TYPE)obs_data_get_int(settings, "agora_client_role");
+	
+	//角色
+	if (AgoraRtcEngine::GetInstance()->bInit && service->client_role != role){//已经初始化
+		AgoraRtcEngine::GetInstance()->setClientRole(role);
+	}
+	service->client_role = role;
+
+	std::string path = obs_data_get_string(settings, "agora_log_path");
+	//日志路径
+	if (AgoraRtcEngine::GetInstance()->bInit
+		/*&& !service->log_path.empty()*/
+		&& service->log_path != path){
+		AgoraRtcEngine::GetInstance()->setLogPath(path);
+	}
+	service->log_path = path;
 	AgoraRtcEngine* agora = AgoraRtcEngine::GetInstance();
 	agora->agora_fps = service->fps;
 	agora->agora_out_cx = service->out_cx;
@@ -91,7 +113,7 @@ bool AgoraService_Initialize(void *data, obs_output_t *output)
 	
 	agora_engine->enableVideo(true);
 	agora_engine->setChannelProfile(agora::rtc::CHANNEL_PROFILE_LIVE_BROADCASTING);
-	agora_engine->setClientRole(agora::rtc::CLIENT_ROLE_BROADCASTER);
+	agora_engine->setClientRole(service_data->client_role);//(agora::rtc::CLIENT_ROLE_BROADCASTER);
 	agora_engine->enableLocalCameara(false);// stop agora camera capture
 	agora_engine->enableLocalRender(false); // stop agora local render
 	agora_engine->keepPreRotation(false);
@@ -104,7 +126,7 @@ void AgoraService_Activate(void *data, obs_data_t *settings)
 	AgoraRtcEngine* agora_engine = AgoraRtcEngine::GetInstance();
 	agora_engine->EnableWebSdkInteroperability(service_data->enableWebSdkInteroperability);
 	agora_engine->setVideoProfileEx(service_data->out_cx, service_data->out_cy, service_data->fps, service_data->video_bitrate);
-	agora_engine->setAudioProfile(44100, 2, 1024 * 4);//agora_pcm_encoder
+	agora_engine->setRecordingAudioFrameParameters(/*44100, 2*/service_data->sample_rate, service_data->audio_channel, 1024 );//agora_pcm_encoder
 	agora_engine->joinChannel("", service_data->channel_name, service_data->uid);
 }
 
