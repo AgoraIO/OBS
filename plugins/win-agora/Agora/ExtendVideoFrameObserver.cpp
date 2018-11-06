@@ -3,10 +3,9 @@
 #include <TCHAR.h>
 //#include <timeapi.h>
 #include <stdio.h>
-FILE* fp = NULL;
+
 CExtendVideoFrameObserver::CExtendVideoFrameObserver()
 {
-	fp = fopen("D:/1.yuv", "wb");
 	m_lpImageBuffer = new BYTE[0x800000];
 
 //	m_lpRenderBuffer = new BYTE[0x800000];
@@ -22,10 +21,6 @@ CExtendVideoFrameObserver::~CExtendVideoFrameObserver()
 	m_lpImageBuffer = NULL;
 //	delete[] m_lpRenderBuffer;
 //	m_lpRenderBuffer = NULL;
-	if (fp){
-		fclose(fp);
-		fp = NULL;
-	}
 }
 
 int timeinc = 0;
@@ -59,10 +54,6 @@ bool CExtendVideoFrameObserver::onCaptureVideoFrame(VideoFrame& videoFrame)
 	videoFrame.type = FRAME_TYPE_YUV420;
 	videoFrame.rotation = 0;
 	videoFrame.renderTimeMs = GetTickCount();
-
-	fwrite(m_lpY, 1, nYLen, fp);
-	fwrite(m_lpU, 1, nUvLen, fp);
-	fwrite(m_lpV, 1, nUvLen, fp);
 	return true;
 }
 
