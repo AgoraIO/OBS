@@ -20,6 +20,7 @@
 /vs2013_NOUI/
 /vs2015/
 /vs2017/
+/dependencies2013/
 /dependencies2015/
 /dependencies2017/
 
@@ -95,7 +96,7 @@ tags
 *.res
 *.manifest
 *.dep
-*.zip
+
 *.lnk
 *.chm
 *~
