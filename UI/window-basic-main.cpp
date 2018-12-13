@@ -6285,7 +6285,7 @@ void OBSBasic::InitAgoraServiceSettings()
 	obs_data_set_int(settings, "agora_uid", loacal_uid);
 	obs_data_set_string(settings, "agora_channel", agora_channel.c_str());
 	obs_data_set_string(settings, "agora_appid", agora_appid.c_str());
-	obs_data_set_bool(settings, "enableWebSdkInteroperability", true);//ÔÊĞíÓëwebsdk»¥Í¨
+	obs_data_set_bool(settings, "enableWebSdkInteroperability", true);//å…è®¸ä¸websdkäº’é€š
 
 	struct obs_audio_info ai;
 	obs_get_audio_info(&ai);
@@ -6396,7 +6396,7 @@ void OBSBasic::SetControlWhenPK(bool bPK)
 {
 	ui->streamButton->setEnabled(!bPK);
 	ui->modeSwitch->setEnabled(!bPK);
-	ui->recordButton->setEnabled(!bPK);
+	//ui->recordButton->setEnabled(!bPK);
 
 	if (bPK){
 		calldata_t params = { 0 };
@@ -6553,12 +6553,12 @@ void OBSBasic::AgoraError(void* data, calldata_t* params)
 
 void OBSBasic::OnInitRtcEngineFailed(long long code)
 {
-	if (code == -1){//aapidÎª¿Õ
+	if (code == -1){//aapidä¸ºç©º
 		OBSMessageBox::information(this,
 			QString("Agora"),
 			QString("Appid Is Empty"));
 	}
-	else if (code == -2){//initengineÊ§°Ü
+	else if (code == -2){//initengineå¤±è´¥
 		OBSMessageBox::information(this,
 			QString("Agora"),
 			QString("Init Agora Engine Failed"));
@@ -6569,7 +6569,7 @@ void OBSBasic::OnInitRtcEngineFailed(long long code)
 
 void OBSBasic::SetupRemoteVideo(long long  uid)
 {
-	if (remote_uid != 0 && remote_uid != uid)//ÒÑ¾­ÏÔÊ¾Ô¶¶Ë»­ÃæÁË
+	if (remote_uid != 0 && remote_uid != uid)//å·²ç»æ˜¾ç¤ºè¿œç«¯ç”»é¢äº†
 		return;
 	remote_uid = uid;
 	SetPreviewPK(true);
