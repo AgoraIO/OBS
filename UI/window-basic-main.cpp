@@ -6287,6 +6287,7 @@ void OBSBasic::InitAgoraServiceSettings()
 	obs_data_set_string(settings, "agora_appid", agora_appid.c_str());
 	obs_data_set_bool(settings, "enableWebSdkInteroperability", true);//允许与websdk互通
 
+
 	struct obs_audio_info ai;
 	obs_get_audio_info(&ai);
 	obs_data_set_int(settings, "agora_sample_rate", ai.samples_per_sec);
@@ -6553,12 +6554,12 @@ void OBSBasic::AgoraError(void* data, calldata_t* params)
 
 void OBSBasic::OnInitRtcEngineFailed(long long code)
 {
-	if (code == -1){//aapid为空
+	if (code == -1){//aapid涓虹┖
 		OBSMessageBox::information(this,
 			QString("Agora"),
 			QString("Appid Is Empty"));
 	}
-	else if (code == -2){//initengine失败
+	else if (code == -2){//initengine澶辫触
 		OBSMessageBox::information(this,
 			QString("Agora"),
 			QString("Init Agora Engine Failed"));
@@ -6569,7 +6570,7 @@ void OBSBasic::OnInitRtcEngineFailed(long long code)
 
 void OBSBasic::SetupRemoteVideo(long long  uid)
 {
-	if (remote_uid != 0 && remote_uid != uid)//已经显示远端画面了
+	if (remote_uid != 0 && remote_uid != uid)//宸茬粡鏄剧ず杩滅鐢婚潰浜�
 		return;
 	remote_uid = uid;
 	SetPreviewPK(true);

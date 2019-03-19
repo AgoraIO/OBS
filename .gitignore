@@ -23,7 +23,6 @@
 /dependencies2013/
 /dependencies2015/
 /dependencies2017/
-
 *.o.d
 *.ninja
 .ninja*
