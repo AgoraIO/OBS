@@ -8,7 +8,7 @@ Unicode true
 !ifndef APPVERSION
 !define APPVERSION "21.1.0"
 !define SHORTVERSION "21.1.0"
-!define AGORASDKVERSION "2.2.1"
+!define AGORASDKVERSION "2.2.3"
 !endif
 
 !define APPNAMEANDVERSION "OBS Studio ${SHORTVERSION}"
