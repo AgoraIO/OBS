@@ -2,7 +2,7 @@
 
 *English: [English](README.md)*
 
-* 基于win32
+* 编译基于win32(x86)
 * agora sdk版本2.2.1
 * obs stduio 版本21.1
 
@@ -14,6 +14,22 @@
 
 配好环境，CMake上选择源码路径和生成路径，编译器选择vs2013，编译即可生成vs解决方案。
 
+    
+## 使用CMake-gui 构建vs项目：
+
+* 运CMake-gui 选择源码路径和生成项目的而路径
+    
+* 设置windows环境变量：
+    * DepsPath 
+
+          **解压dedependencies2013.zip** 之后的目录下有个win32文件夹，作为路径。(vs2015对应dedependencies2015.zip，vs2017对应dedependencies2017.zip) 
+    * QTDir
+
+           QT 5.8 目录下的msvc2013。其他5.0以上版本的QT也可以，只要支持对应的vs版本即可。比如：QT5.8对应的vs2013的版本应该选择msvc2013。QT 5.9对应的vs2015是msvc_2015。
+    * 取消 ENABLE\_SCRIPTING
+               
+           如果不需要使用python或者lua脚本调用obs库接口，可以取消。
+    * 配置好了，点击generate, vs项目最终会生成。
 
 ## 如何在自己的obs studio中集成声网sdk
 上面大概介绍了一些obs studio集成agora sdk的编译环境，接下来从脚本和代码层面做一些说明作为参考，以便用户在自己的obs studio库中集成声网sdk。
