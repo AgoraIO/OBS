@@ -8,6 +8,7 @@ Unicode true
 !ifndef APPVERSION
 !define APPVERSION "21.1.0"
 !define SHORTVERSION "21.1.0"
+!define AGORASDKVERSION "2.2.1"
 !endif
 
 !define APPNAMEANDVERSION "OBS Studio ${SHORTVERSION}"
@@ -24,9 +25,9 @@ InstallDir "$PROGRAMFILES32\obs-studio"
 InstallDirRegKey HKLM "Software\${APPNAME}" ""
 
 !ifdef FULL
-OutFile "OBS-Studio-${SHORTVERSION}-Full-Installer.exe"
+OutFile "OBS-Studio-${SHORTVERSION}-Full--with-Agora-${AGORASDKVERSION}-Installer.exe"
 !else
-OutFile "OBS-Studio-${SHORTVERSION}-Small-Installer.exe"
+OutFile "OBS-Studio-${SHORTVERSION}-Small--with-Agora-${AGORASDKVERSION}-Installer.exe"
 !endif
 
 ; Use compression
@@ -46,7 +47,7 @@ RequestExecutionLevel admin
 !define MUI_PAGE_CUSTOMFUNCTION_LEAVE PreReqCheck
 
 !insertmacro MUI_PAGE_WELCOME
-!insertmacro MUI_PAGE_LICENSE "D:\project\AgoraIO\obs-studio\ARD-Agora-with-OBS\UI\data\license\gplv2.txt"
+!insertmacro MUI_PAGE_LICENSE "D:\project\AgoraIO\obs-studio\OBS\UI\data\license\gplv2.txt"
 !insertmacro MUI_PAGE_DIRECTORY
 !ifdef FULL
 	!insertmacro MUI_PAGE_COMPONENTS
@@ -200,11 +201,11 @@ Section "OBS Studio" SecCore
 	SetOutPath "$INSTDIR"
 	OBSInstallerUtils::KillProcess "obs-plugins\32bit\cef-bootstrap.exe"
 	OBSInstallerUtils::KillProcess "obs-plugins\64bit\cef-bootstrap.exe"
-	File /r "D:\project\AgoraIO\obs-studio\ARD-Agora-with-OBS\vs2013\rundir\Release\data"
+	File /r "D:\project\AgoraIO\obs-studio\OBS\vs2013\rundir\Release\data"
 	SetOutPath "$INSTDIR\bin"
-	File /r "D:\project\AgoraIO\obs-studio\ARD-Agora-with-OBS\vs2013\rundir\Release\bin\32bit"
+	File /r "D:\project\AgoraIO\obs-studio\OBS\vs2013\rundir\Release\bin\32bit"
 	SetOutPath "$INSTDIR\obs-plugins"
-	File /r "D:\project\AgoraIO\obs-studio\ARD-Agora-with-OBS\vs2013\rundir\Release\obs-plugins\32bit"
+	File /r "D:\project\AgoraIO\obs-studio\OBS\vs2013\rundir\Release\obs-plugins\32bit"
 
 	ClearErrors
 
