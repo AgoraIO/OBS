@@ -1,4 +1,4 @@
-# obs stduio集成声网sdk
+# obs studio集成声网sdk
 
 *English: [English](README.md)*
 
