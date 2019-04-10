@@ -82,6 +82,8 @@ public:
 	int testMicrophone(bool start, int interval);
 	int testSpeaker(bool start);
 
+	void EnableAgoraCaptureMicAudio(bool bCapture);
+
 	obs_service_t* agoraService;
 	bool bInit = false;
 	int setupRemoteVideo(unsigned int uid, void* view);
@@ -91,7 +93,7 @@ public:
 	int agora_out_cx = 640;
 	int agora_out_cy = 360;
 	int agora_video_bitrate = 500;
-
+	bool agora_sdk_captrue_mic_audio = false;
 	void joinedChannelSuccess(const char* channel, unsigned int uid, int elapsed);
 
 	int audioChannel = 2;
