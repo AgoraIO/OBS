@@ -12,7 +12,7 @@ public:
 	LPBYTE pPlayerData;
 	int    nPlayerDataLen;
 	bool   bDebug;
-
+	bool agora_sdk_captrue_mic_audio = false;
 	virtual bool onRecordAudioFrame(AudioFrame& audioFrame);
 	virtual bool onPlaybackAudioFrame(AudioFrame& audioFrame);
 	virtual bool onMixedAudioFrame(AudioFrame& audioFrame);

@@ -279,7 +279,7 @@ void* AgoraRtcEngine::AgoraAudioObserver_Create()
 		return nullptr;
 
 	std::unique_ptr<CExtendAudioFrameObserver> audioObserver(new CExtendAudioFrameObserver);
-
+	audioObserver->agora_sdk_captrue_mic_audio = agora_sdk_captrue_mic_audio;
 	if (mediaEngine->registerAudioFrameObserver(audioObserver.get()))
 	{
 		mediaEngine->release();
@@ -482,6 +482,12 @@ int AgoraRtcEngine::setRecordingDeviceVolume(int volume)
     if (!audioDeviceManager)
         return -1;
     return audioDeviceManager->setRecordingDeviceVolume(volume);
+}
+
+void  AgoraRtcEngine::EnableAgoraCaptureMicAudio(bool bCapture)
+{
+	if (m_audioObserver)
+	m_audioObserver->agora_sdk_captrue_mic_audio = bCapture;
 }
 
 int AgoraRtcEngine::setPalyoutDeviceVolume(int volume)
