@@ -65,10 +65,6 @@ public:
 	bool  AgoraAudioObserver_Encode(void* data, struct encoder_frame* frame,
 	struct encoder_packet* packet, bool *receive_packet);
 
-	int ConfigPublisher(const PublisherConfiguration& config);
-	int SetVideoCompositingLayout(const VideoCompositingLayout& sei);
-	int ClearVideoCompositingLayout();
-
 	int AddPublishStreamUrl(const char *url, bool transcodingEnabled);
 	int RemovePublishStreamUrl(const char *url);
 	int SetLiveTranscoding(const LiveTranscoding &transcoding);
@@ -98,7 +94,7 @@ public:
 
 	int audioChannel = 2;
 	int sampleRate = 44100;
-	//public slots:
+	void pushVideoFrame(struct encoder_frame* frame);
 private:
 	friend class AgoraRtcEngineEvent;
 private:

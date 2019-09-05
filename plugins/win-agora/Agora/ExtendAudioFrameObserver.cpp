@@ -68,27 +68,29 @@ bool CExtendAudioFrameObserver::onRecordAudioFrame(AudioFrame& audioFrame)
 	unsigned int datalen = 0;
 	pCircleBuffer->readBuffer(this->pPlayerData, nSize, &datalen);
 
-	if (agora_sdk_captrue_mic_audio){
-		if (nSize > 0 && datalen == nSize)
-		{
-			//int nMixLen = datalen > nSize ? nSize : datalen;
-			int len = datalen / sizeof(int16_t);
-			for (int i = 0; i < len; i++){
-				int16_t* buffer = (int16_t*)(audioFrame.buffer) + i*sizeof(int16_t);
-				int16_t* obsbuffer = (int16_t*)(pPlayerData)+i*sizeof(int16_t);
-				int mix = *buffer + *obsbuffer;
-				if (mix > 32767)
-					*obsbuffer = 32767;
-				else if (mix < -32768)
-					*obsbuffer = -32768;
-				else
-					*obsbuffer = mix;
-			}
-			memcpy(audioFrame.buffer, pPlayerData, datalen);
-		}
-	}
-	else
-	    memcpy(audioFrame.buffer, pPlayerData, datalen);
+
+ if (agora_sdk_captrue_mic_audio) {
+     if (nSize > 0 && datalen == nSize)
+     {
+         //int nMixLen = datalen > nSize ? nSize : datalen;
+         int len = datalen / sizeof(int16_t);
+         for (int i = 0; i < len; i++) {
+             int16_t* buffer = (int16_t*)(audioFrame.buffer) + i * sizeof(int16_t);
+             int16_t* obsbuffer = (int16_t*)(pPlayerData)+i * sizeof(int16_t);
+             int mix = *buffer + *obsbuffer;
+             if (mix > 32767)
+                 *obsbuffer = 32767;
+             else if (mix < -32768)
+                 *obsbuffer = -32768;
+             else
+                 *obsbuffer = mix;
+         }
+         memcpy(audioFrame.buffer, pPlayerData, datalen);
+     }
+
+     else
+         memcpy(audioFrame.buffer, pPlayerData, datalen);
+ }
 	/**/
 	
 	return true;

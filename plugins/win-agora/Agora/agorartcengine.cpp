@@ -233,37 +233,6 @@ void AgoraRtcEngine::AgoraVideoObserver_Destroy(void* data)
 	mediaEngine->release();
 }
 
-static void Cut_I420(uint8_t* Src, int x, int y, int srcWidth, int srcHeight, uint8_t* Dst, int desWidth, int desHeight)//图片按位置裁剪    
-{
-	//得到B图像所在A的坐标    
-	int nIndex = 0;
-	int BPosX = x;//列    
-	int BPosY = y;//行    
-	for (int i = 0; i < desHeight; i++)//    
-	{
-		memcpy(Dst + desWidth * i, Src + (srcWidth*BPosY) + BPosX + nIndex, desWidth);
-		nIndex += (srcWidth);
-	}
-
-	nIndex = 0;
-	uint8_t *pVSour = Src + srcWidth * srcHeight * 5 / 4;
-	uint8_t *pVDest = Dst + desWidth * desHeight * 5 / 4;
-	for (int i = 0; i < desHeight / 2; i++)//    
-	{
-		memcpy(pVDest + desWidth / 2 * i, pVSour + (srcWidth / 2 * BPosY / 2) + BPosX / 2 + nIndex, desWidth / 2);
-		nIndex += (srcWidth / 2);
-	}
-
-	nIndex = 0;
-	uint8_t *pUSour = Src + srcWidth * srcHeight;
-	uint8_t *pUDest = Dst + desWidth * desHeight;
-	for (int i = 0; i < desHeight / 2; i++)//    
-	{
-		memcpy(pUDest + desWidth / 2 * i, pUSour + (srcWidth / 2 * BPosY / 2) + BPosX / 2 + nIndex, desWidth / 2);
-		nIndex += (srcWidth / 2);
-	}
-}
-
 bool  AgoraRtcEngine::AgoraVideoObserver_Encode(void* data, struct encoder_frame* frame, struct encoder_packet* packet, bool *receive_packet)
 {
 	//Cut_I420(frame->frames[0], )
@@ -402,20 +371,7 @@ int AgoraRtcEngine::setupRemoteVideo(unsigned int uid, void* view)
     return m_rtcEngine->setupRemoteVideo(canvas);
 }
 
-int AgoraRtcEngine::ConfigPublisher(const PublisherConfiguration& config)
-{
-	return m_rtcEngine->configPublisher(config);
-}
 
-int AgoraRtcEngine::SetVideoCompositingLayout(const VideoCompositingLayout& sei)
-{
-	return m_rtcEngine->setVideoCompositingLayout(sei);
-}
-
-int AgoraRtcEngine::ClearVideoCompositingLayout()
-{
-	return m_rtcEngine->clearVideoCompositingLayout();
-}
 
 bool AgoraRtcEngine::keepPreRotation(bool bRotate)
 {
@@ -542,4 +498,11 @@ int AgoraRtcEngine::EnableWebSdkInteroperability(bool enabled)
 {
 	RtcEngineParameters rep(*m_rtcEngine);
 	return rep.enableWebSdkInteroperability(true);
+}
+
+void AgoraRtcEngine::pushVideoFrame(struct encoder_frame* frame)
+{
+	if (agora_out_cx && agora_out_cy && agora_out_cx == frame->linesize[0]){
+		m_videoObserver->pushBackVideoFrame(frame->data[0], agora_out_cx*agora_out_cy * 3 / 2);
+	}
 }

@@ -17,70 +17,25 @@ static void AgoraYUV_Destroy(void* data)
 	AgoraRtcEngine::GetInstance()->AgoraVideoObserver_Destroy(data);
 }
 
-static void Cut_I420(uint8_t* Src, int x, int y, int srcWidth, int srcHeight, uint8_t* Dst, int desWidth, int desHeight)//图片按位置裁剪    
-{
-	//得到B图像所在A的坐标    
-	int nIndex = 0;
-	int BPosX = x;//列    
-	int BPosY = y;//行    
-	for (int i = 0; i < desHeight; i++)//    
-	{
-		memcpy(Dst + desWidth * i, Src + (srcWidth*BPosY) + BPosX + nIndex, desWidth);
-		nIndex += (srcWidth);
-	}
-
-	nIndex = 0;
-	uint8_t *pVSour = Src + srcWidth * srcHeight * 5 / 4;
-	uint8_t *pVDest = Dst + desWidth * desHeight * 5 / 4;
-	for (int i = 0; i < desHeight / 2; i++)//    %
-	{
-		memcpy(pVDest + desWidth / 2 * i, pVSour + (srcWidth / 2 * BPosY / 2) + BPosX / 2 + nIndex, desWidth / 2);
-		nIndex += (srcWidth / 2);
-	}
-
-	nIndex = 0;
-	uint8_t *pUSour = Src + srcWidth * srcHeight;
-	uint8_t *pUDest = Dst + desWidth * desHeight;
-	for (int i = 0; i < desHeight / 2; i++)//    
-	{
-		memcpy(pUDest + desWidth / 2 * i, pUSour + (srcWidth / 2 * BPosY / 2) + BPosX / 2 + nIndex, desWidth / 2);
-		nIndex += (srcWidth / 2);
-	}
-}
-
 static bool AgoraYUV_Encode(void* data, struct encoder_frame* frame,
 struct encoder_packet* packet, bool *receive_packet)
 {
-	CExtendVideoFrameObserver* videoObserver = static_cast<CExtendVideoFrameObserver*>(data);
-	AgoraRtcEngine* agora = AgoraRtcEngine::GetInstance();
+//	CExtendVideoFrameObserver* videoObserver = static_cast<CExtendVideoFrameObserver*>(data);
+//	AgoraRtcEngine* agora = AgoraRtcEngine::GetInstance();
 
-	if (agora->agora_out_cx && agora->agora_out_cy && agora->agora_out_cx == frame->linesize[0])
-	{
-		memcpy(videoObserver->m_lpImageBuffer, frame->data[0], agora->agora_out_cx *agora->agora_out_cy * 3 / 2);
-	}
+	AgoraRtcEngine::GetInstance()->pushVideoFrame(frame);
+//	if (agora->agora_out_cx && agora->agora_out_cy && agora->agora_out_cx == frame->linesize[0])
+//	{
+
+//		//memcpy(videoObserver->m_lpImageBuffer, frame->data[0], agora->agora_out_cx *agora->agora_out_cy * 3 / 2);
+//	}
 	return true;
 }
 
 static void AgoraYUV_GetDefaults(obs_data_t *settings)
 {
-
+	UNREFERENCED_PARAMETER(settings);
 }
-
-
-// static obs_properties_t *AgoraPCM_GetProperties(void *)
-// {
-// // 	obs_properties_t *props = obs_properties_create();
-
-// // 
-
-// // 	obs_properties_add_int(props, "bitrate",
-
-// // 		obs_module_text("Bitrate"), 96, 192, 32);
-
-// 
-// 	return props;
-// }
-
 
 static bool AgoraYUV_GetExtraData(void *data, uint8_t **extra_data, size_t *size)
 {
@@ -91,7 +46,7 @@ static bool AgoraYUV_GetExtraData(void *data, uint8_t **extra_data, size_t *size
 
 static void AgoraYUV_GetVideoInfo(void *, struct audio_convert_info *info)
 {
-
+	UNREFERENCED_PARAMETER(info);
 }
 
 
