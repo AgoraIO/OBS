@@ -8,14 +8,14 @@
    
     * Cmake of Windows version
    
-    * visual studio 2013 
+    * visual studio 2015(also support vs2013 and vs2017)
     
-    * QT 5.9.2(msvc2015) if you need UI
+    * QT 5.9.2(msvc2015, any version QT adjust to visual studio version) if you need UI
 
 * Version
 
-    * agora sdk windows version 2.9.0 and above(x86).
-    * obs studio 21.1b and above(x86).
+    * agora sdk windows version 2.9.0 and above(x86), also support x64.
+    * obs studio 21.1b and above(x86), also support x64.
     
 * Build project with CMake-gui：
 
@@ -24,10 +24,10 @@
     * Set variables in windows environment:
         * DepsPath 
 
-               The path where win32 is located after decompressing dedependencies2013.zip 
+               The path where win32 or win64 is located after decompressing dedependencies2015.zip(dedependencies2013.zip or dedependencies2017.zip). dedependencies2013 not support win64. 
         * QTDir
 
-               The path where win32 is loacted after installed QT 5.8
+               The path where win32 is loacted after installed QT 5.9.2
         * Uncheck ENABLE\_SCRIPTING
 
         * After configure is ok,then click generate, vs project can be generated.
