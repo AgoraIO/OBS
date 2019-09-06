@@ -25,9 +25,9 @@ InstallDir "$PROGRAMFILES32\obs-studio"
 InstallDirRegKey HKLM "Software\${APPNAME}" ""
 
 !ifdef FULL
-OutFile "OBS-Studio-${SHORTVERSION}-Full--with-Agora-${AGORASDKVERSION}-Installer.exe"
+OutFile "OBS-Studio-${SHORTVERSION}-Full-2017-with-Agora-${AGORASDKVERSION}-Installer.exe"
 !else
-OutFile "OBS-Studio-${SHORTVERSION}-Small--with-Agora-${AGORASDKVERSION}-Installer.exe"
+OutFile "OBS-Studio-${SHORTVERSION}-Small-2017-with-Agora-${AGORASDKVERSION}-Installer.exe"
 !endif
 
 ; Use compression
@@ -201,11 +201,11 @@ Section "OBS Studio" SecCore
 	SetOutPath "$INSTDIR"
 	OBSInstallerUtils::KillProcess "obs-plugins\32bit\cef-bootstrap.exe"
 	OBSInstallerUtils::KillProcess "obs-plugins\64bit\cef-bootstrap.exe"
-	File /r "..\..\vs2013\rundir\Release\data"
+	File /r "..\..\vs2017\rundir\Release\data"
 	SetOutPath "$INSTDIR\bin"
-	File /r "..\..\vs2013\rundir\Release\bin\32bit"
+	File /r "..\..\vs2017\rundir\Release\bin\32bit"
 	SetOutPath "$INSTDIR\obs-plugins"
-	File /r "..\..\vs2013\rundir\Release\obs-plugins\32bit"
+	File /r "..\..\vs2017\rundir\Release\obs-plugins\32bit"
 
 	ClearErrors
 

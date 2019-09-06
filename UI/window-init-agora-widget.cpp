@@ -14,6 +14,10 @@ AgoraInitWidget::AgoraInitWidget(QWidget *parent)
 	
 	installEventFilter(CreateShortcutFilter());
 	
+ ui->textEdit_uid->setText(QString(""));
+ ui->textEdit_appid->setText(QString(""));
+ ui->textEdit_channel->setText(QString(""));
+
 // 	ui->textEdit_appid->setText(app_id);
 // 	ui->textEdit_channel->setText(QT_UTF8(channel));
 // 	ui->textEdit_uid->setText(QT_UTF8(text_uid.c_str()));
@@ -28,6 +32,7 @@ void AgoraInitWidget::on_saveButton_clicked()
 	QString strUid = ui->textEdit_uid->text();
 	QString strAppid = ui->textEdit_appid->text();
 	QString strChannel = ui->textEdit_channel->text();
+
 	strUid.trimmed();
 	strAppid.trimmed();
 	strChannel.trimmed();
@@ -40,7 +45,7 @@ void AgoraInitWidget::on_saveButton_clicked()
 		QMessageBox::warning(this, QString("agora warning"), QString("please input agora channel"));
 	}
 	else if (input_appid.empty()){
-		QMessageBox::warning(this, QString("agora warning"), QString("please input agora channel"));
+		QMessageBox::warning(this, QString("agora warning"), QString("please input agora appid"));
 	}
 	else{
 		app_id = input_appid;

@@ -8,14 +8,14 @@
    
     * Cmake of Windows version
    
-    * visual studio 2013 
+    * visual studio 2015(also support vs2013 and vs2017)
     
-    * QT 5.8(msvc2013) if you need UI
+    * QT 5.9.2(msvc2015, any version QT adjust to visual studio version) if you need UI
 
 * Version
 
-    * agora sdk windows version 2.2.1 and above(x86).
-    * obs studio 21.1b and above(x86).
+    * agora sdk windows version 2.9.0 and above(x86), also support x64.
+    * obs studio 21.1b and above(x86), also support x64.
     
 * Build project with CMake-gui：
 
@@ -24,10 +24,10 @@
     * Set variables in windows environment:
         * DepsPath 
 
-               The path where win32 is located after decompressing dedependencies2013.zip 
+               The path where win32 or win64 is located after decompressing dedependencies2015.zip(dedependencies2013.zip or dedependencies2017.zip). dedependencies2013 not support win64. 
         * QTDir
 
-               The path where win32 is loacted after installed QT 5.8
+               The path where win32 is loacted after installed QT 5.9.2
         * Uncheck ENABLE\_SCRIPTING
 
         * After configure is ok,then click generate, vs project can be generated.
@@ -148,7 +148,7 @@ You can reference setupRemoteVideo, it's implemented in obs\_service\_agora\_set
 After calling some apis, you'll receive agora callbacks. Sometimes you must first  receive callbacks, then you can call other agora apis. For example, after receiving onUserJoined callback, you can call setupRemoteVideo to show remote video.
 
 * In the file obs-service.c, in constant character array service_signals, add callbacks correspond to signals, including return type and function name.
-* agorartcengine.cpp，声网回调函数想应用层发出signal，调用signal_handler_signal，通过calldata结构体设置多个参数。
+* agorartcengine.cpp，agora sdk callback send signal to app, call signal_handler_signal. you can set parameters with calldata structure.
 
 what to do int the application:
 
