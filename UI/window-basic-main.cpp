@@ -6262,17 +6262,17 @@ void OBSBasic::InitAgoraServiceSettings()
 {
 	obs_data_t* settings = obs_service_get_settings(agoraService);
 	std::string rtmpcustom = "rtmp_custonm";
-	if (rtmpcustom.compare( obs_service_get_type(service) )== 0)
+	if (rtmpcustom.compare(obs_service_get_type(service)) == 0)
 	{
 		obs_data_set_string(settings, "agora_url", obs_service_get_url(service));
 		obs_data_set_string(settings, "agora_key", obs_service_get_key(service));
 	}
-	
+
 	obs_data_set_int(settings, "agora_video_bitrate", 2400);
 
 	int out_cx = config_get_uint(basicConfig, "Video", "OutputCX");
 	int out_cy = config_get_uint(basicConfig, "Video", "OutputCY");
-	
+
 	obs_data_set_int(settings, "agora_out_cx", out_cx);
 	obs_data_set_int(settings, "agora_out_cy", out_cy);
 
