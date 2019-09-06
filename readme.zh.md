@@ -2,17 +2,17 @@
 
 *English: [English](README.md)*
 
-* 编译基于win32(x86)
-* agora sdk版本2.2.1
+* 编译基于win32(x86)，也支持x64
+* agora sdk版本2.9.0
 * obs stduio 版本21.1
 
 ## 编译环境
 
 * CMake 2.8.12以上
-* vs2013
-* QT 5.8(可选，如果不需要界面，可以不需要QT。默认是有界面的)
+* vs2015
+* QT 5.9.2(可选，如果不需要界面，可以不需要QT。默认是有界面的。任何适配对应的visual stduio版本的QT)
 
-配好环境，CMake上选择源码路径和生成路径，编译器选择vs2013，编译即可生成vs解决方案。
+配好环境，CMake上选择源码路径和生成路径，编译器选择vs2015，编译即可生成vs解决方案。
 
     
 ## 使用CMake-gui 构建vs项目：
@@ -22,10 +22,10 @@
 * 设置windows环境变量：
     * DepsPath 
 
-          **解压dedependencies2013.zip** 之后的目录下有个win32文件夹，作为路径。(vs2015对应dedependencies2015.zip，vs2017对应dedependencies2017.zip) 
+          **解压dedependencies2015.zip** 之后的目录下有个win32或者win64文件夹，作为路径。(vs2015对应dedependencies2013.zip，vs2017对应dedependencies2017.zip) 。dedependencies2013目前不支持win64。
     * QTDir
 
-           QT 5.8 目录下的msvc2013。其他5.0以上版本的QT也可以，只要支持对应的vs版本即可。比如：QT5.8对应的vs2013的版本应该选择msvc2013。QT 5.9对应的vs2015是msvc_2015。
+           QT 5.8 目录下的msvc2013。其他5.0以上版本的QT也可以，只要支持对应的vs版本即可。比如：QT5.8对应的vs2013的版本应该选择msvc2013。QT 5.9.2对应的vs2015是msvc_2015。
     * 取消 ENABLE\_SCRIPTING
                
            如果不需要使用python或者lua脚本调用obs库接口，可以取消。

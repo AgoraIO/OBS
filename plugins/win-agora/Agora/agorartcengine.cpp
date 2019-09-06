@@ -118,11 +118,10 @@ AgoraRtcEngine::AgoraRtcEngine()
 
 AgoraRtcEngine::~AgoraRtcEngine()
 {
-    if(m_rtcEngine.get()) {
-        auto re = m_rtcEngine.get();
-        m_rtcEngine.release();
-        re->release();
-    }
+	if (m_rtcEngine){
+		m_rtcEngine->release();
+		m_rtcEngine = NULL;
+	}
 }
 
 bool AgoraRtcEngine::InitEngine(std::string appid)
@@ -176,7 +175,7 @@ int AgoraRtcEngine::setLocalVideoMirrorMode(VIDEO_MIRROR_MODE_TYPE mirrorMode)
 bool AgoraRtcEngine::enableLocalRender(bool bEnable)
 {
 	int ret = -1;
-	AParameter apm(*m_rtcEngine.get());
+	AParameter apm(*m_rtcEngine);
 
 	if (bEnable)
 		ret = apm->setParameters("{\"che.video.local.render\":true}");
@@ -199,7 +198,7 @@ void AgoraRtcEngine::stopPreview()
 void* AgoraRtcEngine::AgoraVideoObserver_Create()
 {
 	agora::util::AutoPtr< agora::media::IMediaEngine> mediaEngine;
-	mediaEngine.queryInterface(m_rtcEngine.get(), agora::AGORA_IID_MEDIA_ENGINE);
+	mediaEngine.queryInterface(m_rtcEngine, agora::AGORA_IID_MEDIA_ENGINE);
 
 	if (mediaEngine.get() == nullptr)
 		return nullptr;
@@ -225,44 +224,13 @@ void AgoraRtcEngine::AgoraVideoObserver_Destroy(void* data)
 	}
 
 	agora::util::AutoPtr< agora::media::IMediaEngine> mediaEngine;
-	mediaEngine.queryInterface(m_rtcEngine.get(), agora::AGORA_IID_MEDIA_ENGINE);
+	mediaEngine.queryInterface(m_rtcEngine, agora::AGORA_IID_MEDIA_ENGINE);
 
 	if (mediaEngine.get() == nullptr)
 		return;
 
 	mediaEngine->registerVideoFrameObserver(nullptr);
 	mediaEngine->release();
-}
-
-static void Cut_I420(uint8_t* Src, int x, int y, int srcWidth, int srcHeight, uint8_t* Dst, int desWidth, int desHeight)//图片按位置裁剪    
-{
-	//得到B图像所在A的坐标    
-	int nIndex = 0;
-	int BPosX = x;//列    
-	int BPosY = y;//行    
-	for (int i = 0; i < desHeight; i++)//    
-	{
-		memcpy(Dst + desWidth * i, Src + (srcWidth*BPosY) + BPosX + nIndex, desWidth);
-		nIndex += (srcWidth);
-	}
-
-	nIndex = 0;
-	uint8_t *pVSour = Src + srcWidth * srcHeight * 5 / 4;
-	uint8_t *pVDest = Dst + desWidth * desHeight * 5 / 4;
-	for (int i = 0; i < desHeight / 2; i++)//    
-	{
-		memcpy(pVDest + desWidth / 2 * i, pVSour + (srcWidth / 2 * BPosY / 2) + BPosX / 2 + nIndex, desWidth / 2);
-		nIndex += (srcWidth / 2);
-	}
-
-	nIndex = 0;
-	uint8_t *pUSour = Src + srcWidth * srcHeight;
-	uint8_t *pUDest = Dst + desWidth * desHeight;
-	for (int i = 0; i < desHeight / 2; i++)//    
-	{
-		memcpy(pUDest + desWidth / 2 * i, pUSour + (srcWidth / 2 * BPosY / 2) + BPosX / 2 + nIndex, desWidth / 2);
-		nIndex += (srcWidth / 2);
-	}
 }
 
 bool  AgoraRtcEngine::AgoraVideoObserver_Encode(void* data, struct encoder_frame* frame, struct encoder_packet* packet, bool *receive_packet)
@@ -274,13 +242,13 @@ bool  AgoraRtcEngine::AgoraVideoObserver_Encode(void* data, struct encoder_frame
 void* AgoraRtcEngine::AgoraAudioObserver_Create()
 {
 	agora::util::AutoPtr< agora::media::IMediaEngine> mediaEngine;
-	mediaEngine.queryInterface(m_rtcEngine.get(), agora::AGORA_IID_MEDIA_ENGINE);
+	mediaEngine.queryInterface(m_rtcEngine, agora::AGORA_IID_MEDIA_ENGINE);
 
 	if (mediaEngine.get() == nullptr)
 		return nullptr;
 
 	std::unique_ptr<CExtendAudioFrameObserver> audioObserver(new CExtendAudioFrameObserver);
-
+	audioObserver->agora_sdk_captrue_mic_audio = agora_sdk_captrue_mic_audio;
 	if (mediaEngine->registerAudioFrameObserver(audioObserver.get()))
 	{
 		mediaEngine->release();
@@ -296,7 +264,7 @@ void AgoraRtcEngine::AgoraAudioObserver_Destroy(void* data)
 	CExtendAudioFrameObserver* audioObserver = static_cast<CExtendAudioFrameObserver*>(data);
 
 	agora::util::AutoPtr< agora::media::IMediaEngine> mediaEngine;
-	mediaEngine.queryInterface(m_rtcEngine.get(), agora::AGORA_IID_MEDIA_ENGINE);
+	mediaEngine.queryInterface(m_rtcEngine, agora::AGORA_IID_MEDIA_ENGINE);
 
 	if (mediaEngine.get() == nullptr)
 		return;
@@ -330,7 +298,7 @@ bool AgoraRtcEngine::enableExtendPlayDevice(bool bEnable)
 {
 	int ret = 0;
 
-	AParameter apm(*m_rtcEngine.get());
+	AParameter apm(*m_rtcEngine);
 
 	if (bEnable)
 		ret = apm->setParameters("{\"che.audio.external_render\":true}");
@@ -342,7 +310,7 @@ bool AgoraRtcEngine::enableExtendPlayDevice(bool bEnable)
 
 bool AgoraRtcEngine::setExternalAudioSource(bool bEnabled, int nSampleRate, int nChannels)
 {
-	RtcEngineParameters rep(m_rtcEngine.get());
+	RtcEngineParameters rep(m_rtcEngine);
 
 	int nRet = rep.setExternalAudioSource(bEnabled, nSampleRate, nChannels);
 
@@ -351,7 +319,7 @@ bool AgoraRtcEngine::setExternalAudioSource(bool bEnabled, int nSampleRate, int 
 
 bool AgoraRtcEngine::setRecordingAudioFrameParameters(int nSampleRate, int nChannels, int nSamplesPerCall)
 {
-	RtcEngineParameters rep(m_rtcEngine.get());
+	RtcEngineParameters rep(m_rtcEngine);
 	int ret = rep.setRecordingAudioFrameParameters(nSampleRate, nChannels,  RAW_AUDIO_FRAME_OP_MODE_READ_WRITE, nSamplesPerCall);
 	return ret == 0 ? true : false;
 }
@@ -403,25 +371,12 @@ int AgoraRtcEngine::setupRemoteVideo(unsigned int uid, void* view)
     return m_rtcEngine->setupRemoteVideo(canvas);
 }
 
-int AgoraRtcEngine::ConfigPublisher(const PublisherConfiguration& config)
-{
-	return m_rtcEngine->configPublisher(config);
-}
 
-int AgoraRtcEngine::SetVideoCompositingLayout(const VideoCompositingLayout& sei)
-{
-	return m_rtcEngine->setVideoCompositingLayout(sei);
-}
-
-int AgoraRtcEngine::ClearVideoCompositingLayout()
-{
-	return m_rtcEngine->clearVideoCompositingLayout();
-}
 
 bool AgoraRtcEngine::keepPreRotation(bool bRotate)
 {
 	int ret = -1;
-	AParameter apm(m_rtcEngine.get());
+	AParameter apm(m_rtcEngine);
 	if (bRotate)
 		ret = apm->setParameters("{\"che.video.keep_prerotation\":true}");
 	else
@@ -432,7 +387,7 @@ bool AgoraRtcEngine::keepPreRotation(bool bRotate)
 
 bool AgoraRtcEngine::setVideoProfileEx(int nWidth, int nHeight, int nFrameRate, int nBitRate)
 {
-	IRtcEngine2 *lpRtcEngine2 = (IRtcEngine2 *)m_rtcEngine.get();
+	IRtcEngine2 *lpRtcEngine2 = (IRtcEngine2 *)m_rtcEngine;
 	int nRet = lpRtcEngine2->setVideoProfileEx(nWidth, nHeight, nFrameRate, nBitRate);
 
 	return nRet == 0 ? true : false;
@@ -440,7 +395,7 @@ bool AgoraRtcEngine::setVideoProfileEx(int nWidth, int nHeight, int nFrameRate, 
 
 bool AgoraRtcEngine::enableLocalCameara(bool bEnable)
 {
-	AParameter apm(*m_rtcEngine.get());
+	AParameter apm(*m_rtcEngine);
 	int ret = -1;
 	if (!apm.get()) return false;
 
@@ -455,129 +410,9 @@ bool AgoraRtcEngine::enableLocalCameara(bool bEnable)
 ///////////////////////////////////////////////////////////////////////////////////////
 //agora device
 ///////////////////////////////////////////////////////////////////////////////////////
-// QVariantMap AgoraRtcEngine::getRecordingDeviceList()
-// {
-//     QVariantMap devices;
-//     QVariantList names, guids;
-//     AAudioDeviceManager audioDeviceManager(m_rtcEngine.get());
-//     if (!audioDeviceManager)
-//         return devices;
-// 
-//     agora::util::AutoPtr<IAudioDeviceCollection> spCollection(audioDeviceManager->enumerateRecordingDevices());
-//     if (!spCollection)
-//         return devices;
-// 	char name[MAX_DEVICE_ID_LENGTH], guid[MAX_DEVICE_ID_LENGTH];
-//     int count = spCollection->getCount();
-//     if (count > 0)
-//     {
-//         for (int i = 0; i < count; i++)
-//         {
-//             if (!spCollection->getDevice(i, name, guid))
-//             {
-//                 names.push_back(name);
-//                 guids.push_back(guid);
-//             }
-//         }
-//         devices.insert("name", names);
-//         devices.insert("guid", guids);
-//         devices.insert("length", names.length());
-//     }
-//     return devices;
-// }
-
-// QVariantMap AgoraRtcEngine::getPlayoutDeviceList()
-// {
-//     QVariantMap devices;
-//     QVariantList names, guids;
-//     AAudioDeviceManager audioDeviceManager(m_rtcEngine.get());
-//     if (!audioDeviceManager)
-//         return devices;
-// 
-//     agora::util::AutoPtr<IAudioDeviceCollection> spCollection(audioDeviceManager->enumeratePlaybackDevices());
-//     if (!spCollection)
-//         return devices;
-// 	char name[MAX_DEVICE_ID_LENGTH], guid[MAX_DEVICE_ID_LENGTH];
-//     int count = spCollection->getCount();
-//     if (count > 0)
-//     {
-//         for (int i = 0; i < count; i++)
-//         {
-//             if (!spCollection->getDevice(i, name, guid))
-//             {
-//                 names.push_back(name);
-//                 guids.push_back(guid);
-//             }
-//         }
-//         devices.insert("name", names);
-//         devices.insert("guid", guids);
-//         devices.insert("length", names.length());
-//     }
-//     return devices;
-// }
-// 
-// QVariantMap AgoraRtcEngine::getVideoDeviceList()
-// {
-//     QVariantMap devices;
-//     QVariantList names, guids;
-//     AVideoDeviceManager videoDeviceManager(m_rtcEngine.get());
-//     if (!videoDeviceManager)
-//         return devices;
-// 
-//     agora::util::AutoPtr<IVideoDeviceCollection> spCollection(videoDeviceManager->enumerateVideoDevices());
-//     if (!spCollection)
-//         return devices;
-// 	char name[MAX_DEVICE_ID_LENGTH], guid[MAX_DEVICE_ID_LENGTH];
-//     int count = spCollection->getCount();
-//     if (count > 0)
-//     {
-//         for (int i = 0; i < count; i++)
-//         {
-//             if (!spCollection->getDevice(i, name, guid))
-//             {
-//                 names.push_back(name);
-//                 guids.push_back(guid);
-//             }
-//         }
-//         devices.insert("name", names);
-//         devices.insert("guid", guids);
-//         devices.insert("length", names.length());
-//     }
-//     return devices;
-// }
-// 
-// int AgoraRtcEngine::setRecordingDevice(const QString& guid)
-// {
-//     if (guid.isEmpty())
-//         return -1;
-//     AAudioDeviceManager audioDeviceManager(m_rtcEngine.get());
-//     if (!audioDeviceManager)
-//         return -1;
-//     return audioDeviceManager->setRecordingDevice(guid.toUtf8().data());
-// }
-// 
-// int AgoraRtcEngine::setPlayoutDevice(const QString& guid)
-// {
-//     if (guid.isEmpty())
-//         return -1;
-//     AAudioDeviceManager audioDeviceManager(m_rtcEngine.get());
-//     if (!audioDeviceManager)
-//         return -1;
-//     return audioDeviceManager->setPlaybackDevice(guid.toUtf8().data());
-// }
-// 
-// int AgoraRtcEngine::setVideoDevice(const QString& guid)
-// {
-//     if (guid.isEmpty())
-//         return -1;
-//     AVideoDeviceManager videoDeviceManager(m_rtcEngine.get());
-//     if (!videoDeviceManager)
-//         return -1;
-//     return videoDeviceManager->setDevice(guid.toUtf8().data());
-// }
-
 int AgoraRtcEngine::getRecordingDeviceVolume()
 {
-    AAudioDeviceManager audioDeviceManager(m_rtcEngine.get());
+    AAudioDeviceManager audioDeviceManager(m_rtcEngine);
     if (!audioDeviceManager)
         return 0;
     int vol = 0;
@@ -588,7 +423,7 @@ int AgoraRtcEngine::getRecordingDeviceVolume()
 
 int AgoraRtcEngine::getPalyoutDeviceVolume()
 {
-    AAudioDeviceManager audioDeviceManager(m_rtcEngine.get());
+    AAudioDeviceManager audioDeviceManager(m_rtcEngine);
     if (!audioDeviceManager)
         return 0;
     int vol = 0;
@@ -599,15 +434,21 @@ int AgoraRtcEngine::getPalyoutDeviceVolume()
 
 int AgoraRtcEngine::setRecordingDeviceVolume(int volume)
 {
-    AAudioDeviceManager audioDeviceManager(m_rtcEngine.get());
+    AAudioDeviceManager audioDeviceManager(m_rtcEngine);
     if (!audioDeviceManager)
         return -1;
     return audioDeviceManager->setRecordingDeviceVolume(volume);
 }
 
+void  AgoraRtcEngine::EnableAgoraCaptureMicAudio(bool bCapture)
+{
+	if (m_audioObserver)
+	m_audioObserver->agora_sdk_captrue_mic_audio = bCapture;
+}
+
 int AgoraRtcEngine::setPalyoutDeviceVolume(int volume)
 {
-    AAudioDeviceManager audioDeviceManager(m_rtcEngine.get());
+    AAudioDeviceManager audioDeviceManager(m_rtcEngine);
     if (!audioDeviceManager)
         return -1;
     return audioDeviceManager->setPlaybackDeviceVolume(volume);
@@ -615,7 +456,7 @@ int AgoraRtcEngine::setPalyoutDeviceVolume(int volume)
 
 int AgoraRtcEngine::testMicrophone(bool start, int interval)
 {
-    agora::rtc::AAudioDeviceManager dm(m_rtcEngine.get());
+    agora::rtc::AAudioDeviceManager dm(m_rtcEngine);
     if (!dm)
         return -1;
     if (start)
@@ -626,7 +467,7 @@ int AgoraRtcEngine::testMicrophone(bool start, int interval)
 
 int AgoraRtcEngine::testSpeaker(bool start)
 {
-    agora::rtc::AAudioDeviceManager dm(m_rtcEngine.get());
+    agora::rtc::AAudioDeviceManager dm(m_rtcEngine);
     if (!dm)
         return -1;
     if (start)
@@ -634,21 +475,6 @@ int AgoraRtcEngine::testSpeaker(bool start)
     else
         return dm->stopPlaybackDeviceTest();
 }
-// 
-// int AgoraRtcEngine::testCamera(bool start, QWidget* view)
-// {
-//     agora::rtc::AVideoDeviceManager dm(m_rtcEngine.get());
-//     if (!dm)
-//         return -1;
-// 
-//     if (start)
-//     {
-// 		agora::rtc::view_t v = reinterpret_cast<agora::rtc::view_t>(view->winId());
-//         return dm->startDeviceTest(v);
-//     }
-//     else
-//         return dm->stopDeviceTest();
-// }
 
 void AgoraRtcEngine::joinedChannelSuccess(const char* channel, unsigned int uid, int elapsed)
 {
@@ -672,4 +498,11 @@ int AgoraRtcEngine::EnableWebSdkInteroperability(bool enabled)
 {
 	RtcEngineParameters rep(*m_rtcEngine);
 	return rep.enableWebSdkInteroperability(true);
+}
+
+void AgoraRtcEngine::pushVideoFrame(struct encoder_frame* frame)
+{
+	if (agora_out_cx && agora_out_cy && agora_out_cx == frame->linesize[0]){
+		m_videoObserver->pushBackVideoFrame(frame->data[0], agora_out_cx*agora_out_cy * 3 / 2);
+	}
 }

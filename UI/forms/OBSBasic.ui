@@ -997,7 +997,7 @@
      <item>
       <widget class="QPushButton" name="agoraPKButton">
        <property name="text">
-        <string>agora PK</string>
+        <string>Basic.Main.StartAgoraStreaming</string>
        </property>
       </widget>
      </item>

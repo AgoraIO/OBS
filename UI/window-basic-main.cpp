@@ -1496,10 +1496,6 @@ void OBSBasic::OBSInit()
 		throw "Failed to initialize service";
 
 	InitAgoraService();
-// 	const char* mainServiceType = obs_service_get_type(service);
-// 	if (mainServiceType && strcmp(mainServiceType, "rtmp_custom")){
-// 		ui->agoraPKButton->setEnabled(false);
-// 	}
 
 	InitPrimitives();
 
@@ -6266,17 +6262,17 @@ void OBSBasic::InitAgoraServiceSettings()
 {
 	obs_data_t* settings = obs_service_get_settings(agoraService);
 	std::string rtmpcustom = "rtmp_custonm";
-	if (rtmpcustom.compare( obs_service_get_type(service) )== 0)
+	if (rtmpcustom.compare(obs_service_get_type(service)) == 0)
 	{
 		obs_data_set_string(settings, "agora_url", obs_service_get_url(service));
 		obs_data_set_string(settings, "agora_key", obs_service_get_key(service));
 	}
-	
+
 	obs_data_set_int(settings, "agora_video_bitrate", 2400);
 
 	int out_cx = config_get_uint(basicConfig, "Video", "OutputCX");
 	int out_cy = config_get_uint(basicConfig, "Video", "OutputCY");
-	
+
 	obs_data_set_int(settings, "agora_out_cx", out_cx);
 	obs_data_set_int(settings, "agora_out_cy", out_cy);
 
@@ -6312,51 +6308,55 @@ void OBSBasic::MuteAudioDevice(bool bMute)
 
 void OBSBasic::on_agoraPKButton_clicked()
 {
-	if (agoraOutputHandler->AgoraActive()){
-		std::string rtmp_url = "";
-		if (GetObsRtmpUrl(rtmp_url) && !rtmp_url.empty()){
-			obs_service_agora_remove_publish_stream_url(GetAgoraService(), rtmp_url.c_str());
-		}
-		agoraOutputHandler->StopAgora();
-		ClearRemoteVideos();
-		m_lstUids.clear();
-		m_lstRemoteVideoUids.clear();
-		SetControlWhenPK(false);
-		MuteAudioDevice(false);
-		SetPreviewPK(false);
-	}
-	else{
-		AgoraInitWidget agoraWidget(this);
-		int ret = agoraWidget.exec();
-		if (QDialog::Accepted != ret){
-			return;
-		}
-		
-		loacal_uid = agoraWidget.uid;
-		agora_channel = agoraWidget.channel;
-		agora_appid = agoraWidget.app_id;
+    if (agoraOutputHandler->AgoraActive()) {
+        std::string rtmp_url = "";
+        if (GetObsRtmpUrl(rtmp_url) && !rtmp_url.empty()) {
+            obs_service_agora_remove_publish_stream_url(GetAgoraService(), rtmp_url.c_str());
+        }
+        agoraOutputHandler->StopAgora();
+        ClearRemoteVideos();
+        m_lstUids.clear();
+        m_lstRemoteVideoUids.clear();
+        SetControlWhenPK(false);
+        MuteAudioDevice(false);
+        SetPreviewPK(false);
+    }
+    else {
+        AgoraInitWidget agoraWidget(this);
+        int ret = agoraWidget.exec();
+        if (QDialog::Accepted != ret) {
+            return;
+        }
 
-		InitAgoraServiceSettings();
-		
-		if (outputHandler->StreamingActive()){
-			StopStreaming();
-		}
-			
-		if (IsPreviewProgramMode()){
-			on_modeSwitch_clicked();
-		}
-	
-		ui->agoraPKButton->setText(QTStr("Starting PK"));
-		SetControlWhenPK(true);
-		MuteAudioDevice(true);
-		if (!agoraOutputHandler->StartAgora(agoraService))
-			ui->agoraPKButton->setText(QTStr("Agora PK"));
-		//for test
-		//UpdateAgoraClientRole(2);
-		//QString strLogFile = QString("D:/agora_sdk_log.log");
-		//UpdateAgoraLogPath(QT_TO_UTF8(strLogFile));
-		// end
-	}
+        loacal_uid = agoraWidget.uid;
+        agora_channel = agoraWidget.channel;
+        agora_appid = agoraWidget.app_id;
+
+        InitAgoraServiceSettings();
+
+        if (outputHandler->StreamingActive()) {
+            StopStreaming();
+        }
+
+        if (IsPreviewProgramMode()) {
+            on_modeSwitch_clicked();
+        }
+
+        ui->agoraPKButton->setText(QTStr("Basic.Main.StartAgoraStreaming"));
+        SetControlWhenPK(true);
+        MuteAudioDevice(true);
+        if (!agoraOutputHandler->StartAgora(agoraService)) {
+            SetControlWhenPK(false);
+            ui->agoraPKButton->setText(QTStr("Basic.Main.StopAgoraStreaming"));
+
+        }
+
+        //for test
+        //UpdateAgoraClientRole(2);
+        //QString strLogFile = QString("D:/agora_sdk_log.log");
+        //UpdateAgoraLogPath(QT_TO_UTF8(strLogFile));
+        // end
+    }
 }
 
 void OBSBasic::UpdateAgoraClientRole(int role)
@@ -6395,30 +6395,30 @@ void OBSBasic::SetPreviewPK(bool bPK)
 
 void OBSBasic::SetControlWhenPK(bool bPK)
 {
-	ui->streamButton->setEnabled(!bPK);
-	ui->modeSwitch->setEnabled(!bPK);
-	//ui->recordButton->setEnabled(!bPK);
+    ui->streamButton->setEnabled(!bPK);
+    ui->modeSwitch->setEnabled(!bPK);
+    //ui->recordButton->setEnabled(!bPK);
 
-	if (bPK){
-		calldata_t params = { 0 };
-		signal_handler_connect(obs_service_get_signal_handler(agoraService), "initRtcEngineFailed", AgoraInitRtcEngineFailed, &params);
-		signal_handler_connect(obs_service_get_signal_handler(agoraService), "firstRemoteVideoDecoded", AgoraFirstRemoteVideoDecoded, &params);
-		signal_handler_connect(obs_service_get_signal_handler(agoraService), "userJoined", AgoraUserJoined, &params);
-		signal_handler_connect(obs_service_get_signal_handler(agoraService), "userOffline", AgoraUserOffline, &params);
-		signal_handler_connect(obs_service_get_signal_handler(agoraService), "joinChannelSuccess", AgoraJoinChannelSuccess, &params);
-		
-		obsColorFormatReplacedByAgora = config_get_string(basicConfig, "Video", "ColorFormat");
-		if (obsColorFormatReplacedByAgora.empty())
-			obsColorFormatReplacedByAgora = "NV12";
-		config_set_string(basicConfig, "Video", "ColorFormat", agoraColorFormat.c_str());
-		ui->agoraPKButton->setText(QTStr("Stop PK"));
-	}
-	else{
-		config_set_string(basicConfig, "Video", "ColorFormat", obsColorFormatReplacedByAgora.c_str());
-		ui->agoraPKButton->setText(QTStr("Agora PK"));
-	}
+    if (bPK) {
+        calldata_t params = { 0 };
+        signal_handler_connect(obs_service_get_signal_handler(agoraService), "initRtcEngineFailed", AgoraInitRtcEngineFailed, &params);
+        signal_handler_connect(obs_service_get_signal_handler(agoraService), "firstRemoteVideoDecoded", AgoraFirstRemoteVideoDecoded, &params);
+        signal_handler_connect(obs_service_get_signal_handler(agoraService), "userJoined", AgoraUserJoined, &params);
+        signal_handler_connect(obs_service_get_signal_handler(agoraService), "userOffline", AgoraUserOffline, &params);
+        signal_handler_connect(obs_service_get_signal_handler(agoraService), "joinChannelSuccess", AgoraJoinChannelSuccess, &params);
 
-	ResetVideo();
+        obsColorFormatReplacedByAgora = config_get_string(basicConfig, "Video", "ColorFormat");
+        if (obsColorFormatReplacedByAgora.empty())
+            obsColorFormatReplacedByAgora = "NV12";
+        config_set_string(basicConfig, "Video", "ColorFormat", agoraColorFormat.c_str());
+        ui->agoraPKButton->setText(QTStr("Basic.Main.StopAgoraStreaming"));
+    }
+    else {
+        config_set_string(basicConfig, "Video", "ColorFormat", obsColorFormatReplacedByAgora.c_str());
+        ui->agoraPKButton->setText(QTStr("Basic.Main.StartAgoraStreaming"));
+    }
+
+    ResetVideo();
 }
 
 bool OBSBasic::GetObsRtmpUrl(std::string& rtmp_url)
