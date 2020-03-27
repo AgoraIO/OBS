@@ -36,7 +36,7 @@
 
 In order to use agora sdk in your own obs studio, there's statement about compile and source code.
 
-###Initialize Agora Service Settings In Application
+### Initialize Agora Service Settings In Application
 
 You can reference source code in window-basic-main.cpp file(OBSBasic::InitAgoraServiceSettings).
 
@@ -132,7 +132,7 @@ Currently encapsulated apis and callbacks:
 * onUserJoined
 * onFirstRemoteVideoDecoded
 
-####how to add agora sdk apis
+#### how to add agora sdk apis
 
 * In the file obs-service.h，add new memeber function declaration to obs\_service\_info
 * In the file agora-service.cpp，Add memeber function implement for agora\_service, the member fucntion will call agora sdk api.
@@ -143,7 +143,7 @@ Currently encapsulated apis and callbacks:
 You can reference setupRemoteVideo, it's implemented in obs\_service\_agora\_setup\_remote\_video
  and obs\_service\_info.setup\_agora\_remote\_video.
 
-####how to add agora callbacks
+#### how to add agora callbacks
 
 After calling some apis, you'll receive agora callbacks. Sometimes you must first  receive callbacks, then you can call other agora apis. For example, after receiving onUserJoined callback, you can call setupRemoteVideo to show remote video.
 
