@@ -4340,7 +4340,7 @@ void OBSBasic::on_actionViewCurrentLog_triggered()
 
 void OBSBasic::on_actionCheckForUpdates_triggered()
 {
-	CheckForUpdates(true);
+	CheckForUpdates(false);//true=>false modify by agora
 }
 
 void OBSBasic::logUploadFinished(const QString &text, const QString &error)
@@ -6260,7 +6260,16 @@ void OBSBasic::ResetAgoraOutput()
 
 void OBSBasic::InitAgoraServiceSettings()
 {
-	obs_data_t* settings = obs_service_get_settings(agoraService);
+ // get config bitrate
+ const char *mode = config_get_string(basicConfig, "Output", "Mode");
+ std::string OutputKey = "";
+ OutputKey = astrcmpi(mode, "Advanced") == 0 ? "AdvOut" : "SimpleOutput";
+
+ int videoBitrate = videoBitrate = config_get_uint(basicConfig, OutputKey.c_str(),
+     "VBitrate");
+
+	obs_data_t* settings = obs_service_get_settings(agoraService); 
+
 	std::string rtmpcustom = "rtmp_custonm";
 	if (rtmpcustom.compare(obs_service_get_type(service)) == 0)
 	{
@@ -6268,7 +6277,7 @@ void OBSBasic::InitAgoraServiceSettings()
 		obs_data_set_string(settings, "agora_key", obs_service_get_key(service));
 	}
 
-	obs_data_set_int(settings, "agora_video_bitrate", 2400);
+	obs_data_set_int(settings, "agora_video_bitrate", videoBitrate);
 
 	int out_cx = config_get_uint(basicConfig, "Video", "OutputCX");
 	int out_cy = config_get_uint(basicConfig, "Video", "OutputCY");
@@ -6288,6 +6297,7 @@ void OBSBasic::InitAgoraServiceSettings()
 	obs_get_audio_info(&ai);
 	obs_data_set_int(settings, "agora_sample_rate", ai.samples_per_sec);
 	obs_data_set_int(settings, "agora_audio_channel", ai.speakers);//
+
 	obs_service_update(agoraService, settings);
 }
 
@@ -6334,9 +6344,9 @@ void OBSBasic::on_agoraPKButton_clicked()
 
         InitAgoraServiceSettings();
 
-        if (outputHandler->StreamingActive()) {
-            StopStreaming();
-        }
+      //  if (outputHandler->StreamingActive()) {
+      //      StopStreaming();
+      //  }
 
         if (IsPreviewProgramMode()) {
             on_modeSwitch_clicked();
@@ -6395,8 +6405,7 @@ void OBSBasic::SetPreviewPK(bool bPK)
 
 void OBSBasic::SetControlWhenPK(bool bPK)
 {
-    ui->streamButton->setEnabled(!bPK);
-    ui->modeSwitch->setEnabled(!bPK);
+
     //ui->recordButton->setEnabled(!bPK);
 
     if (bPK) {

@@ -16,20 +16,23 @@ static void* AgoraPCM_Create(obs_data_t* settings, obs_encoder_t* encoder )
 
 static void AgoraPCM_Destroy(void* data)
 {
-	AgoraRtcEngine::GetInstance()->AgoraAudioObserver_Destroy(data);
+	AgoraRtcEngine::GetInstance()->AgoraAudioObserver_Destroy();
 }
 
 static bool AgoraPCM_Encode(void* data, struct encoder_frame* frame,
 struct encoder_packet* packet, bool *receive_packet)
 {
+
 	CExtendAudioFrameObserver* audioObserver = static_cast<CExtendAudioFrameObserver*>(data);
 
 	int dataLen = frame->frames * 2 * AgoraRtcEngine::GetInstance()->audioChannel;//
 
 	TCHAR szBuf[MAX_PATH] = { 0 };
 	_stprintf_s(szBuf, MAX_PATH, _T("AgoraPCM_Encode: datalen=%d \n"), dataLen);
-	OutputDebugString(szBuf);
-	audioObserver->pCircleBuffer->writeBuffer(frame->data[0], dataLen);
+	//OutputDebugString(szBuf);
+ int64_t audioTime = GetTickCount();
+	audioObserver->pCircleBuffer->writeBuffer(frame->data[0], dataLen, audioTime);
+ AgoraRtcEngine::GetInstance()->logAudioFrameTimestamp();
 	return true;
 }
 

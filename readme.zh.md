@@ -157,3 +157,13 @@ agora-pcm-encoder.cpp和agora-yuv-encoder.cpp分别实现了音频和视频编�
 
 **注解：**
 应用层调用signal\_handler\_connect和底层插件调用signal\_handler\_signal第一个参数都是obs\_service\_get\_signal\_handler(obs\_service\_t*)。获取的是相同的service signal hanlder
+
+## 联系我们
+- 完整的 API 文档见 [文档中心](https://docs.agora.io/cn/)
+- 如果在集成中遇到问题, 你可以到 [开发者社区](https://dev.agora.io/cn/) 提问
+- 如果有售前咨询问题, 可以拨打 400 632 6626，或加入官方Q群 12742516 提问
+- 如果需要售后技术支持, 你可以在 [Agora Dashboard](https://dashboard.agora.io) 提交工单
+- 如果发现了示例代码的 bug, 欢迎提交 [issue](https://github.com/AgoraIO/obs/issues)
+
+## 代码许可
+The MIT License (MIT).

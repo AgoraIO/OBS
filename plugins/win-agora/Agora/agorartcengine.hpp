@@ -2,7 +2,6 @@
 #include <memory>
 #include <Agora/IAgoraRtcEngine.h>
 #include <Agora/IAgoraMediaEngine.h>
-#include <Agora/IAgoraRtcEngine2.h>
 #include <string>
 #include "ExtendAudioFrameObserver.hpp"
 #include "ExtendVideoFrameObserver.hpp"
@@ -52,7 +51,7 @@ public:
 	bool  enableLocalCameara(bool bEnable);
 
 	void* AgoraVideoObserver_Create();
-	void  AgoraVideoObserver_Destroy(void* data);
+	void  AgoraVideoObserver_Destroy();
 	bool  AgoraVideoObserver_Encode(void* data, struct encoder_frame* frame,
 	struct encoder_packet* packet, bool *receive_packet);
 
@@ -61,7 +60,7 @@ public:
 	bool enableExtendPlayDevice(bool bEnable);
 
 	void* AgoraAudioObserver_Create();
-	void  AgoraAudioObserver_Destroy(void* data);
+	void  AgoraAudioObserver_Destroy();
 	bool  AgoraAudioObserver_Encode(void* data, struct encoder_frame* frame,
 	struct encoder_packet* packet, bool *receive_packet);
 
@@ -95,6 +94,8 @@ public:
 	int audioChannel = 2;
 	int sampleRate = 44100;
 	void pushVideoFrame(struct encoder_frame* frame);
+ void logAudioFrameTimestamp();
+ void enableLogTimestamp(bool bEnable);
 private:
 	friend class AgoraRtcEngineEvent;
 private:
@@ -104,6 +105,10 @@ private:
 	static AgoraRtcEngine* m_agoraEngine;
 	
 	std::unique_ptr<CExtendVideoFrameObserver> m_videoObserver;
-	std::unique_ptr<CExtendAudioFrameObserver> m_audioObserver;
+ std::unique_ptr<CExtendAudioFrameObserver> m_audioObserver;
+ bool logFirstPushVideo;
+ int logVideoFrameTimeCount;
+ int logAudioFrameTimeCount;
+ bool logAudioVideoTimestamp;
 };
 

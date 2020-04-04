@@ -272,6 +272,8 @@ void OBSBasicSettings::HookWidget(QWidget *widget, const char *signal,
 #define VIDEO_CHANGED   SLOT(VideoChanged())
 #define ADV_CHANGED     SLOT(AdvancedChanged())
 #define ADV_RESTART     SLOT(AdvancedChangedRestart())
+//Agora
+#define AGORA_CHANGED SLOT(AgoraChanged())
 
 OBSBasicSettings::OBSBasicSettings(QWidget *parent)
 	: QDialog          (parent),
@@ -294,7 +296,7 @@ OBSBasicSettings::OBSBasicSettings(QWidget *parent)
 	auto policy = ui->audioSourceScrollArea->sizePolicy();
 	policy.setVerticalStretch(true);
 	ui->audioSourceScrollArea->setSizePolicy(policy);
-
+ 
 	HookWidget(ui->language,             COMBO_CHANGED,  GENERAL_CHANGED);
 	HookWidget(ui->theme, 		     COMBO_CHANGED,  GENERAL_CHANGED);
 	HookWidget(ui->enableAutoUpdates,    CHECK_CHANGED,  GENERAL_CHANGED);
@@ -441,6 +443,9 @@ OBSBasicSettings::OBSBasicSettings(QWidget *parent)
 	HookWidget(ui->bindToIP,             COMBO_CHANGED,  ADV_CHANGED);
 	HookWidget(ui->enableNewSocketLoop,  CHECK_CHANGED,  ADV_CHANGED);
 	HookWidget(ui->enableLowLatencyMode, CHECK_CHANGED,  ADV_CHANGED);
+
+ //agora settings
+ HookWidget(ui->logRawDatacheckBox, CHECK_CHANGED, AGORA_CHANGED);
 
 #if !defined(_WIN32) && !defined(__APPLE__) && !HAVE_PULSEAUDIO
 	delete ui->enableAutoUpdates;
@@ -995,6 +1000,14 @@ void OBSBasicSettings::LoadThemeList()
 	int idx = ui->theme->findText(App()->GetTheme());
 	if (idx != -1)
 		ui->theme->setCurrentIndex(idx);
+}
+
+void OBSBasicSettings::LoadAgoraSettings()
+{
+    loading = true;
+    bool enableLogAVTimeStamp = config_get_bool(GetGlobalConfig(),
+        "Agora", "LogAudioVideoTimestamp");
+    ui->logRawDatacheckBox->setChecked(enableLogAVTimeStamp);
 }
 
 void OBSBasicSettings::LoadGeneralSettings()
@@ -2575,7 +2588,11 @@ void OBSBasicSettings::LoadSettings(bool changedOnly)
 		LoadHotkeySettings();
 	if (!changedOnly || advancedChanged)
 		LoadAdvancedSettings();
+
+ //if (!changedOnly || agoraChanged)
+ //    LoadAgoraSettings();
 }
+
 
 void OBSBasicSettings::SaveGeneralSettings()
 {
@@ -4405,4 +4422,24 @@ void OBSBasicSettings::SaveAgoraSettings()
 
 	if (update)
 		obs_service_update(main->GetAgoraService(), settings);
+
+ //for agora UI settings
+ {
+    /* config_set_bool(GetGlobalConfig(), "Agora",
+         "LogAudioVideoTimestamp",
+         ui->logRawDatacheckBox->isChecked());*/
+
+     obs_data_t* settings = obs_service_get_settings(main->GetAgoraService());
+     obs_data_set_bool(settings, "LogAudioVideoTimestamp", ui->logRawDatacheckBox->isChecked());
+     obs_service_update(main->GetAgoraService(), settings);
+ }
+}
+
+void OBSBasicSettings::AgoraChanged()
+{
+    if (!loading) {
+        generalChanged = true;
+        sender()->setProperty("changed", QVariant(true));
+        EnableApplyButton(true);
+    }
 }

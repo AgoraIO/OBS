@@ -1,5 +1,6 @@
 #pragma once
 #include <windows.h>
+#include <queue>
 #define CIC_WAITTIMEOUT		0
 
 class CicleBuffer
@@ -13,6 +14,7 @@ private:
 	CRITICAL_SECTION m_csCircleBuffer;
 	BOOL m_bComplete;
 	int wait_timeout;
+ std::queue<int64_t> audioTimeQueue;
 public:
 	CicleBuffer(const unsigned int iBufferSize,int waittimeout);
 	~CicleBuffer(void);
@@ -20,8 +22,8 @@ public:
 	void SetComplete();
 	unsigned int getFreeSize();
 	unsigned int getUsedSize();
-	void writeBuffer(const void* pSourceBuffer, const unsigned int iNumBytes);
-	BOOL readBuffer(void* pDestBuffer, const unsigned int iBytesToRead, unsigned int* pbBytesRead);
+	void writeBuffer(const void* pSourceBuffer, const unsigned int iNumBytes, int64_t audioTime);
+	BOOL readBuffer(void* pDestBuffer, const unsigned int iBytesToRead, unsigned int* pbBytesRead, int64_t& audioTime);
 	void flushBuffer();
 };
 
