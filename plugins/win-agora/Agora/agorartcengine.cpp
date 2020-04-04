@@ -112,6 +112,10 @@ void AgoraRtcEngine::ReleaseInstance()
 AgoraRtcEngine::AgoraRtcEngine()
 	: m_rtcEngine(createAgoraRtcEngine())
     , m_eventHandler(new AgoraRtcEngineEvent(*this))
+    , logFirstPushVideo(false)
+    , logVideoFrameTimeCount(0)
+    , logAudioFrameTimeCount(0)
+    , logAudioVideoTimestamp(false)
 {
 
 }
@@ -204,6 +208,7 @@ void* AgoraRtcEngine::AgoraVideoObserver_Create()
 		return nullptr;
 
 	m_videoObserver.reset(new CExtendVideoFrameObserver);
+ m_videoObserver->fps = agora_fps;
 	if (mediaEngine->registerVideoFrameObserver(m_videoObserver.get()))
 	{
 		mediaEngine->release();
@@ -211,18 +216,11 @@ void* AgoraRtcEngine::AgoraVideoObserver_Create()
 	}
 
 	mediaEngine->release();
-	return m_videoObserver.release();
+	return m_videoObserver.get();
 }
 
-void AgoraRtcEngine::AgoraVideoObserver_Destroy(void* data)
-{
-	CExtendVideoFrameObserver* videoObserver = static_cast<CExtendVideoFrameObserver*>(data);
-	if (videoObserver != nullptr)
-	{
-		delete videoObserver;
-		videoObserver = nullptr;
-	}
-
+void AgoraRtcEngine::AgoraVideoObserver_Destroy()
+{ 
 	agora::util::AutoPtr< agora::media::IMediaEngine> mediaEngine;
 	mediaEngine.queryInterface(m_rtcEngine, agora::AGORA_IID_MEDIA_ENGINE);
 
@@ -231,6 +229,9 @@ void AgoraRtcEngine::AgoraVideoObserver_Destroy(void* data)
 
 	mediaEngine->registerVideoFrameObserver(nullptr);
 	mediaEngine->release();
+
+ m_videoObserver.reset();
+ m_videoObserver.release();
 }
 
 bool  AgoraRtcEngine::AgoraVideoObserver_Encode(void* data, struct encoder_frame* frame, struct encoder_packet* packet, bool *receive_packet)
@@ -241,42 +242,46 @@ bool  AgoraRtcEngine::AgoraVideoObserver_Encode(void* data, struct encoder_frame
 
 void* AgoraRtcEngine::AgoraAudioObserver_Create()
 {
+    logFirstPushVideo = false;
+    logVideoFrameTimeCount = 0;
+    logAudioFrameTimeCount = 0;
 	agora::util::AutoPtr< agora::media::IMediaEngine> mediaEngine;
 	mediaEngine.queryInterface(m_rtcEngine, agora::AGORA_IID_MEDIA_ENGINE);
 
 	if (mediaEngine.get() == nullptr)
 		return nullptr;
 
-	std::unique_ptr<CExtendAudioFrameObserver> audioObserver(new CExtendAudioFrameObserver);
-	audioObserver->agora_sdk_captrue_mic_audio = agora_sdk_captrue_mic_audio;
-	if (mediaEngine->registerAudioFrameObserver(audioObserver.get()))
+ std::unique_ptr<CExtendAudioFrameObserver> obServer = std::unique_ptr<CExtendAudioFrameObserver>(new CExtendAudioFrameObserver);
+ //m_audioObserver.reset(new CExtendAudioFrameObserver);
+ m_audioObserver = std::move(obServer);
+ m_audioObserver->agora_sdk_captrue_mic_audio = agora_sdk_captrue_mic_audio;
+
+	if (mediaEngine->registerAudioFrameObserver(m_audioObserver.get()))
 	{
 		mediaEngine->release();
 		return nullptr;
 	}
-
+ m_audioObserver->Resetlog(logAudioVideoTimestamp);
 	mediaEngine->release();
-	return audioObserver.release();
+	return m_audioObserver.get();
 }
 
-void AgoraRtcEngine::AgoraAudioObserver_Destroy(void* data)
+void AgoraRtcEngine::AgoraAudioObserver_Destroy()
 {
-	CExtendAudioFrameObserver* audioObserver = static_cast<CExtendAudioFrameObserver*>(data);
-
+    logFirstPushVideo = false;
+    logVideoFrameTimeCount = 0;
+    logAudioFrameTimeCount = 0;
+ 
 	agora::util::AutoPtr< agora::media::IMediaEngine> mediaEngine;
 	mediaEngine.queryInterface(m_rtcEngine, agora::AGORA_IID_MEDIA_ENGINE);
 
 	if (mediaEngine.get() == nullptr)
 		return;
-
+ 
 	mediaEngine->registerAudioFrameObserver(0);
 	mediaEngine->release();
-
-	if (audioObserver != nullptr)
-	{
-		delete audioObserver;
-		audioObserver = nullptr;
-	}
+ m_audioObserver.reset();
+ m_audioObserver.release();
 }
 
 bool AgoraRtcEngine::AgoraAudioObserver_Encode(void* data, struct encoder_frame* frame,
@@ -363,6 +368,7 @@ int AgoraRtcEngine::enableVideo(bool enabled)
 
 int AgoraRtcEngine::setupRemoteVideo(unsigned int uid, void* view)
 {
+    return 0;
 	agora::rtc::view_t v = reinterpret_cast<agora::rtc::view_t>(view);
 	VideoCanvas canvas;// (v, RENDER_MODE_FIT, uid);
 	canvas.view = v;
@@ -387,8 +393,18 @@ bool AgoraRtcEngine::keepPreRotation(bool bRotate)
 
 bool AgoraRtcEngine::setVideoProfileEx(int nWidth, int nHeight, int nFrameRate, int nBitRate)
 {
-	IRtcEngine2 *lpRtcEngine2 = (IRtcEngine2 *)m_rtcEngine;
-	int nRet = lpRtcEngine2->setVideoProfileEx(nWidth, nHeight, nFrameRate, nBitRate);
+    AParameter apm(m_rtcEngine);
+    apm->setParameters("{\"che.video.freestyle_customer\": true}");
+ VideoEncoderConfiguration config;
+ config.dimensions.width = nWidth;
+ config.dimensions.height = nHeight;
+ config.frameRate = (FRAME_RATE)nFrameRate;
+ config.bitrate = nBitRate;
+ if (nWidth < nHeight)
+     config.orientationMode = ORIENTATION_MODE_FIXED_PORTRAIT;
+ else
+     config.orientationMode = ORIENTATION_MODE_FIXED_LANDSCAPE;
+ int nRet = m_rtcEngine->setVideoEncoderConfiguration(config);
 
 	return nRet == 0 ? true : false;
 }
@@ -442,8 +458,8 @@ int AgoraRtcEngine::setRecordingDeviceVolume(int volume)
 
 void  AgoraRtcEngine::EnableAgoraCaptureMicAudio(bool bCapture)
 {
-	if (m_audioObserver)
-	m_audioObserver->agora_sdk_captrue_mic_audio = bCapture;
+    if (m_audioObserver)
+        m_audioObserver->agora_sdk_captrue_mic_audio = bCapture;
 }
 
 int AgoraRtcEngine::setPalyoutDeviceVolume(int volume)
@@ -503,6 +519,37 @@ int AgoraRtcEngine::EnableWebSdkInteroperability(bool enabled)
 void AgoraRtcEngine::pushVideoFrame(struct encoder_frame* frame)
 {
 	if (agora_out_cx && agora_out_cy && agora_out_cx == frame->linesize[0]){
-		m_videoObserver->pushBackVideoFrame(frame->data[0], agora_out_cx*agora_out_cy * 3 / 2);
-	}
+     int64_t time = GetTickCount();
+
+     if (logAudioVideoTimestamp && logVideoFrameTimeCount < agora_fps * LOG_VIDEO_FRAME_TIME_DUARATION) {
+         blog(LOG_INFO, "win-agora pushVideoFrame , obs output video frame time: %ld", time);
+         logVideoFrameTimeCount++;
+     }
+   
+	   	m_videoObserver->pushBackVideoFrame(frame->data[0], agora_out_cx*agora_out_cy * 3 / 2, time);
+ }
+ else {
+     if (!logFirstPushVideo) {
+         blog(LOG_INFO, "win-agora: pushVideoFrame failed because of width is not equal,"
+             "agora:width=%d,obs width=%d\n", agora_out_cx, frame->linesize[0]);
+         logFirstPushVideo = true;
+     }
+ }
+
+}
+
+void AgoraRtcEngine::logAudioFrameTimestamp()
+{
+    unsigned int audioTime = GetTickCount();
+    if (logAudioVideoTimestamp && logAudioFrameTimeCount < LOG_AUDIO_FRAME_TIME_COUNT) {
+        blog(LOG_INFO, "win-agora pushAudioFrame , obs output audio frame time: %u", audioTime);
+        logAudioFrameTimeCount++;
+    }
+}
+
+void AgoraRtcEngine::enableLogTimestamp(bool bEnable)
+{
+    logAudioVideoTimestamp = bEnable;
+    m_videoObserver->Resetlog(bEnable);
+    m_audioObserver->Resetlog(bEnable);
 }

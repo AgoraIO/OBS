@@ -3,17 +3,24 @@
 #include <TCHAR.h>
 //#include <timeapi.h>
 #include <stdio.h>
+#include <util/base.h>
 
-
-static unsigned char imageBuffer[1920 * 1080 * 4] = { 0 };
+//static unsigned char imageBuffer[1920 * 1080 * 4] = { 0 };
+static AgoraVideoBuffer videoBuffer = { 0, {0} };
 pthread_mutex_t buffer_mutex;
+
+FILE* file = NULL;
 CExtendVideoFrameObserver::CExtendVideoFrameObserver()
+    : logVideoFrameTimeCount(0)
+    , logVideoTimestamp(false)
+    , m_RenderWidth(640)
+    , m_RenderHeight(480)
 {
     //	m_lpImageBuffer = new BYTE[0x800000];
 
     m_RenderWidth = 0;
     m_RenderHeight = 0;
-
+    file = fopen("D:\\obs.yuv", "ab+");
     pthread_mutexattr_t attr;
     pthread_mutex_init_value(&buffer_mutex);
 
@@ -27,11 +34,12 @@ CExtendVideoFrameObserver::CExtendVideoFrameObserver()
 CExtendVideoFrameObserver::~CExtendVideoFrameObserver()
 {
     pthread_mutex_destroy(&buffer_mutex);
+    fclose(file);
 }
 
 int CExtendVideoFrameObserver::_PrintObserverVideoFrame(VideoFrame* frame)
 {
-    unsigned char* srcBuffer = imageBuffer;
+    unsigned char* srcBuffer = videoBuffer.imageBuffer;
     for (int planeNum = 0; planeNum < 3; ++planeNum) {
         int width = (planeNum ? (frame->width + 1) / 2 : frame->width);
         int height;
@@ -77,21 +85,28 @@ int timeinc = 0;
 bool CExtendVideoFrameObserver::onCaptureVideoFrame(VideoFrame& videoFrame)
 {
     int size = videoFrame.yStride * videoFrame.height * 3 / 2;
-    int bufSize = 0;
+    int bufSize = 0;    
     pthread_mutex_lock(&buffer_mutex);
+    fwrite(videoBuffer.imageBuffer, 1, size, file);
     if (videoFrame.yStride == videoFrame.width) {
         int nUvLen = videoFrame.height * videoFrame.width / 4;
         int nYLen = nUvLen * 4;
 
-        memcpy_s(videoFrame.yBuffer, nYLen, imageBuffer, nYLen);
-        memcpy_s(videoFrame.uBuffer, nUvLen, imageBuffer + nYLen, nUvLen);
-        memcpy_s(videoFrame.vBuffer, nUvLen, imageBuffer + nYLen + nUvLen, nUvLen);
+        memcpy_s(videoFrame.yBuffer, nYLen, videoBuffer.imageBuffer, nYLen);
+        memcpy_s(videoFrame.uBuffer, nUvLen, videoBuffer.imageBuffer + nYLen, nUvLen);
+        memcpy_s(videoFrame.vBuffer, nUvLen, videoBuffer.imageBuffer + nYLen + nUvLen, nUvLen);
     }
     else {
         _PrintObserverVideoFrame(&videoFrame);
     }
     pthread_mutex_unlock(&buffer_mutex);
-    videoFrame.renderTimeMs = GetTickCount();
+
+    videoFrame.renderTimeMs = GetTickCount64();
+    if (logVideoTimestamp && logVideoFrameTimeCount < fps * LOG_VIDEO_FRAME_TIME_DUARATION) {
+        blog(LOG_INFO, "Agora Info onCaptureVideoFrame , agora sdk get obs video frame time: %lld, agora video frame time %lld.(%lldms)", videoBuffer.videoTimes, videoFrame.renderTimeMs, videoFrame.renderTimeMs - videoBuffer.videoTimes);
+        logVideoFrameTimeCount++;
+    }
+  
     return true;
 }
 
@@ -107,9 +122,10 @@ void CExtendVideoFrameObserver::setVideoResolution(int w, int h)
 	m_resolutionY = h;
 }
 
-void CExtendVideoFrameObserver::pushBackVideoFrame(void* buffer, int size)
+void CExtendVideoFrameObserver::pushBackVideoFrame(void* buffer, int size, int64_t videoTime)
 {
     pthread_mutex_lock(&buffer_mutex);
-    memcpy_s(imageBuffer, size, buffer, size);
+    memcpy_s(videoBuffer.imageBuffer, size, buffer, size);
+    videoBuffer.videoTimes = videoTime;
     pthread_mutex_unlock(&buffer_mutex);
 }

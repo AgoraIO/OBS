@@ -924,7 +924,6 @@ const char *OBSApp::GetRenderModule() const
 {
 	const char *renderer = config_get_string(globalConfig, "Video",
 			"Renderer");
-
 	return (astrcmpi(renderer, "Direct3D 11") == 0) ?
 		DL_D3D11 : DL_OPENGL;
 }

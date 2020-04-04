@@ -143,10 +143,10 @@
            <widget class="QWidget" name="scrollAreaWidgetContents_2">
             <property name="geometry">
              <rect>
-              <x>0</x>
-              <y>0</y>
-              <width>801</width>
-              <height>741</height>
+              <x>-44</x>
+              <y>-367</y>
+              <width>825</width>
+              <height>1058</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_19">
@@ -291,16 +291,6 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="3" column="1">
-                    <widget class="QCheckBox" name="keepRecordStreamStops">
-                     <property name="enabled">
-                      <bool>false</bool>
-                     </property>
-                     <property name="text">
-                      <string>Basic.Settings.General.KeepRecordingWhenStreamStops</string>
-                     </property>
-                    </widget>
-                   </item>
                    <item row="4" column="1">
                     <widget class="QCheckBox" name="replayWhileStreaming">
                      <property name="text">
@@ -315,6 +305,16 @@
                      </property>
                      <property name="text">
                       <string>Basic.Settings.General.KeepReplayBufferStreamStops</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="3" column="1">
+                    <widget class="QCheckBox" name="keepRecordStreamStops">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                     <property name="text">
+                      <string>Basic.Settings.General.KeepRecordingWhenStreamStops</string>
                      </property>
                     </widget>
                    </item>
@@ -449,13 +449,6 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="1" column="1">
-                    <widget class="QCheckBox" name="projectorAlwaysOnTop">
-                     <property name="text">
-                      <string>Basic.Settings.General.ProjectorAlwaysOnTop</string>
-                     </property>
-                    </widget>
-                   </item>
                    <item row="2" column="1">
                     <widget class="QCheckBox" name="saveProjectors">
                      <property name="text">
@@ -478,6 +471,13 @@
                       </size>
                      </property>
                     </spacer>
+                   </item>
+                   <item row="1" column="1">
+                    <widget class="QCheckBox" name="projectorAlwaysOnTop">
+                     <property name="text">
+                      <string>Basic.Settings.General.ProjectorAlwaysOnTop</string>
+                     </property>
+                    </widget>
                    </item>
                   </layout>
                  </widget>
@@ -555,13 +555,6 @@
                    <property name="topMargin">
                     <number>2</number>
                    </property>
-                   <item row="0" column="1">
-                    <widget class="QCheckBox" name="doubleClickSwitch">
-                     <property name="text">
-                      <string>Basic.Settings.General.SwitchOnDoubleClick</string>
-                     </property>
-                    </widget>
-                   </item>
                    <item row="0" column="0">
                     <spacer name="horizontalSpacer_6">
                      <property name="orientation">
@@ -575,15 +568,19 @@
                      </property>
                     </spacer>
                    </item>
+                   <item row="0" column="1">
+                    <widget class="QCheckBox" name="doubleClickSwitch">
+                     <property name="text">
+                      <string>Basic.Settings.General.SwitchOnDoubleClick</string>
+                     </property>
+                    </widget>
+                   </item>
                    <item row="1" column="1">
                     <widget class="QCheckBox" name="studioPortraitLayout">
                      <property name="text">
                       <string>Basic.Settings.General.StudioPortraitLayout</string>
                      </property>
                     </widget>
-                   </item>
-                   <item row="2" column="1">
-                    <widget class="QComboBox" name="multiviewLayout"/>
                    </item>
                    <item row="2" column="0">
                     <widget class="QLabel" name="label_64">
@@ -592,6 +589,37 @@
                      </property>
                      <property name="buddy">
                       <cstring>multiviewLayout</cstring>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="1">
+                    <widget class="QComboBox" name="multiviewLayout"/>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QGroupBox" name="agoraGroupBox">
+                  <property name="title">
+                   <string>Basic.Settings.Agora.Settings</string>
+                  </property>
+                  <layout class="QFormLayout" name="formLayout_34">
+                   <property name="leftMargin">
+                    <number>13</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>5</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>13</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>13</number>
+                   </property>
+                   <item row="0" column="0">
+                    <widget class="QCheckBox" name="logRawDatacheckBox">
+                     <property name="text">
+                      <string>Basic.Settings.Agora.Settings.LogRawDataTime</string>
                      </property>
                     </widget>
                    </item>
@@ -733,8 +761,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>818</width>
-              <height>697</height>
+              <width>985</width>
+              <height>850</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_21">
@@ -3362,23 +3390,6 @@
            </property>
           </widget>
          </item>
-         <item row="8" column="0" colspan="2">
-          <widget class="QScrollArea" name="audioSourceScrollArea">
-           <property name="widgetResizable">
-            <bool>true</bool>
-           </property>
-           <widget class="QWidget" name="audioSourceWidget">
-            <property name="geometry">
-             <rect>
-              <x>0</x>
-              <y>0</y>
-              <width>800</width>
-              <height>69</height>
-             </rect>
-            </property>
-           </widget>
-          </widget>
-         </item>
          <item row="9" column="1">
           <widget class="QLabel" name="audioMsg">
            <property name="styleSheet">
@@ -3438,6 +3449,23 @@
              <string>Basic.Settings.Audio.MeterDecayRate.Slow</string>
             </property>
            </item>
+          </widget>
+         </item>
+         <item row="8" column="0" colspan="2">
+          <widget class="QScrollArea" name="audioSourceScrollArea">
+           <property name="widgetResizable">
+            <bool>true</bool>
+           </property>
+           <widget class="QWidget" name="audioSourceWidget">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>781</width>
+              <height>105</height>
+             </rect>
+            </property>
+           </widget>
           </widget>
          </item>
         </layout>
@@ -3744,8 +3772,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>98</width>
-           <height>28</height>
+           <width>807</width>
+           <height>675</height>
           </rect>
          </property>
          <layout class="QFormLayout" name="hotkeyLayout">
@@ -3791,8 +3819,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>593</width>
-              <height>761</height>
+              <width>973</width>
+              <height>1020</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_16">

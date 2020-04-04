@@ -97,6 +97,7 @@ private:
 	bool videoChanged = false;
 	bool hotkeysChanged = false;
 	bool advancedChanged = false;
+ bool agoraChanged = false;
 	int  pageIndex = 0;
 	bool loading = true;
 	std::string savedTheme;
@@ -155,7 +156,7 @@ private:
 	{
 		return generalChanged || outputsChanged || stream1Changed ||
 			audioChanged || videoChanged || advancedChanged ||
-			hotkeysChanged;
+			hotkeysChanged || agoraChanged;
 	}
 
 	inline void EnableApplyButton(bool en)
@@ -172,6 +173,7 @@ private:
 		videoChanged   = false;
 		hotkeysChanged = false;
 		advancedChanged= false;
+  agoraChanged = false;
 		EnableApplyButton(false);
 	}
 
@@ -199,6 +201,7 @@ private:
 	void LoadHotkeySettings(obs_hotkey_id ignoreKey=OBS_INVALID_HOTKEY_ID);
 	void LoadAdvancedSettings();
 	void LoadSettings(bool changedOnly);
+ void LoadAgoraSettings();
 
 	OBSPropertiesView *CreateEncoderPropertyView(const char *encoder,
 			const char *path, bool changed = false);
@@ -274,7 +277,7 @@ private slots:
 	void on_baseResolution_editTextChanged(const QString &text);
 
 	void on_disableOSXVSync_clicked();
-
+ void AgoraChanged();
 	void GeneralChanged();
 	void AudioChanged();
 	void AudioChangedRestart();

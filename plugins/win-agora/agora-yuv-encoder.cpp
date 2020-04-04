@@ -14,7 +14,7 @@ static void* AgoroYUV_Create(obs_data_t* settings, obs_encoder_t* encoder)
 
 static void AgoraYUV_Destroy(void* data)
 {
-	AgoraRtcEngine::GetInstance()->AgoraVideoObserver_Destroy(data);
+	AgoraRtcEngine::GetInstance()->AgoraVideoObserver_Destroy();
 }
 
 static bool AgoraYUV_Encode(void* data, struct encoder_frame* frame,

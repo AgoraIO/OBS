@@ -64,13 +64,13 @@ void CicleBuffer::flushBuffer()
 	LeaveCriticalSection(&this->m_csCircleBuffer);
 }
 
-void CicleBuffer::writeBuffer(const void* pSourceBuffer, const unsigned int iNumBytes)
+void CicleBuffer::writeBuffer(const void* pSourceBuffer, const unsigned int iNumBytes, int64_t audioTime)
 {
 	unsigned int iBytesToWrite = iNumBytes;
 	BYTE* pSourceReadCursor = (BYTE*)pSourceBuffer;
 
 	EnterCriticalSection(&this->m_csCircleBuffer);
-
+ audioTimeQueue.push(audioTime);
 //	if (this->m_iInternalWriteCursor >= this->m_iInternalReadCursor)			//2_9 avoid memcpy over
 //	{
 		unsigned int iChunkSize = this->m_iBufferSize - this->m_iInternalWriteCursor;
@@ -96,7 +96,7 @@ void CicleBuffer::writeBuffer(const void* pSourceBuffer, const unsigned int iNum
 	LeaveCriticalSection(&this->m_csCircleBuffer);
 }
 
-BOOL CicleBuffer::readBuffer(void* pDestBuffer, const unsigned int _iBytesToRead, unsigned int* pbBytesRead)
+BOOL CicleBuffer::readBuffer(void* pDestBuffer, const unsigned int _iBytesToRead, unsigned int* pbBytesRead, int64_t& audioTime)
 {
 	unsigned int iBytesToRead = _iBytesToRead;
 	unsigned int iBytesRead = 0;
@@ -121,6 +121,11 @@ BOOL CicleBuffer::readBuffer(void* pDestBuffer, const unsigned int _iBytesToRead
 				iChunkSize = iBytesToRead;
 
 			memcpy((BYTE*)pDestBuffer + iBytesRead, this->m_pBuffer + this->m_iInternalReadCursor, iChunkSize);
+
+   if (!audioTimeQueue.empty()) {
+       audioTime = audioTimeQueue.front();//audio timestamp
+       audioTimeQueue.pop();
+   }
 
 			iBytesRead += iChunkSize;
 			iBytesToRead -= iChunkSize;
