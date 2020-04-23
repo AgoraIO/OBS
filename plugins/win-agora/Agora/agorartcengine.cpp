@@ -368,7 +368,7 @@ int AgoraRtcEngine::enableVideo(bool enabled)
 
 int AgoraRtcEngine::setupRemoteVideo(unsigned int uid, void* view)
 {
-    return 0;
+ 
 	agora::rtc::view_t v = reinterpret_cast<agora::rtc::view_t>(view);
 	VideoCanvas canvas;// (v, RENDER_MODE_FIT, uid);
 	canvas.view = v;
