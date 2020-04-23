@@ -83,7 +83,7 @@ static void AgoraPCM_GetAudioInfo(void *, struct audio_convert_info *info)
 static size_t AgoraPCM_GetFrameSize(void *data)
 {
 	UNUSED_PARAMETER(data);
-	return 1024;
+	return AgoraRtcEngine::GetInstance()->sampleRate / AUDIO_CALLBACK_TIMES;;
 }
 
 void RegisterAgoraAudioEncoder()
