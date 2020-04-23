@@ -61,13 +61,13 @@ void AgoraService_Update(void *data, obs_data_t *settings)
 	bool agora_sdk_capture_mic_audio = obs_data_get_bool(settings, "agora_sdk_capture_mic_audio");
 	AgoraRtcEngine::GetInstance()->agora_sdk_captrue_mic_audio = agora_sdk_capture_mic_audio;
 	
-	if (!AgoraRtcEngine::GetInstance()->bInit && service->agora_sdk_capture_mic_audio != agora_sdk_capture_mic_audio){//�Ѿ���ʼ��
+	if (!AgoraRtcEngine::GetInstance()->bInit && service->agora_sdk_capture_mic_audio != agora_sdk_capture_mic_audio){//ÒÑ¾­³õÊ¼»¯
 		AgoraRtcEngine::GetInstance()->EnableAgoraCaptureMicAudio(agora_sdk_capture_mic_audio);
 	}
 
 	agora::rtc::CLIENT_ROLE_TYPE role = (agora::rtc::CLIENT_ROLE_TYPE)obs_data_get_int(settings, "agora_client_role");	
 	//role
-	if (AgoraRtcEngine::GetInstance()->bInit && service->client_role != role){//�Ѿ���ʼ��
+	if (AgoraRtcEngine::GetInstance()->bInit && service->client_role != role){//ÒÑ¾­³õÊ¼»¯
 		AgoraRtcEngine::GetInstance()->setClientRole(role);
 	}
 	service->client_role = role;
@@ -143,8 +143,7 @@ void AgoraService_Activate(void *data, obs_data_t *settings)
 	AgoraRtcEngine* agora_engine = AgoraRtcEngine::GetInstance();
 	agora_engine->EnableWebSdkInteroperability(service_data->enableWebSdkInteroperability);
 	agora_engine->setVideoProfileEx(service_data->out_cx, service_data->out_cy, service_data->fps, service_data->video_bitrate);
- agora_engine->setRecordingAudioFrameParameters(/*44100, 2*/service_data->sample_rate, service_data->audio_channel, 2 * 1024);
-    // , service_data->sample_rate/ AUDIO_CALLBACK_TIMES * service_data->audio_channel);//agora_pcm_encoder  
+ agora_engine->setRecordingAudioFrameParameters(/*44100, 2*/service_data->sample_rate, service_data->audio_channel, service_data->sample_rate / AUDIO_CALLBACK_TIMES * service_data->audio_channel);
 	agora_engine->joinChannel("", service_data->channel_name, service_data->uid);
 }
 
