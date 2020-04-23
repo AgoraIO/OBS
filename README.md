@@ -135,9 +135,9 @@ Currently encapsulated apis and callbacks:
 #### how to add agora sdk apis
 
 * In the file obs-service.h，add new memeber function declaration to obs\_service\_info
-* In the file agora-service.cpp，Add memeber function implement for agora\_service, the member fucntion will call agora sdk api.
+* In the file agora-service.cpp，Add memeber function implement for agora\_service, the member function will call agora sdk api.
 * In the file obs.h, declare api, the first parameter type of this api is obs\_service\_t*
-* In the file obs.cpp, implement the api. This api will call new adding member fuction for agora service.
+* In the file obs.cpp, implement the api. This api will call new adding member function for agora service.
 * Then the application call new adding api in obs.h .
 
 You can reference setupRemoteVideo, it's implemented in obs\_service\_agora\_setup\_remote\_video
