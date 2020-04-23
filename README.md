@@ -110,7 +110,7 @@ how to use obs studio demo that use agora sdk：
 * Copy FindAgora.cmake file to CMake\Modules. Copy text including agora in CopyMSVCBins.cmake to you own file CopyMSVCBins.cmake.
 * In files obs.h、obs.cpp、obs-service.h,search agora, copy the source code to to you own corresponding files.
 
-After that, you use CMake to compile obs, then generate vs project.UI is optional, you decide by youselft. How to use win-agora plugin, you can reference demo.
+After that, you use CMake to compile obs, then generate vs project.UI is optional, you decide by yourself. How to use win-agora plugin, you can reference demo.
 
 ##how add agora sdk api and callback
 
