@@ -81,7 +81,7 @@ Audio and Video encoders are implemented in agora-pcm-encoder.cpp and agora-yuv-
 * Besides configure some information for agora sdk by agora\_service, call agora\_service member function to use agora sdk api.
 * Add apis in obs.h for agora sdk api, application will call obs api. These new apis will call agora\_service member function.agora\_service is implemented in agora_service.cpp.
 
-* agora ouput is actually a null output.It's used to start or stop agora communication. OBS studio library associated encoder and service with agora output. agora\_service is implemented in agora-output.cpp  
+* agora output is actually a null output.It's used to start or stop agora communication. OBS studio library associated encoder and service with agora output. agora\_service is implemented in agora-output.cpp  
 
 #### Agora sdk   
 
