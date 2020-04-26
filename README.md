@@ -150,7 +150,7 @@ After calling some apis, you'll receive agora callbacks. Sometimes you must firs
 * In the file obs-service.c, in constant character array service_signals, add callbacks correspond to signals, including return type and function name.
 * agorartcengine.cpp，agora sdk callback send signal to app, call signal_handler_signal. you can set parameters with calldata structure.
 
-what to do int the application:
+what to do in the application:
 
 * Call signal_handler_connect, connect new adding service signal to the application callback. Note, these callbacks are static member functions, you need notify the main thread(UI thread) by aaplication message(Signal/Slot of QT).
 
