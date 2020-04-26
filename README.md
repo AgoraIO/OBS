@@ -137,7 +137,7 @@ Currently encapsulated apis and callbacks:
 * In the file obs-service.h，add new member function declaration to obs\_service\_info
 * In the file agora-service.cpp，Add member function implement for agora\_service, the member fucntion will call agora sdk api.
 * In the file obs.h, declare api, the first parameter type of this api is obs\_service\_t*
-* In the file obs.cpp, implement the api. This api will call new adding member fuction for agora service.
+* In the file obs.cpp, implement the api. This api will call new adding member function for agora service.
 * Then the application call new adding api in obs.h .
 
 You can reference setupRemoteVideo, it's implemented in obs\_service\_agora\_setup\_remote\_video
@@ -150,7 +150,7 @@ After calling some apis, you'll receive agora callbacks. Sometimes you must firs
 * In the file obs-service.c, in constant character array service_signals, add callbacks correspond to signals, including return type and function name.
 * agorartcengine.cpp，agora sdk callback send signal to app, call signal_handler_signal. you can set parameters with calldata structure.
 
-what to do int the application:
+what to do in the application:
 
 * Call signal_handler_connect, connect new adding service signal to the application callback. Note, these callbacks are static member functions, you need notify the main thread(UI thread) by aaplication message(Signal/Slot of QT).
 
