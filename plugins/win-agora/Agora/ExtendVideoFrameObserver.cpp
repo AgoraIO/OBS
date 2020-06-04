@@ -9,18 +9,15 @@
 static AgoraVideoBuffer videoBuffer = { 0, {0} };
 pthread_mutex_t buffer_mutex;
 
-FILE* file = NULL;
+;;FILE* file = NULL;
 CExtendVideoFrameObserver::CExtendVideoFrameObserver()
     : logVideoFrameTimeCount(0)
     , logVideoTimestamp(false)
     , m_RenderWidth(640)
     , m_RenderHeight(480)
 {
-    //	m_lpImageBuffer = new BYTE[0x800000];
-
     m_RenderWidth = 0;
     m_RenderHeight = 0;
-    file = fopen("D:\\obs.yuv", "ab+");
     pthread_mutexattr_t attr;
     pthread_mutex_init_value(&buffer_mutex);
 
@@ -34,7 +31,6 @@ CExtendVideoFrameObserver::CExtendVideoFrameObserver()
 CExtendVideoFrameObserver::~CExtendVideoFrameObserver()
 {
     pthread_mutex_destroy(&buffer_mutex);
-    fclose(file);
 }
 
 int CExtendVideoFrameObserver::_PrintObserverVideoFrame(VideoFrame* frame)
@@ -87,7 +83,9 @@ bool CExtendVideoFrameObserver::onCaptureVideoFrame(VideoFrame& videoFrame)
     int size = videoFrame.yStride * videoFrame.height * 3 / 2;
     int bufSize = 0;    
     pthread_mutex_lock(&buffer_mutex);
+#ifdef 0
     fwrite(videoBuffer.imageBuffer, 1, size, file);
+#endif
     if (videoFrame.yStride == videoFrame.width) {
         int nUvLen = videoFrame.height * videoFrame.width / 4;
         int nYLen = nUvLen * 4;
