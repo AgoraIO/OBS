@@ -236,16 +236,6 @@ void* AgoraRtcEngine::AgoraVideoObserver_Create()
 {
 	if (m_pMediaEngine.get() == nullptr)
 		return nullptr;
-
-	/*m_videoObserver.reset(new CExtendVideoFrameObserver);
-	m_videoObserver->fps = agora_fps;
-	if (m_pMediaEngine->registerVideoFrameObserver(m_videoObserver.get()))
-	{
-		return nullptr;
-	}
-
-	return m_videoObserver.get();*/
-	m_pMediaEngine->setExternalVideoSource(true, false);
 	m_externalVideoFrame.stride = agora_out_cx;
 	m_externalVideoFrame.height = agora_out_cy;
 	m_externalVideoFrame.rotation = 0;
@@ -262,31 +252,10 @@ void AgoraRtcEngine::AgoraVideoObserver_Destroy()
 		delete[] m_externalVideoFrame.buffer;
 		m_externalVideoFrame.buffer = nullptr;
 	}
-	/*m_pMediaEngine->registerVideoFrameObserver(nullptr);
-	m_videoObserver.reset();
-	m_videoObserver.release();*/
-
 }
 
 bool  AgoraRtcEngine::AgoraVideoObserver_Encode(void* data, struct encoder_frame* frame, struct encoder_packet* packet, bool *receive_packet)
 {
-	/*if (agora_out_cx && agora_out_cy && agora_out_cx == frame->linesize[0]) {
-		int64_t time = GetTickCount();
-
-		if (logAudioVideoTimestamp && logVideoFrameTimeCount < agora_fps * LOG_VIDEO_FRAME_TIME_DUARATION) {
-			blog(LOG_INFO, "win-agora pushVideoFrame , obs output video frame time: %ld", time);
-			logVideoFrameTimeCount++;
-		}
-		m_videoObserver->pushBackVideoFrame(frame->data[0], agora_out_cx*agora_out_cy * 3 / 2, time);
-	}
-	else {
-		if (!logFirstPushVideo) {
-			blog(LOG_INFO, "win-agora: pushVideoFrame failed because of width is not equal,"
-				"agora:width=%d,obs width=%d\n", agora_out_cx, frame->linesize[0]);
-			logFirstPushVideo = true;
-		}
-	}*/
-
 	if (agora_out_cx && agora_out_cx != frame->linesize[0]
 		&& m_externalVideoFrame.buffer) {
 		delete[] m_externalVideoFrame.buffer;
@@ -309,8 +278,6 @@ void* AgoraRtcEngine::AgoraAudioObserver_Create()
 	logVideoFrameTimeCount = 0;
 	logAudioFrameTimeCount = 0;
 
-	m_rtcEngine->setExternalAudioSource(true, sampleRate, audioChannel);
-
 	m_externalAudioframe.channels           = audioChannel;
 	m_externalAudioframe.samplesPerChannel  = sampleRate / AUDIO_CALLBACK_TIMES;//samplerate/100  10ms one audio frame
 	m_externalAudioframe.samplesPerSec      = sampleRate;
@@ -320,21 +287,6 @@ void* AgoraRtcEngine::AgoraAudioObserver_Create()
 	m_externalAudioframe.avsync_type        = 0;
 	m_externalAudioframe.renderTimeMs       = 0;
 	return &m_externalAudioframe;
-	/*
-	if (m_pMediaEngine.get() == nullptr)
-		return nullptr;
-
-	std::unique_ptr<CExtendAudioFrameObserver> obServer = std::unique_ptr<CExtendAudioFrameObserver>(new CExtendAudioFrameObserver);
-	//m_audioObserver.reset(new CExtendAudioFrameObserver);
-	m_audioObserver = std::move(obServer);
-	m_audioObserver->agora_sdk_captrue_mic_audio = agora_sdk_captrue_mic_audio;
-
-	if (m_pMediaEngine->registerAudioFrameObserver(m_audioObserver.get()))
-	{
-		return nullptr;
-	}
-	m_audioObserver->Resetlog(logAudioVideoTimestamp);
-	return m_audioObserver.get();*/
 }
 
 void AgoraRtcEngine::AgoraAudioObserver_Destroy()
@@ -383,9 +335,16 @@ bool AgoraRtcEngine::setRecordingAudioFrameParameters(int nSampleRate, int nChan
 
 int AgoraRtcEngine::joinChannel(const std::string& key, const std::string& channel, unsigned int uid)
 {
-	AParameter apm(*m_rtcEngine);
-	apm->setParameters("{\"che.audio.start_debug_recording\":\"NoName\"}");
-	int r = m_rtcEngine->joinChannel(key.data(), channel.data(), nullptr, uid);
+	//int r = m_rtcEngine->joinChannel(key.data(), channel.data(), nullptr, uid);
+	ChannelMediaOptions options;
+	options.publishAudioTrack = false;
+	options.publishCameraTrack = false;
+	options.clientRoleType = CLIENT_ROLE_BROADCASTER;
+	options.autoSubscribeAudio = true;
+	options.autoSubscribeVideo = true;
+	options.publishCustomAudioTrack = true;
+	options.publishCustomVideoTrack = true;
+	int r = m_rtcEngine->joinChannel(key.data(), channel.data(), uid, options);
 	return r;
 }
 

@@ -42,7 +42,6 @@ public:
 
 	int enableVideo(bool enabled);
 	bool enableLocalRender(bool bEnable);
-	int muteLocalAudioStream(bool muted);
 	int  setLocalVideoMirrorMode(VIDEO_MIRROR_MODE_TYPE mirrorMode);
 	void startPreview();
 	void stopPreview();
