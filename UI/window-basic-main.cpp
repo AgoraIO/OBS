@@ -6311,10 +6311,7 @@ void OBSBasic::MuteAudioDevice(bool bMute)
 		VolControl* pControl = volumes[i];
 		OBSSource source = pControl->GetSource();
 		std::string name = obs_source_get_id(source);
-		if (name.compare("wasapi_input_capture") == 0){
-			pControl->MuteVolume(bMute);
-		}
-		else if(name.compare("wasapi_output_capture")== 0){
+		if(name.compare("wasapi_output_capture")== 0){
 			pControl->MuteVolume(bMute);
 		}
 	}
