@@ -333,7 +333,7 @@ getval:
 }
 
 static inline bool lookup_getstring(const char *lookup_val,
-		const char **out, struct text_node *node)
+	const char **out, struct text_node *node)
 {
 	struct text_node *child;
 	char ch;

@@ -6285,7 +6285,11 @@ void OBSBasic::InitAgoraServiceSettings()
 	obs_data_set_int(settings, "agora_out_cx", out_cx);
 	obs_data_set_int(settings, "agora_out_cy", out_cy);
 
-	obs_data_set_int(settings, "fps", 15);
+	uint32_t fps_num = 15;
+	uint32_t fps_den = 1;
+	GetConfigFPS(fps_num, fps_den);
+
+	obs_data_set_int(settings, "fps", fps_num / fps_den);
 	obs_data_set_int(settings, "agora_client_role", 1);
 	obs_data_set_int(settings, "agora_uid", loacal_uid);
 	obs_data_set_string(settings, "agora_channel", agora_channel.c_str());

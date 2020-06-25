@@ -5,7 +5,7 @@
 struct agora_data
 {
 	char* agora_appid;
-    long long uid;
+	long long uid;
 	char* publish_url, *key, *channel_name;
 	int out_cx, out_cy;
 	int fps;
@@ -16,7 +16,7 @@ struct agora_data
 	agora::rtc::CLIENT_ROLE_TYPE client_role;
 	std::string log_path;
 	bool  agora_sdk_capture_mic_audio;
- bool  enableAgoraRawDataTimelog;
+	bool  enableAgoraRawDataTimelog;
 };
 
 const char * AgoraService_GetName(void *type_data)
@@ -56,7 +56,7 @@ void AgoraService_Update(void *data, obs_data_t *settings)
 
 	service->sample_rate = obs_data_get_int(settings, "agora_sample_rate");
 	service->audio_channel = obs_data_get_int(settings, "agora_audio_channel");//
- service->enableAgoraRawDataTimelog = obs_data_get_bool(settings, "agora_log_raw_data_time");
+	service->enableAgoraRawDataTimelog = obs_data_get_bool(settings, "agora_log_raw_data_time");
 	
 	bool agora_sdk_capture_mic_audio = obs_data_get_bool(settings, "agora_sdk_capture_mic_audio");
 	AgoraRtcEngine::GetInstance()->agora_sdk_captrue_mic_audio = agora_sdk_capture_mic_audio;
@@ -86,12 +86,12 @@ void AgoraService_Update(void *data, obs_data_t *settings)
 	agora->agora_out_cy = service->out_cy;
 	agora->agora_video_bitrate = service->video_bitrate;
 
- bool bLog = obs_data_get_bool(settings, "LogAudioVideoTimestamp");
+	bool bLog = obs_data_get_bool(settings, "LogAudioVideoTimestamp");
 
- if (service->enableAgoraRawDataTimelog != bLog) {
-     service->enableAgoraRawDataTimelog = bLog;
-     AgoraRtcEngine::GetInstance()->enableLogTimestamp(bLog);
- }
+	if (service->enableAgoraRawDataTimelog != bLog) {
+		service->enableAgoraRawDataTimelog = bLog;
+		AgoraRtcEngine::GetInstance()->enableLogTimestamp(bLog);
+	}
 }
 
 void *AgoraService_Create(obs_data_t *settings, obs_service_t *service)
@@ -143,7 +143,7 @@ void AgoraService_Activate(void *data, obs_data_t *settings)
 	AgoraRtcEngine* agora_engine = AgoraRtcEngine::GetInstance();
 	agora_engine->EnableWebSdkInteroperability(service_data->enableWebSdkInteroperability);
 	agora_engine->setVideoProfileEx(service_data->out_cx, service_data->out_cy, service_data->fps, service_data->video_bitrate);
- agora_engine->setRecordingAudioFrameParameters(/*44100, 2*/service_data->sample_rate, service_data->audio_channel, service_data->sample_rate / AUDIO_CALLBACK_TIMES * service_data->audio_channel);
+	agora_engine->setRecordingAudioFrameParameters(/*44100, 2*/service_data->sample_rate, service_data->audio_channel, service_data->sample_rate / AUDIO_CALLBACK_TIMES * service_data->audio_channel);
 	agora_engine->joinChannel("", service_data->channel_name, service_data->uid);
 }
 

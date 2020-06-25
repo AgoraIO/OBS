@@ -22,17 +22,24 @@ static void AgoraPCM_Destroy(void* data)
 static bool AgoraPCM_Encode(void* data, struct encoder_frame* frame,
 struct encoder_packet* packet, bool *receive_packet)
 {
-
-	CExtendAudioFrameObserver* audioObserver = static_cast<CExtendAudioFrameObserver*>(data);
+	/*CExtendAudioFrameObserver* audioObserver = static_cast<CExtendAudioFrameObserver*>(data);
 
 	int dataLen = frame->frames * 2 * AgoraRtcEngine::GetInstance()->audioChannel;//
 
 	TCHAR szBuf[MAX_PATH] = { 0 };
 	_stprintf_s(szBuf, MAX_PATH, _T("AgoraPCM_Encode: datalen=%d \n"), dataLen);
-	//OutputDebugString(szBuf);
- int64_t audioTime = GetTickCount();
+	//OutputDebugString(szBuf
+	int64_t audioTime = GetTickCount();
 	audioObserver->pCircleBuffer->writeBuffer(frame->data[0], dataLen, audioTime);
- AgoraRtcEngine::GetInstance()->logAudioFrameTimestamp();
+	AgoraRtcEngine::GetInstance()->logAudioFrameTimestamp();*/
+	
+	int dataLen = frame->frames * 2 * AgoraRtcEngine::GetInstance()->audioChannel;//
+	char szInfo[MAX_PATH] = { 0 };
+	sprintf_s(szInfo, MAX_PATH, "AgoraPCM_Encode: datalen=%d \n", dataLen);
+	blog(LOG_INFO, szInfo);
+	int64_t audioTime = GetTickCount();
+	AgoraRtcEngine::GetInstance()->logAudioFrameTimestamp();
+	AgoraRtcEngine::GetInstance()->AgoraAudioObserver_Encode(frame, packet, receive_packet);
 	return true;
 }
 
@@ -101,7 +108,6 @@ void RegisterAgoraAudioEncoder()
 	agora_pcm_encoder.get_extra_data = AgoraPCM_GetExtraData;
 	agora_pcm_encoder.get_audio_info = AgoraPCM_GetAudioInfo;
 	agora_pcm_encoder.get_frame_size = AgoraPCM_GetFrameSize;
-	//MF_LOG(LOG_DEBUG, "Adding Agora Audio Encoder");
 
 	obs_register_encoder(&agora_pcm_encoder);
 }
