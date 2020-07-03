@@ -97,5 +97,4 @@ tags
 .DS_Store
 */.DS_Store
 */**/.DS_Store
-vs2017/
-vs2017_64/
+build/

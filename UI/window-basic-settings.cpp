@@ -4879,18 +4879,18 @@ void OBSBasicSettings::on_loadConfigButton_clicked()
 		std::shared_ptr<QSettings> spConfig = std::make_shared<QSettings>(iter, QSettings::IniFormat);
 		ui->loadConfiglineEdit->setText(iter);
 		QString str;
-		str = spConfig->value("General/Appid").toString();
+		str = spConfig->value("/BaseInfo/AppId").toString();
 		if (!str.isEmpty())
 			ui->lineEditAppid->setText(str);
 
-		str = spConfig->value("General/AppToken").toString();
+		str = spConfig->value("/BaseInfo/AppToken").toString();
 		if (!str.isEmpty())
 			ui->lineEditToken->setText(str);
-		str = spConfig->value("/General/ChannelName").toString();
+		str = spConfig->value("/BaseInfo/ChannelName").toString();
 		if (!str.isEmpty())
 			ui->lineEditChannel->setText(str);
 		
-		str = spConfig->value("/General/UID").toString();
+		str = spConfig->value("/BaseInfo/UID").toString();
 		if (!str.isEmpty())
 			ui->lineEditUID->setText(str);	
 	}

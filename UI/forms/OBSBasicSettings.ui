@@ -5482,12 +5482,6 @@
                    </property>
                    <item row="1" column="0">
                     <widget class="QLabel" name="loadConfigFileLabel">
-                     <property name="maximumSize">
-                      <size>
-                       <width>0</width>
-                       <height>0</height>
-                      </size>
-                     </property>
                      <property name="text">
                       <string>Basic.Settigs.Agora.LoadConfig</string>
                      </property>
@@ -5500,12 +5494,6 @@
                     <layout class="QHBoxLayout" name="horizontalLayout_26">
                      <item>
                       <widget class="QLineEdit" name="loadConfiglineEdit">
-                       <property name="maximumSize">
-                        <size>
-                         <width>0</width>
-                         <height>0</height>
-                        </size>
-                       </property>
                        <property name="readOnly">
                         <bool>true</bool>
                        </property>
@@ -5515,8 +5503,8 @@
                       <widget class="QPushButton" name="loadConfigButton">
                        <property name="maximumSize">
                         <size>
-                         <width>0</width>
-                         <height>0</height>
+                         <width>80</width>
+                         <height>16777215</height>
                         </size>
                        </property>
                        <property name="text">

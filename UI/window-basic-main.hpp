@@ -1056,7 +1056,6 @@ private:
 	void ResetRemoteVideoWidget(int index);
 	OBSService agoraService;
 	std::unique_ptr<AgoraOutputHandler> agoraOutputHandler;
-
 	std::string agoraColorFormat = "I420";
 	std::string obsColorFormatReplacedByAgora = "NV12";
 	QWidget *remoteVideo = nullptr;

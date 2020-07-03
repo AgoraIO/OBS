@@ -161,7 +161,7 @@ bool AgoraRtcEngine::InitEngine(std::string appid)
 	//m_externalAudioframe.samples = sampleRate / AUDIO_CALLBACK_TIMES;
 	m_externalAudioframe.samplesPerChannel = sampleRate / AUDIO_CALLBACK_TIMES;
 	m_externalAudioframe.samplesPerSec = sampleRate;
-	m_externalAudioframe.bytesPerSample = 2;
+	m_externalAudioframe.bytesPerSample = 4;
 	m_externalAudioframe.type = agora::media::IAudioFrameObserver::FRAME_TYPE_PCM16;
 	m_externalAudioframe.buffer = NULL;
 	m_externalAudioframe.avsync_type = 0;
