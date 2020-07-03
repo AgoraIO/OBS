@@ -1,10 +1,46 @@
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.10)
+
+if (UNIX AND POLICY CMP0072)
+	# In case of both legacy and glvnd OpenGL libraries found. Prefer GLVND
+	cmake_policy(SET CMP0072 NEW)
+endif()
 
 project(obs-studio)
 
 option(BUILD_CAPTIONS "Build captions" FALSE)
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 if(WIN32)
+	cmake_minimum_required(VERSION 3.16)
+
+	# Check for Win SDK version 10.0.19041 or above
+	if(MSVC AND MSVC_VERSION LESS 1920)
+		message(STATUS "Windows API version is ${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}")
+		string(REPLACE "." ";" WINAPI_VER "${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}")
+
+		list(GET WINAPI_VER 0 WINAPI_VER_MAJOR)
+		list(GET WINAPI_VER 1 WINAPI_VER_MINOR)
+		list(GET WINAPI_VER 2 WINAPI_VER_BUILD)
+
+		set(WINAPI_COMPATIBLE FALSE)
+		if(WINAPI_VER_MAJOR EQUAL 10)
+			if (WINAPI_VER_MINOR EQUAL 0)
+				if (WINAPI_VER_BUILD GREATER_EQUAL 19041)
+					set(WINAPI_COMPATIBLE TRUE)
+				endif()
+			else()
+				set(WINAPI_COMPATIBLE TRUE)
+			endif()
+		elseif(WINAPI_VER_MAJOR GREATER 10)
+			set(WINAPI_COMPATIBLE TRUE)
+		endif()
+
+		if(NOT WINAPI_COMPATIBLE)
+			message(FATAL_ERROR "OBS requires Windows 10 SDK version 10.0.19041.0 and above to compile.\nPlease download the most recent Windows 10 SDK in order to compile (or update to Visual Studio 2019).")
+		endif()
+	endif()
+
 	if (QTDIR OR DEFINED ENV{QTDIR} OR DEFINED ENV{QTDIR32} OR DEFINED ENV{QTDIR64})
 		# Qt path set by user or env var
 	else()
@@ -21,11 +57,45 @@ endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 set(ENABLE_SCRIPTING TRUE CACHE BOOL "Enables scripting")
-set(SCRIPTING_ENABLED OFF CACHE BOOL "Interal global cmake variable" FORCE)
+set(SCRIPTING_ENABLED OFF CACHE BOOL "Internal global cmake variable" FORCE)
 
 include(ObsHelpers)
 include(ObsCpack)
 include(GNUInstallDirs)
+
+# Must be a string in the format of "x.x.x-rcx"
+set (RELEASE_CANDIDATE "25.0.8-rc1")
+if(DEFINED RELEASE_CANDIDATE)
+	set(OBS_VERSION "${RELEASE_CANDIDATE}")
+	string(REPLACE "-rc" "." RC_SPLIT ${RELEASE_CANDIDATE})
+	string(REPLACE "." ";" RC_SPLIT ${RC_SPLIT})
+	message(WARNING "******************************************************************************\nRelease candidate deteced, OBS_VERSION is now: ${OBS_VERSION}\n******************************************************************************")
+	list(GET RC_SPLIT 0 OBS_RELEASE_CANDIDATE_MAJOR)
+	list(GET RC_SPLIT 1 OBS_RELEASE_CANDIDATE_MINOR)
+	list(GET RC_SPLIT 2 OBS_RELEASE_CANDIDATE_PATCH)
+	list(GET RC_SPLIT 3 OBS_RELEASE_CANDIDATE)
+else()
+	set(OBS_RELEASE_CANDIDATE_MAJOR 0)
+	set(OBS_RELEASE_CANDIDATE_MINOR 0)
+	set(OBS_RELEASE_CANDIDATE_PATCH 0)
+	set(OBS_RELEASE_CANDIDATE 0)
+endif()
+
+# Binary Versioning for Windows
+if(WIN32)
+	string(REPLACE "-" ";" UI_VERSION_SPLIT ${OBS_VERSION})
+	list(GET UI_VERSION_SPLIT 0 UI_VERSION)
+	string(REPLACE "." ";" UI_VERSION_SEMANTIC ${UI_VERSION})
+	list(GET UI_VERSION_SEMANTIC 0 UI_VERSION_MAJOR)
+	list(GET UI_VERSION_SEMANTIC 1 UI_VERSION_MINOR)
+	list(GET UI_VERSION_SEMANTIC 2 UI_VERSION_PATCH)
+	set(OBS_COMPANY_NAME "OBS")
+	set(OBS_PRODUCT_NAME "OBS Studio")
+	set(OBS_COMMENTS "Free and open source software for video recording and live streaming")
+	set(OBS_LEGAL_COPYRIGHT "(C) Hugh Bailey")
+	set(MODULE_DESCRIPTION "OBS Studio")
+	configure_file(UI/obs.rc.in ${PROJECT_BINARY_DIR}/obs.rc)
+endif()
 
 if(MSVC AND NOT EXISTS "${CMAKE_BINARY_DIR}/ALL_BUILD.vcxproj.user")
 	file(GENERATE
@@ -37,16 +107,43 @@ if(NOT CMAKE_BUILD_TYPE)
         set(CMAKE_BUILD_TYPE RelWithDebInfo)
 endif()
 
-find_package(CXX11 REQUIRED)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX11_FLAGS}")
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED YES)
+set(CMAKE_CXX_EXTENSIONS NO)
 
 if(${CMAKE_C_COMPILER_ID} MATCHES "Clang" OR ${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
 	set(CMAKE_COMPILER_IS_CLANG TRUE)
 endif()
 
+if (MSVC_CXX_ARCHITECTURE_ID)
+    string(TOLOWER ${MSVC_CXX_ARCHITECTURE_ID} LOWERCASE_CMAKE_SYSTEM_PROCESSOR)
+else ()
+    string(TOLOWER ${CMAKE_SYSTEM_PROCESSOR} LOWERCASE_CMAKE_SYSTEM_PROCESSOR)
+endif ()
+
+if(LOWERCASE_CMAKE_SYSTEM_PROCESSOR MATCHES "(i[3-6]86|x86|x64|x86_64|amd64)")
+	set(NEEDS_SIMDE "0")
+	if(NOT MSVC)
+		set(ARCH_SIMD_FLAGS "-mmmx" "-msse" "-msse2")
+	endif()
+elseif(LOWERCASE_CMAKE_SYSTEM_PROCESSOR MATCHES "^(powerpc|ppc)64(le)?")
+	set(NEEDS_SIMDE "0")
+	set(ARCH_SIMD_FLAGS "-mvsx")
+	add_compile_definitions(NO_WARN_X86_INTRINSICS)
+else()
+	set(NEEDS_SIMDE "1")
+	add_definitions(-DNEEDS_SIMDE=1)
+	if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp-simd -DSIMDE_ENABLE_OPENMP")
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fopenmp-simd -DSIMDE_ENABLE_OPENMP")
+	endif()
+	set(ARCH_SIMD_FLAGS "")
+	message(STATUS "No Native SSE2 SIMD Support - Using SIMDE")
+endif()
+
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANG)
-	set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-unused-function -Werror-implicit-function-declaration -Wno-missing-field-initializers ${CMAKE_CXX_FLAGS} -fno-strict-aliasing")
-	set(CMAKE_C_FLAGS "-Wall -Wextra -Wno-unused-function -Werror-implicit-function-declaration -Wno-missing-braces -Wno-missing-field-initializers ${CMAKE_C_FLAGS} -std=gnu99 -fno-strict-aliasing")
+	set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wvla -Wno-unused-function -Wno-missing-field-initializers ${CMAKE_CXX_FLAGS} -fno-strict-aliasing")
+	set(CMAKE_C_FLAGS "-Wall -Wextra -Wvla -Wno-unused-function -Werror-implicit-function-declaration -Wno-missing-braces -Wno-missing-field-initializers ${CMAKE_C_FLAGS} -std=gnu99 -fno-strict-aliasing")
 
 	option(USE_LIBC++ "Use libc++ instead of libstdc++" ${APPLE})
 	if(USE_LIBC++)
@@ -60,7 +157,7 @@ elseif(MSVC)
 	endif()
 
 	# Disable pointless constant condition warnings
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4127 /wd4201")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4127 /wd4201 /wd4456 /wd4457 /wd4458 /wd4459 /wd4595")
 endif()
 
 if(WIN32)
@@ -68,6 +165,7 @@ if(WIN32)
 endif()
 
 if(MSVC)
+	add_compile_options("/MP")
 	set(CMAKE_C_FLAGS_DEBUG "/DDEBUG=1 /D_DEBUG=1 ${CMAKE_C_FLAGS_DEBUG}")
 	set(CMAKE_CXX_FLAGS_DEBUG "/DDEBUG=1 /D_DEBUG=1 ${CMAKE_C_FLAGS_DEBUG}")
 
@@ -76,6 +174,12 @@ if(MSVC)
 		set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /SAFESEH:NO")
 		set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} /SAFESEH:NO")
 	endif()
+
+	foreach(t EXE SHARED MODULE)
+		set(CMAKE_${t}_LINKER_FLAGS "${CMAKE_${t}_LINKER_FLAGS} /OPT:REF")
+		set(CMAKE_${t}_LINKER_FLAGS_DEBUG "${CMAKE_${t}_LINKER_FLAGS_DEBUG} /INCREMENTAL:NO")
+		set(CMAKE_${t}_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_${t}_LINKER_FLAGS_RELWITHDEBINFO} /INCREMENTAL:NO")
+	endforeach()
 else()
 	if(MINGW)
 		set(CMAKE_WIDL "widl" CACHE STRING "wine IDL header file generation program")
@@ -110,19 +214,43 @@ if(NOT INSTALLER_RUN)
 		set(UI_ENABLED FALSE)
 	else()
 		set(UI_ENABLED TRUE)
+
+		if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+			set(_lib_suffix 64)
+		else()
+			set(_lib_suffix 32)
+		endif()
+
+		if(DEFINED QTDIR${_lib_suffix})
+			list(APPEND CMAKE_PREFIX_PATH "${QTDIR${_lib_suffix}}")
+		elseif(DEFINED QTDIR)
+			list(APPEND CMAKE_PREFIX_PATH "${QTDIR}")
+		elseif(DEFINED ENV{QTDIR${_lib_suffix}})
+			list(APPEND CMAKE_PREFIX_PATH "$ENV{QTDIR${_lib_suffix}}")
+		elseif(DEFINED ENV{QTDIR})
+			list(APPEND CMAKE_PREFIX_PATH "$ENV{QTDIR}")
+		endif()
+
+		find_package(Qt5Widgets ${FIND_MODE})
 	endif()
 
 	add_subdirectory(deps)
 
 	if(WIN32)
 		add_subdirectory(libobs-d3d11)
+		add_subdirectory(libobs-winrt)
 	endif()
 
 	add_subdirectory(libobs-opengl)
 	add_subdirectory(libobs)
-	add_subdirectory(UI)
 	add_subdirectory(plugins)
-	if (BUILD_TESTS)
+	add_subdirectory(UI)
+
+	if (ENABLE_UNIT_TESTS)
+		enable_testing()
+	endif()
+
+	if (BUILD_TESTS OR ENABLE_UNIT_TESTS)
 		add_subdirectory(test)
 	endif()
 

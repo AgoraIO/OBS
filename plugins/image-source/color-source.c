@@ -51,13 +51,15 @@ static obs_properties_t *color_source_properties(void *unused)
 	obs_properties_t *props = obs_properties_create();
 
 	obs_properties_add_color(props, "color",
-		obs_module_text("ColorSource.Color"));
+				 obs_module_text("ColorSource.Color"));
 
 	obs_properties_add_int(props, "width",
-		obs_module_text("ColorSource.Width"), 0, 4096, 1);
+			       obs_module_text("ColorSource.Width"), 0, 4096,
+			       1);
 
 	obs_properties_add_int(props, "height",
-		obs_module_text("ColorSource.Height"), 0, 4096, 1);
+			       obs_module_text("ColorSource.Height"), 0, 4096,
+			       1);
 
 	return props;
 }
@@ -68,9 +70,9 @@ static void color_source_render(void *data, gs_effect_t *effect)
 
 	struct color_source *context = data;
 
-	gs_effect_t    *solid = obs_get_base_effect(OBS_EFFECT_SOLID);
-	gs_eparam_t    *color = gs_effect_get_param_by_name(solid, "color");
-	gs_technique_t *tech  = gs_effect_get_technique(solid, "Solid");
+	gs_effect_t *solid = obs_get_base_effect(OBS_EFFECT_SOLID);
+	gs_eparam_t *color = gs_effect_get_param_by_name(solid, "color");
+	gs_technique_t *tech = gs_effect_get_technique(solid, "Solid");
 
 	struct vec4 colorVal;
 	vec4_from_rgba(&colorVal, context->color);
@@ -97,24 +99,75 @@ static uint32_t color_source_getheight(void *data)
 	return context->height;
 }
 
-static void color_source_defaults(obs_data_t *settings)
+static void color_source_defaults_v1(obs_data_t *settings)
 {
 	obs_data_set_default_int(settings, "color", 0xFFFFFFFF);
 	obs_data_set_default_int(settings, "width", 400);
 	obs_data_set_default_int(settings, "height", 400);
 }
 
-struct obs_source_info color_source_info = {
-	.id             = "color_source",
-	.type           = OBS_SOURCE_TYPE_INPUT,
-	.output_flags   = OBS_SOURCE_VIDEO | OBS_SOURCE_CUSTOM_DRAW,
-	.create         = color_source_create,
-	.destroy        = color_source_destroy,
-	.update         = color_source_update,
-	.get_name       = color_source_get_name,
-	.get_defaults   = color_source_defaults,
-	.get_width      = color_source_getwidth,
-	.get_height     = color_source_getheight,
-	.video_render   = color_source_render,
-	.get_properties = color_source_properties
+static void color_source_defaults_v2(obs_data_t *settings)
+{
+	obs_data_set_default_int(settings, "color", 0xFFFFFFFF);
+	obs_data_set_default_int(settings, "width", 1920);
+	obs_data_set_default_int(settings, "height", 1080);
+}
+
+static void color_source_defaults_v3(obs_data_t *settings)
+{
+	obs_data_set_default_int(settings, "color", 0xFFD1D1D1);
+	obs_data_set_default_int(settings, "width", 1920);
+	obs_data_set_default_int(settings, "height", 1080);
+}
+
+struct obs_source_info color_source_info_v1 = {
+	.id = "color_source",
+	.type = OBS_SOURCE_TYPE_INPUT,
+	.output_flags = OBS_SOURCE_VIDEO | OBS_SOURCE_CUSTOM_DRAW |
+			OBS_SOURCE_CAP_OBSOLETE,
+	.create = color_source_create,
+	.destroy = color_source_destroy,
+	.update = color_source_update,
+	.get_name = color_source_get_name,
+	.get_defaults = color_source_defaults_v1,
+	.get_width = color_source_getwidth,
+	.get_height = color_source_getheight,
+	.video_render = color_source_render,
+	.get_properties = color_source_properties,
+	.icon_type = OBS_ICON_TYPE_COLOR,
+};
+
+struct obs_source_info color_source_info_v2 = {
+	.id = "color_source",
+	.version = 2,
+	.type = OBS_SOURCE_TYPE_INPUT,
+	.output_flags = OBS_SOURCE_VIDEO | OBS_SOURCE_CUSTOM_DRAW |
+			OBS_SOURCE_CAP_OBSOLETE,
+	.create = color_source_create,
+	.destroy = color_source_destroy,
+	.update = color_source_update,
+	.get_name = color_source_get_name,
+	.get_defaults = color_source_defaults_v2,
+	.get_width = color_source_getwidth,
+	.get_height = color_source_getheight,
+	.video_render = color_source_render,
+	.get_properties = color_source_properties,
+	.icon_type = OBS_ICON_TYPE_COLOR,
+};
+
+struct obs_source_info color_source_info_v3 = {
+	.id = "color_source",
+	.version = 3,
+	.type = OBS_SOURCE_TYPE_INPUT,
+	.output_flags = OBS_SOURCE_VIDEO | OBS_SOURCE_CUSTOM_DRAW,
+	.create = color_source_create,
+	.destroy = color_source_destroy,
+	.update = color_source_update,
+	.get_name = color_source_get_name,
+	.get_defaults = color_source_defaults_v3,
+	.get_width = color_source_getwidth,
+	.get_height = color_source_getheight,
+	.video_render = color_source_render,
+	.get_properties = color_source_properties,
+	.icon_type = OBS_ICON_TYPE_COLOR,
 };

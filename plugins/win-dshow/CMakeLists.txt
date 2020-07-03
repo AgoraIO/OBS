@@ -12,11 +12,14 @@ set(win-dshow_HEADERS
 	encode-dstr.hpp
 	ffmpeg-decode.h)
 
+set(MODULE_DESCRIPTION "OBS DirectShow module")
+configure_file(${CMAKE_SOURCE_DIR}/cmake/winrc/obs-module.rc.in win-dshow.rc)
 set(win-dshow_SOURCES
 	win-dshow.cpp
 	win-dshow-encoder.cpp
 	dshow-plugin.cpp
-	ffmpeg-decode.c)
+	ffmpeg-decode.c
+	win-dshow.rc)
 
 set(libdshowcapture_SOURCES
 	libdshowcapture/source/capture-filter.cpp
@@ -35,7 +38,7 @@ set(libdshowcapture_SOURCES
 
 set(libdshowcapture_HEADERS
 	libdshowcapture/dshowcapture.hpp
-	libdshowcapture/source/IVideoCaptureFilter.h
+	libdshowcapture/source/external/IVideoCaptureFilter.h
 	libdshowcapture/source/capture-filter.hpp
 	libdshowcapture/source/output-filter.hpp
 	libdshowcapture/source/device.hpp
@@ -59,5 +62,6 @@ target_link_libraries(win-dshow
 	ksuser
 	wmcodecdspuuid
 	${FFMPEG_LIBRARIES})
+set_target_properties(win-dshow PROPERTIES FOLDER "plugins")
 
 install_obs_plugin_with_data(win-dshow data)

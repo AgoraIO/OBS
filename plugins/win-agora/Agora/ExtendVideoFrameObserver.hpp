@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include "util/threading.h"
 
+using namespace agora::media;
 #define VIDEO_BUF_SIZE (1920*1080*4)
 #define LOG_VIDEO_FRAME_TIME_DUARATION 10 //10 second
 typedef struct _AgoraVideoBuffer {

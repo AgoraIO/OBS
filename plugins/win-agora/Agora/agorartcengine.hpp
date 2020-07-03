@@ -101,7 +101,7 @@ public:
 private:
 	friend class AgoraRtcEngineEvent;
 private:
-	agora::rtc::IRtcEngine* m_rtcEngine;
+	agora::rtc::IRtcEngine* m_rtcEngine = nullptr;
 	std::unique_ptr<agora::rtc::IRtcEngineEventHandler> m_eventHandler;
 	static char* m_appid;
 	static AgoraRtcEngine* m_agoraEngine;
@@ -117,6 +117,6 @@ private:
 	int m_externalAudioFrameSize;
 	agora::media::IAudioFrameObserver::AudioFrame m_externalAudioframe;
 	int m_externalVideoFrameSize;
-	agora::media::ExternalVideoFrame m_externalVideoFrame;
+	agora::media::base::ExternalVideoFrame m_externalVideoFrame;
 };
 

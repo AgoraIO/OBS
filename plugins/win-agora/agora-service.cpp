@@ -5,6 +5,7 @@
 struct agora_data
 {
 	char* agora_appid;
+	char *agora_token;
 	long long uid;
 	char* publish_url, *key, *channel_name;
 	int out_cx, out_cy;
@@ -33,6 +34,10 @@ void AgoraService_Update(void *data, obs_data_t *settings)
 	if (service->agora_appid)
 		bfree(service->agora_appid);
 
+	if (service->agora_token)
+		bfree(service->agora_token);
+
+
 	if (service->channel_name)
 		bfree(service->channel_name);
 
@@ -44,10 +49,11 @@ void AgoraService_Update(void *data, obs_data_t *settings)
 	
 	service->uid          = obs_data_get_int(settings, "agora_uid");
 	service->agora_appid = bstrdup(obs_data_get_string(settings, "agora_appid"));//app_id
+	service->agora_token = bstrdup(obs_data_get_string(settings, "agora_token"));
+	
 	service->publish_url  = bstrdup(obs_data_get_string(settings, "agora_url"));
 	service->key          = bstrdup(obs_data_get_string(settings, "agora_key"));
 	service->channel_name = bstrdup(obs_data_get_string(settings, "agora_channel"));
-	
 	service->out_cx = obs_data_get_int(settings, "agora_out_cx");
 	service->out_cy = obs_data_get_int(settings, "agora_out_cy");
 	service->fps    = obs_data_get_int(settings, "fps");
@@ -129,7 +135,7 @@ bool AgoraService_Initialize(void *data, obs_output_t *output)
 
 	
 	agora_engine->enableVideo(true);
-	agora_engine->setChannelProfile(agora::rtc::CHANNEL_PROFILE_LIVE_BROADCASTING);
+	agora_engine->setChannelProfile(agora::CHANNEL_PROFILE_LIVE_BROADCASTING);
 	agora_engine->setClientRole(service_data->client_role);//(agora::rtc::CLIENT_ROLE_BROADCASTER);
 	agora_engine->enableLocalCameara(false);// stop agora camera capture
 	agora_engine->enableLocalRender(false); // stop agora local render
@@ -144,7 +150,7 @@ void AgoraService_Activate(void *data, obs_data_t *settings)
 	agora_engine->EnableWebSdkInteroperability(service_data->enableWebSdkInteroperability);
 	agora_engine->setVideoProfileEx(service_data->out_cx, service_data->out_cy, service_data->fps, service_data->video_bitrate);
 	agora_engine->setRecordingAudioFrameParameters(/*44100, 2*/service_data->sample_rate, service_data->audio_channel, service_data->sample_rate / AUDIO_CALLBACK_TIMES * service_data->audio_channel);
-	agora_engine->joinChannel("", service_data->channel_name, service_data->uid);
+	agora_engine->joinChannel(service_data->agora_token, service_data->channel_name, service_data->uid);
 }
 
 void AgoraService_Deactivate(void *data)

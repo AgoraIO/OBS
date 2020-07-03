@@ -16,13 +16,7 @@
 /debug32/
 /debug64/
 /builds/
-/vs2013/
-/vs2013_NOUI/
-/vs2015/
-/vs2017/
-/dependencies2013/
-/dependencies2015/
-/dependencies2017/
+.vs/
 *.o.d
 *.ninja
 .ninja*
@@ -42,6 +36,8 @@ x64/
 ipch/
 GeneratedFiles/
 .moc/
+/UI/obs.rc
+.vscode/
 
 /other/
 
@@ -93,14 +89,13 @@ tags
 *.obj
 *.pdb
 *.res
-*.manifest
 *.dep
-
+*.zip
 *.lnk
 *.chm
 *~
 .DS_Store
 */.DS_Store
 */**/.DS_Store
-vs2015_x64/
+vs2017/
 vs2017_64/

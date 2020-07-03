@@ -13,7 +13,7 @@ include_directories(
 
 if(WIN32)
 	if(MSVC)
-		add_compile_options("$<$<CONFIG:RelWithDebInfo>:/MT>")
+		add_compile_options($<IF:$<CONFIG:Debug>,/MTd,/MT> /Zl)
 	endif()
 	add_definitions(
 		-Dinline=_inline
@@ -30,3 +30,4 @@ set(blake2_HEADERS
 add_library(blake2 STATIC
 	${blake2_SOURCES}
 	${blake2_HEADERS})
+set_target_properties(blake2 PROPERTIES FOLDER "deps")

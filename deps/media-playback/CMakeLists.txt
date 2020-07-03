@@ -9,6 +9,7 @@ include_directories(
 	)
 
 set(media-playback_HEADERS
+	media-playback/closest-format.h
 	media-playback/decode.h
 	media-playback/media.h
 	)
@@ -22,17 +23,14 @@ add_library(media-playback STATIC
 	${media-playback_SOURCES}
 	)
 
-if(NOT MSVC)
-	target_compile_options(media-playback
-		PUBLIC
-			-mmmx
-			-msse
-			-msse2)
-endif()
+target_compile_options(media-playback
+	PUBLIC
+	${ARCH_SIMD_FLAGS})
 
 target_include_directories(media-playback
 	PUBLIC .
 	)
+
 
 if(NOT MSVC)
         if(NOT MINGW)
@@ -43,3 +41,4 @@ endif()
 target_link_libraries(media-playback
 	${FFMPEG_LIBRARIES}
 	)
+set_target_properties(media-playback PROPERTIES FOLDER "deps")

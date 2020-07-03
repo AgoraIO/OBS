@@ -15,6 +15,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
+#pragma once
+
 #include <obs-module.h>
 #include <ft2build.h>
 
@@ -28,13 +30,14 @@ struct glyph_info {
 };
 
 struct ft2_source {
-	char     *font_name;
-	char     *font_style;
+	char *font_name;
+	char *font_style;
 	uint16_t font_size;
 	uint32_t font_flags;
 
 	bool file_load_failed;
 	bool from_file;
+	bool antialiasing;
 	char *text_file;
 	wchar_t *text;
 	time_t m_timestamp;
@@ -52,7 +55,7 @@ struct ft2_source {
 
 	struct glyph_info *cacheglyphs[num_cache_slots];
 
-	FT_Face	font_face;
+	FT_Face font_face;
 
 	uint8_t *texbuf;
 	gs_vertbuffer_t *vbuf;
@@ -60,13 +63,15 @@ struct ft2_source {
 	gs_effect_t *draw_effect;
 	bool outline_text, drop_shadow;
 	bool log_mode, word_wrap;
+	uint32_t log_lines;
 
 	obs_source_t *src;
 };
 
 extern FT_Library ft2_lib;
 
-static void *ft2_source_create(obs_data_t *settings, obs_source_t *source);
+static void *ft2_source_create_v1(obs_data_t *settings, obs_source_t *source);
+static void *ft2_source_create_v2(obs_data_t *settings, obs_source_t *source);
 static void ft2_source_destroy(void *data);
 static void ft2_source_update(void *data, obs_data_t *settings);
 static void ft2_source_render(void *data, gs_effect_t *effect);

@@ -132,7 +132,6 @@ AgoraRtcEngine::~AgoraRtcEngine()
 		m_rtcEngine->release();
 		m_rtcEngine = NULL;
 	}
-	
 }
 
 bool AgoraRtcEngine::InitEngine(std::string appid)
@@ -178,7 +177,7 @@ bool AgoraRtcEngine::InitEngine(std::string appid)
 	m_externalVideoFrame.height = agora_out_cx;
 	m_externalVideoFrame.stride = agora_out_cy;
 	m_externalVideoFrame.timestamp = 0;
-	m_externalVideoFrame.type = agora::media::ExternalVideoFrame::VIDEO_BUFFER_RAW_DATA;
+	m_externalVideoFrame.type = ExternalVideoFrame::VIDEO_BUFFER_RAW_DATA;
 
 	return true;
 }

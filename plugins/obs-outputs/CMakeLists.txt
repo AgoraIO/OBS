@@ -1,26 +1,33 @@
 project(obs-outputs)
 
-option(USE_SSL "Enable rtmps support with OpenSSL" OFF)
+set(WITH_RTMPS AUTO CACHE STRING "Enable RTMPS support with mbedTLS")
+set_property(CACHE WITH_RTMPS PROPERTY STRINGS AUTO ON OFF)
 
-if (USE_SSL)
-	find_package(SSL QUIET)
-	find_package(ZLIB QUIET)
+option(STATIC_MBEDTLS "Statically link mbedTLS into binary" OFF)
+
+if (WITH_RTMPS STREQUAL "AUTO")
+	find_package(MbedTLS)
+	find_package(ZLIB)
+	if (NOT MBEDTLS_FOUND OR NOT ZLIB_FOUND)
+		set(WITH_RTMPS "OFF")
+		message(WARNING "mbedTLS or zlib was not found, RTMPS will be auto-disabled")
+	endif()
 endif()
 
-if (SSL_FOUND AND ZLIB_FOUND)
-	add_definitions(-DCRYPTO -DUSE_OPENSSL)
-	include_directories(${SSL_INCLUDE_DIRS} ${ZLIB_INCLUDE_DIRS})
+if (WITH_RTMPS)
+	find_package(MbedTLS REQUIRED)
+	find_package(ZLIB REQUIRED)
+	add_definitions(-DCRYPTO -DUSE_MBEDTLS)
+	include_directories(${MBEDTLS_INCLUDE_DIRS} ${ZLIB_INCLUDE_DIRS})
 else()
-	if (USE_SSL)
-		message(WARNING "SSL enabled by user, but OpenSSL was not found")
-	endif()
-	unset(SSL_LIBRARIES)
-	unset(ZLIB_LIBRARIES)
 	add_definitions(-DNO_CRYPTO)
 endif()
 
 if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/ftl-sdk/CMakeLists.txt")
 	find_package(Libcurl REQUIRED)
+	message(STATUS "Found ftl-sdk: ftl outputs enabled")
+
+	add_definitions(-DFTL_STATIC_COMPILE)
 
 	include_directories(${LIBCURL_INCLUDE_DIRS})
 
@@ -82,12 +89,28 @@ if(WIN32)
 		ws2_32
 		winmm
 		Iphlpapi)
+
+	if (WITH_RTMPS OR (WITH_RTMPS STREQUAL "AUTO"))
+		SET(obs-outputs_PLATFORM_DEPS
+			${obs-outputs_PLATFORM_DEPS}
+			crypt32)
+	endif()
 endif()
 
 if(MSVC)
 	set(obs-outputs_PLATFORM_DEPS
 		${obs-outputs_PLATFORM_DEPS}
 		w32-pthreads)
+endif()
+
+if(APPLE AND (WITH_RTMPS OR (WITH_RTMPS STREQUAL "AUTO")))
+	find_library(FOUNDATION_FRAMEWORK Foundation)
+	find_library(SECURITY_FRAMEWORK Security)
+
+	set(obs-outputs_PLATFORM_DEPS
+		${obs-outputs_PLATFORM_DEPS}
+		${FOUNDATION_FRAMEWORK}
+		${SECURITY_FRAMEWORK})
 endif()
 
 set(obs-outputs_librtmp_HEADERS
@@ -131,7 +154,14 @@ set(obs-outputs_SOURCES
 	flv-output.c
 	flv-mux.c
 	net-if.c)
-	
+
+if(WIN32)
+	set(MODULE_DESCRIPTION "OBS output module")
+	configure_file(${CMAKE_SOURCE_DIR}/cmake/winrc/obs-module.rc.in obs-outputs.rc)
+	list(APPEND obs-outputs_SOURCES
+		obs-outputs.rc)
+endif()
+
 add_library(obs-outputs MODULE
 	${ftl_SOURCES}
 	${ftl_HEADERS}
@@ -141,9 +171,10 @@ add_library(obs-outputs MODULE
 	${obs-outputs_librtmp_HEADERS})
 target_link_libraries(obs-outputs
 	libobs
-	${SSL_LIBRARIES}
+	${MBEDTLS_LIBRARIES}
 	${ZLIB_LIBRARIES}
 	${ftl_IMPORTS}
 	${obs-outputs_PLATFORM_DEPS})
+set_target_properties(obs-outputs PROPERTIES FOLDER "plugins")
 
 install_obs_plugin_with_data(obs-outputs data)

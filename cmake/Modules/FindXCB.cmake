@@ -21,6 +21,7 @@
 #   XCB_GLX_FOUND        XCB_GLX_INCLUDE_DIR        XCB_GLX_LIBRARY
 #   XCB_SHM_FOUND        XCB_SHM_INCLUDE_DIR        XCB_SHM_LIBRARY
 #   XCB_XV_FOUND         XCB_XV_INCLUDE_DIR         XCB_XV_LIBRARY
+#   XCB_XINPUT_FOUND     XCB_XINPUT_INCLUDE_DIR     XCB_XINPUT_LIBRARY
 #   XCB_SYNC_FOUND       XCB_SYNC_INCLUDE_DIR       XCB_SYNC_LIBRARY
 #   XCB_XTEST_FOUND      XCB_XTEST_INCLUDE_DIR      XCB_XTEST_LIBRARY
 #   XCB_ICCCM_FOUND      XCB_ICCCM_INCLUDE_DIR      XCB_ICCCM_LIBRARY
@@ -54,6 +55,7 @@ set(knownComponents XCB
                     XFIXES
                     XTEST
                     XV
+                    XINPUT
                     XINERAMA)
 
 unset(unknownComponents)
@@ -112,6 +114,8 @@ foreach(comp ${comps})
             list(APPEND pkgConfigModules "xcb-xtest")
         elseif("${comp}" STREQUAL "XV")
             list(APPEND pkgConfigModules "xcb-xv")
+        elseif("${comp}" STREQUAL "XINPUT")
+            list(APPEND pkgConfigModules "xcb-xinput")
         elseif("${comp}" STREQUAL "XINERAMA")
             list(APPEND pkgConfigModules "xcb-xinerama")
         endif()
@@ -190,6 +194,9 @@ macro(_XCB_HANDLE_COMPONENT _comp)
     elseif("${_comp}" STREQUAL "XV")
         set(_header "xcb/xv.h")
         set(_lib "xcb-xv")
+    elseif("${_comp}" STREQUAL "XINPUT")
+        set(_header "xcb/xinput.h")
+        set(_lib "xcb-xinput")
     elseif("${_comp}" STREQUAL "XINERAMA")
         set(_header "xcb/xinerama.h")
         set(_lib "xcb-xinerama")
@@ -197,30 +204,19 @@ macro(_XCB_HANDLE_COMPONENT _comp)
 
     find_path(XCB_${_comp}_INCLUDE_DIR NAMES ${_header} HINTS ${PKG_XCB_INCLUDE_DIRS})
     find_library(XCB_${_comp}_LIBRARY NAMES ${_lib} HINTS ${PKG_XCB_LIBRARY_DIRS})
+    mark_as_advanced(XCB_${_comp}_LIBRARY XCB_${_comp}_INCLUDE_DIR)
 
     if(XCB_${_comp}_INCLUDE_DIR AND XCB_${_comp}_LIBRARY)
+        set(XCB_${_comp}_FOUND TRUE)
         list(APPEND XCB_INCLUDE_DIRS ${XCB_${_comp}_INCLUDE_DIR})
         list(APPEND XCB_LIBRARIES ${XCB_${_comp}_LIBRARY})
         if (NOT XCB_FIND_QUIETLY)
             message(STATUS "XCB[${_comp}]: Found component ${_comp}")
         endif()
     endif()
-
-    if(XCB_FIND_REQUIRED_${_comp})
-        list(APPEND requiredComponents XCB_${_comp}_FOUND)
-    endif()
-
-    find_package_handle_standard_args(XCB_${_comp} DEFAULT_MSG XCB_${_comp}_LIBRARY XCB_${_comp}_INCLUDE_DIR)
-
-    mark_as_advanced(XCB_${_comp}_LIBRARY XCB_${_comp}_INCLUDE_DIR)
-
-    # compatibility for old variable naming
-    set(XCB_${_comp}_INCLUDE_DIRS ${XCB_${_comp}_INCLUDE_DIR})
-    set(XCB_${_comp}_LIBRARIES ${XCB_${_comp}_LIBRARY})
 endmacro()
 
 IF (NOT WIN32)
-    include(FindPackageHandleStandardArgs)
     # Use pkg-config to get the directories and then use these values
     # in the FIND_PATH() and FIND_LIBRARY() calls
     find_package(PkgConfig)
@@ -236,9 +232,11 @@ IF (NOT WIN32)
         list(REMOVE_DUPLICATES XCB_INCLUDE_DIRS)
     endif()
 
-    find_package_handle_standard_args(XCB DEFAULT_MSG XCB_LIBRARIES XCB_INCLUDE_DIRS ${requiredComponents})
+    include(FindPackageHandleStandardArgs)
+    find_package_handle_standard_args(XCB
+        REQUIRED_VARS XCB_LIBRARIES XCB_INCLUDE_DIRS
+        HANDLE_COMPONENTS)
 
     # compatibility for old variable naming
     set(XCB_INCLUDE_DIR ${XCB_INCLUDE_DIRS})
-
 ENDIF (NOT WIN32)
