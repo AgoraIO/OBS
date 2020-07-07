@@ -59,10 +59,10 @@ find_library(AGORA_LIB
 		../bin${_lib_suffix} ../bin)
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(Libcurl DEFAULT_MSG AGORA_LIB AGORA_INCLUDE_DIR)
+find_package_handle_standard_args(Agora DEFAULT_MSG AGORA_LIB AGORA_INCLUDE_DIR)
 mark_as_advanced(AGORA_INCLUDE_DIR AGORA_LIB)
 
-if(LIBCURL_FOUND)
+if(Agora_FOUND)
 	set(AGORA_INCLUDE_DIRS ${AGORA_INCLUDE_DIR})
 	set(AGORA_LIB_DIRS ${AGORA_LIB})
 endif()
