@@ -5,7 +5,8 @@
 struct agora_data
 {
 	char* agora_appid;
-    long long uid;
+	char *agora_certificate;
+	long long uid;
 	char* publish_url, *key, *channel_name;
 	int out_cx, out_cy;
 	int fps;
@@ -16,7 +17,9 @@ struct agora_data
 	agora::rtc::CLIENT_ROLE_TYPE client_role;
 	std::string log_path;
 	bool  agora_sdk_capture_mic_audio;
- bool  enableAgoraRawDataTimelog;
+	bool  enableAgoraRawDataTimelog;
+	unsigned int privilegeExpiredTs = 60;
+	bool bRenewToken = false;
 };
 
 const char * AgoraService_GetName(void *type_data)
@@ -29,69 +32,114 @@ void AgoraService_Update(void *data, obs_data_t *settings)
 	struct agora_data *service = static_cast<struct agora_data*>(data);
 	if (service == nullptr)
 		return;
+	service->bRenewToken = obs_data_get_bool(settings, "bRenewToken");
+	if (service->bRenewToken) {
+		service->privilegeExpiredTs =
+			obs_data_get_int(settings, "privilegeExpiredTs");
+		std::string token =
+			AgoraRtcEngine::GetInstance()->CalculateToken(
+			service->agora_appid,
+			service->agora_certificate,
+			service->channel_name, service->uid,
+			service->privilegeExpiredTs);
+		AgoraRtcEngine::GetInstance()->getRtcEngine()->renewToken(
+			token.c_str());
+		service->bRenewToken = false;
+		obs_data_set_bool(settings, "bRenewToken", false);
+	} else {
+		if (service->agora_appid)
+			bfree(service->agora_appid);
 
-	if (service->agora_appid)
-		bfree(service->agora_appid);
+		if (service->agora_certificate)
+			bfree(service->agora_certificate);
 
-	if (service->channel_name)
-		bfree(service->channel_name);
+		if (service->channel_name)
+			bfree(service->channel_name);
 
-	if (service->publish_url)
-		bfree(service->publish_url);
+		if (service->publish_url)
+			bfree(service->publish_url);
 
-	if (service->key)
-		bfree(service->key);
-	
-	service->uid          = obs_data_get_int(settings, "agora_uid");
-	service->agora_appid = bstrdup(obs_data_get_string(settings, "agora_appid"));//app_id
-	service->publish_url  = bstrdup(obs_data_get_string(settings, "agora_url"));
-	service->key          = bstrdup(obs_data_get_string(settings, "agora_key"));
-	service->channel_name = bstrdup(obs_data_get_string(settings, "agora_channel"));
-	
-	service->out_cx = obs_data_get_int(settings, "agora_out_cx");
-	service->out_cy = obs_data_get_int(settings, "agora_out_cy");
-	service->fps    = obs_data_get_int(settings, "fps");
-	service->video_bitrate = obs_data_get_int(settings, "agora_video_bitrate");
-	service->enableWebSdkInteroperability = obs_data_get_bool(settings, "enableWebSdkInteroperability");
+		if (service->key)
+			bfree(service->key);
 
-	service->sample_rate = obs_data_get_int(settings, "agora_sample_rate");
-	service->audio_channel = obs_data_get_int(settings, "agora_audio_channel");//
- service->enableAgoraRawDataTimelog = obs_data_get_bool(settings, "agora_log_raw_data_time");
-	
-	bool agora_sdk_capture_mic_audio = obs_data_get_bool(settings, "agora_sdk_capture_mic_audio");
-	AgoraRtcEngine::GetInstance()->agora_sdk_captrue_mic_audio = agora_sdk_capture_mic_audio;
-	
-	if (!AgoraRtcEngine::GetInstance()->bInit && service->agora_sdk_capture_mic_audio != agora_sdk_capture_mic_audio){//ÒÑ¾­³õÊ¼»¯
-		AgoraRtcEngine::GetInstance()->EnableAgoraCaptureMicAudio(agora_sdk_capture_mic_audio);
+		service->uid = obs_data_get_int(settings, "agora_uid");
+		service->agora_appid = bstrdup(
+			obs_data_get_string(settings, "agora_appid")); //app_id
+		service->agora_certificate = bstrdup(
+			obs_data_get_string(settings, "agora_certificate"));
+
+		service->publish_url =
+			bstrdup(obs_data_get_string(settings, "agora_url"));
+		service->key =
+			bstrdup(obs_data_get_string(settings, "agora_key"));
+		service->channel_name =
+			bstrdup(obs_data_get_string(settings, "agora_channel"));
+		service->out_cx = obs_data_get_int(settings, "agora_out_cx");
+		service->out_cy = obs_data_get_int(settings, "agora_out_cy");
+		service->fps = obs_data_get_int(settings, "fps");
+
+		service->privilegeExpiredTs = obs_data_get_int(settings, "privilegeExpiredTs");
+		service->privilegeExpiredTs = 60;
+		service->video_bitrate =
+			obs_data_get_int(settings, "agora_video_bitrate");
+		service->enableWebSdkInteroperability = obs_data_get_bool(
+			settings, "enableWebSdkInteroperability");
+
+		service->sample_rate =
+			obs_data_get_int(settings, "agora_sample_rate");
+		service->audio_channel =
+			obs_data_get_int(settings, "agora_audio_channel"); //
+		service->enableAgoraRawDataTimelog =
+			obs_data_get_bool(settings, "agora_log_raw_data_time");
+
+		bool agora_sdk_capture_mic_audio = obs_data_get_bool(
+			settings, "agora_sdk_capture_mic_audio");
+		AgoraRtcEngine::GetInstance()->agora_sdk_captrue_mic_audio =
+			agora_sdk_capture_mic_audio;
+
+		if (!AgoraRtcEngine::GetInstance()->bInit &&
+		    service->agora_sdk_capture_mic_audio !=
+			    agora_sdk_capture_mic_audio) { //
+			AgoraRtcEngine::GetInstance()
+				->EnableAgoraCaptureMicAudio(
+					agora_sdk_capture_mic_audio);
+		}
+
+		agora::rtc::CLIENT_ROLE_TYPE role =
+			(agora::rtc::CLIENT_ROLE_TYPE)obs_data_get_int(
+				settings, "agora_client_role");
+		//role
+		if (AgoraRtcEngine::GetInstance()->bInit &&
+		    service->client_role != role) { //
+			AgoraRtcEngine::GetInstance()->setClientRole(role);
+		}
+		service->client_role = role;
+
+		std::string path =
+			obs_data_get_string(settings, "agora_log_path");
+		//log
+		if (AgoraRtcEngine::GetInstance()->bInit
+		    /*&& !service->log_path.empty()*/
+		    && service->log_path != path) {
+			AgoraRtcEngine::GetInstance()->setLogPath(path);
+		}
+		service->log_path = path;
+		AgoraRtcEngine *agora = AgoraRtcEngine::GetInstance();
+		agora->agora_fps = service->fps;
+		agora->agora_out_cx = service->out_cx;
+		agora->agora_out_cy = service->out_cy;
+		agora->agora_video_bitrate = service->video_bitrate;
+
+		bool bLog =
+			obs_data_get_bool(settings, "LogAudioVideoTimestamp");
+
+		if (service->enableAgoraRawDataTimelog != bLog) {
+			service->enableAgoraRawDataTimelog = bLog;
+			AgoraRtcEngine::GetInstance()->enableLogTimestamp(bLog);
+		}
 	}
 
-	agora::rtc::CLIENT_ROLE_TYPE role = (agora::rtc::CLIENT_ROLE_TYPE)obs_data_get_int(settings, "agora_client_role");	
-	//role
-	if (AgoraRtcEngine::GetInstance()->bInit && service->client_role != role){//ÒÑ¾­³õÊ¼»¯
-		AgoraRtcEngine::GetInstance()->setClientRole(role);
-	}
-	service->client_role = role;
-
-	std::string path = obs_data_get_string(settings, "agora_log_path");
-	//log
-	if (AgoraRtcEngine::GetInstance()->bInit
-		/*&& !service->log_path.empty()*/
-		&& service->log_path != path){
-		AgoraRtcEngine::GetInstance()->setLogPath(path);
-	}
-	service->log_path = path;
-	AgoraRtcEngine* agora = AgoraRtcEngine::GetInstance();
-	agora->agora_fps = service->fps;
-	agora->agora_out_cx = service->out_cx;
-	agora->agora_out_cy = service->out_cy;
-	agora->agora_video_bitrate = service->video_bitrate;
-
- bool bLog = obs_data_get_bool(settings, "LogAudioVideoTimestamp");
-
- if (service->enableAgoraRawDataTimelog != bLog) {
-     service->enableAgoraRawDataTimelog = bLog;
-     AgoraRtcEngine::GetInstance()->enableLogTimestamp(bLog);
- }
+	
 }
 
 void *AgoraService_Create(obs_data_t *settings, obs_service_t *service)
@@ -127,9 +175,8 @@ bool AgoraService_Initialize(void *data, obs_output_t *output)
 		agora_engine->bInit = true;
 	}
 
-	
 	agora_engine->enableVideo(true);
-	agora_engine->setChannelProfile(agora::rtc::CHANNEL_PROFILE_LIVE_BROADCASTING);
+	agora_engine->setChannelProfile(CHANNEL_PROFILE_LIVE_BROADCASTING);
 	agora_engine->setClientRole(service_data->client_role);//(agora::rtc::CLIENT_ROLE_BROADCASTER);
 	agora_engine->enableLocalCameara(false);// stop agora camera capture
 	agora_engine->enableLocalRender(false); // stop agora local render
@@ -143,8 +190,19 @@ void AgoraService_Activate(void *data, obs_data_t *settings)
 	AgoraRtcEngine* agora_engine = AgoraRtcEngine::GetInstance();
 	agora_engine->EnableWebSdkInteroperability(service_data->enableWebSdkInteroperability);
 	agora_engine->setVideoProfileEx(service_data->out_cx, service_data->out_cy, service_data->fps, service_data->video_bitrate);
- agora_engine->setRecordingAudioFrameParameters(/*44100, 2*/service_data->sample_rate, service_data->audio_channel, service_data->sample_rate / AUDIO_CALLBACK_TIMES * service_data->audio_channel);
-	agora_engine->joinChannel("", service_data->channel_name, service_data->uid);
+	//agora_engine->setRecordingAudioFrameParameters(/*44100, 2*/service_data->sample_rate, service_data->audio_channel, service_data->sample_rate / AUDIO_CALLBACK_TIMES * service_data->audio_channel);
+
+
+	std::string token = "";
+	if (strlen(service_data->agora_certificate))
+		agora_engine->CalculateToken(service_data->agora_appid,
+					     service_data->agora_certificate,
+					     service_data->channel_name,
+					     service_data->uid,
+					     service_data->privilegeExpiredTs);
+
+	agora_engine->joinChannel(token, service_data->channel_name,
+				  service_data->uid);
 }
 
 void AgoraService_Deactivate(void *data)

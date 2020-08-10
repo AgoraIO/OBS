@@ -23,12 +23,13 @@ else()
 endif()
 
 if(MSVC)
-	add_compile_options("$<$<CONFIG:RelWithDebInfo>:/MT>")
+	add_compile_options($<IF:$<CONFIG:Debug>,/MTd,/MT> /Zl)
 endif()
 
 add_library(ipc-util STATIC
 	${ipc-util_SOURCES}
 	${ipc-util_HEADERS})
+set_target_properties(ipc-util PROPERTIES FOLDER "deps")
 target_include_directories(ipc-util
 	PUBLIC .)
 target_link_libraries(ipc-util)

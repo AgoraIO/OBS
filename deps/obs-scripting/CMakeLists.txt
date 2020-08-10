@@ -1,22 +1,74 @@
 cmake_minimum_required(VERSION 2.8)
 
 if(NOT ENABLE_SCRIPTING)
+	message(STATUS "Scripting plugin disabled")
 	return()
 endif()
 
 project(obs-scripting)
+
+if(POLICY CMP0068)
+	# RPATH settings on macOS do not affect install_name.
+	cmake_policy(SET CMP0068 NEW)
+endif()
 
 if(MSVC)
 	set(obs-scripting_PLATFORM_DEPS
 		w32-pthreads)
 endif()
 
-find_package(Luajit QUIET)
-find_package(PythonDeps QUIET)
-find_package(SwigDeps QUIET 2)
+if(APPLE)
+	set(obs-scripting_PLATFORM_DEPS
+		objc)
+endif()
+
+option(DISABLE_LUA "Disable Lua scripting support" OFF)
+option(DISABLE_PYTHON "Disable Python scripting support" OFF)
 
 set(COMPILE_PYTHON FALSE CACHE BOOL "" FORCE)
 set(COMPILE_LUA FALSE CACHE BOOL "" FORCE)
+
+if(NOT DISABLE_LUA)
+	find_package(Luajit QUIET)
+
+	if(NOT DISABLE_LUA AND NOT LUAJIT_FOUND)
+		message(STATUS "Luajit support not found.")
+		set(LUAJIT_FOUND FALSE)
+	else()
+		message(STATUS "Scripting: Luajit supported")
+		set(COMPILE_LUA TRUE CACHE BOOL "" FORCE)
+	endif()
+else()
+	message(STATUS "Scripting: Luajit support disabled")
+	set(LUAJIT_FOUND FALSE)
+endif()
+
+if(NOT DISABLE_PYTHON)
+	find_package(PythonDeps QUIET)
+
+	if(NOT DISABLE_PYTHON AND NOT PYTHONLIBS_FOUND)
+		message(STATUS "Python support not found.")
+		set(PYTHON_FOUND FALSE)
+		set(PYTHONLIBS_FOUND FALSE)
+	else()
+		message(STATUS "Scripting: Python 3 supported")
+		set(PYTHON_FOUND TRUE)
+		set(COMPILE_PYTHON TRUE CACHE BOOL "" FORCE)
+
+		get_filename_component(PYTHON_LIB "${PYTHON_LIBRARIES}" NAME)
+		string(REGEX REPLACE "\\.[^.]*$" "" PYTHON_LIB ${PYTHON_LIB})
+
+		if(WIN32)
+			string(REGEX REPLACE "_d" "" PYTHON_LIB "${PYTHON_LIB}")
+		endif()
+	endif()
+else()
+	message(STATUS "Scripting: Python 3 support disabled")
+	set(PYTHON_FOUND FALSE)
+	set(PYTHONLIBS_FOUND FALSE)
+endif()
+
+find_package(SwigDeps QUIET 2)
 
 if(NOT SWIG_FOUND)
 	message(STATUS "Scripting: SWIG not found; scripting disabled")
@@ -28,34 +80,15 @@ if(NOT PYTHONLIBS_FOUND AND NOT LUAJIT_FOUND)
 	return()
 endif()
 
-if(NOT LUAJIT_FOUND)
-	message(STATUS "Scripting: Luajit not found; Luajit support disabled")
-else()
-	message(STATUS "Scripting: Luajit supported")
-	set(COMPILE_LUA TRUE CACHE BOOL "" FORCE)
-endif()
-
-if(NOT PYTHONLIBS_FOUND)
-	message(STATUS "Scripting: Python 3 not found; Python support disabled")
-	set(PYTHON_FOUND FALSE)
-	set(PYTHONLIBS_FOUND FALSE)
-else()
-	message(STATUS "Scripting: Python 3 supported")
-	set(PYTHON_FOUND TRUE)
-	set(COMPILE_PYTHON TRUE CACHE BOOL "" FORCE)
-
-	get_filename_component(PYTHON_LIB "${PYTHON_LIBRARIES}" NAME)
-	string(REGEX REPLACE "\\.[^.]*$" "" PYTHON_LIB ${PYTHON_LIB})
-	if(WIN32)
-		string(REGEX REPLACE "_d" "" PYTHON_LIB "${PYTHON_LIB}")
-	endif()
-endif()
-
-set(SCRIPTING_ENABLED ON CACHE BOOL "Interal global cmake variable" FORCE)
+set(SCRIPTING_ENABLED ON CACHE BOOL "Internal global cmake variable" FORCE)
 
 if(UI_ENABLED)
 	set(EXTRA_LIBS obs-frontend-api)
 	include_directories(SYSTEM "${CMAKE_SOURCE_DIR}/UI/obs-frontend-api")
+endif()
+
+IF(BUILD_CAPTIONS)
+	string(TOUPPER "${BUILD_CAPTIONS}" BUILD_CAPTIONS)
 endif()
 
 configure_file(
@@ -125,6 +158,13 @@ set(obs-scripting_HEADERS
 	cstrcache.h
 	)
 
+if(WIN32)
+	set(MODULE_DESCRIPTION "OBS Studio scripting module")
+	configure_file(${CMAKE_SOURCE_DIR}/cmake/winrc/obs-module.rc.in obs-scripting.rc)
+	list(APPEND obs-scripting_SOURCES
+		obs-scripting.rc)
+endif()
+
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/swig)
 
 if(PYTHONLIBS_FOUND)
@@ -166,6 +206,8 @@ target_link_libraries(obs-scripting
 	${EXTRA_LIBS}
 	${obs-scripting_PLATFORM_DEPS}
 	)
+
+set_target_properties(obs-scripting PROPERTIES FOLDER "scripting")
 
 if(PYTHONLIBS_FOUND)
 	add_subdirectory(obspython)

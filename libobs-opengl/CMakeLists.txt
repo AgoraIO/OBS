@@ -7,8 +7,11 @@ include_directories(${OPENGL_INCLUDE_DIR})
 add_definitions(-DLIBOBS_EXPORTS)
 
 if(WIN32)
+	set(MODULE_DESCRIPTION "OBS Library OpenGL wrapper")
+	configure_file(${CMAKE_SOURCE_DIR}/cmake/winrc/obs-module.rc.in libobs-opengl.rc)
 	set(libobs-opengl_PLATFORM_SOURCES
-		gl-windows.c)
+		gl-windows.c
+		libobs-opengl.rc)
 elseif(APPLE)
 	set(libobs-opengl_PLATFORM_SOURCES
 		gl-cocoa.m)
@@ -58,6 +61,7 @@ set(libobs-opengl_SOURCES
 	gl-stagesurf.c
 	gl-subsystem.c
 	gl-texture2d.c
+	gl-texture3d.c
 	gl-texturecube.c
 	gl-vertexbuffer.c
 	gl-zstencil.c)
@@ -80,11 +84,13 @@ endif()
 if(WIN32 OR APPLE)
 set_target_properties(libobs-opengl
 	PROPERTIES
+		FOLDER "core"
 		OUTPUT_NAME libobs-opengl
 		PREFIX "")
 else()
 set_target_properties(libobs-opengl
 	PROPERTIES
+		FOLDER "core"
 		OUTPUT_NAME obs-opengl
 		VERSION 0.0
 		SOVERSION 0

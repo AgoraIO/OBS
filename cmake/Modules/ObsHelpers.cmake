@@ -61,7 +61,7 @@ if(NOT UNIX_STRUCTURE)
 		set(OBS_INSTALL_PREFIX "")
 		set(OBS_RELATIVE_PREFIX "../")
 
-		set(OBS_SCRIPT_PLUGIN_DESTINATION "${OBS_DATA_DESTINATION}/obs-scripting/${_lib_suffix}bit")
+		set(OBS_SCRIPT_PLUGIN_DESTINATION "${OBS_DATA_DESTINATION}/obs-scripting")
 	else()
 		set(OBS_EXECUTABLE_DESTINATION "bin/${_lib_suffix}bit")
 		set(OBS_EXECUTABLE32_DESTINATION "bin/32bit")
@@ -500,6 +500,30 @@ function(install_obs_data target datadir datadest)
 		add_custom_command(TARGET ${target} POST_BUILD
 			COMMAND "${CMAKE_COMMAND}" -E copy_directory
 				"${CMAKE_CURRENT_SOURCE_DIR}/${datadir}" "$ENV{obsInstallerTempDir}/${OBS_DATA_DESTINATION}/${datadest}"
+			VERBATIM)
+	endif()
+endfunction()
+
+function(install_obs_data_file target datafile datadest)
+	install(FILES ${datafile}
+		DESTINATION "${OBS_DATA_DESTINATION}/${datadest}")
+	add_custom_command(TARGET ${target} POST_BUILD
+		COMMAND "${CMAKE_COMMAND}" -E make_directory
+			"${OBS_OUTPUT_DIR}/$<CONFIGURATION>/data/${datadest}"
+		VERBATIM)
+	add_custom_command(TARGET ${target} POST_BUILD
+		COMMAND "${CMAKE_COMMAND}" -E copy
+			"${CMAKE_CURRENT_SOURCE_DIR}/${datafile}" "${OBS_OUTPUT_DIR}/$<CONFIGURATION>/data/${datadest}"
+		VERBATIM)
+
+	if(CMAKE_SIZEOF_VOID_P EQUAL 8 AND DEFINED ENV{obsInstallerTempDir})
+		add_custom_command(TARGET ${target} POST_BUILD
+			COMMAND "${CMAKE_COMMAND}" -E make_directory
+				"$ENV{obsInstallerTempDir}/${OBS_DATA_DESTINATION}/${datadest}"
+			VERBATIM)
+		add_custom_command(TARGET ${target} POST_BUILD
+			COMMAND "${CMAKE_COMMAND}" -E copy
+				"${CMAKE_CURRENT_SOURCE_DIR}/${datafile}" "$ENV{obsInstallerTempDir}/${OBS_DATA_DESTINATION}/${datadest}"
 			VERBATIM)
 	endif()
 endfunction()

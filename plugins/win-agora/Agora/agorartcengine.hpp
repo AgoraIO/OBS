@@ -9,14 +9,18 @@
 //#include "video_render_impl.h"
 
 class QQuickItem;
+using namespace agora;
 using namespace agora::rtc;
-
+using namespace agora::util;
+using namespace agora::base;
+using namespace agora::media;
 static const char *agora_signals[] = {
 	"void firstRemoteVideoDecoded(ptr service, unsigned int uid, int width, int height, int elapsed)",
 	"void userJoined(ptr service, unsigned int uid, int elapsed)",
 	"void userOffline(ptr service, unsigned int uid, int reason)",
 	"void joinChannelSuccess(ptr output, const char* channel, unsigned int uid, int elapsed)",
 	"void onError(int err, const char* msg)",
+	"void TokenPrivilegeWillExpire()",
 	"void onLeaveChannel()",
 	NULL
 };
@@ -38,12 +42,12 @@ public:
 
 	int enableVideo(bool enabled);
 	bool enableLocalRender(bool bEnable);
-	int muteLocalAudioStream(bool muted);
 	int  setLocalVideoMirrorMode(VIDEO_MIRROR_MODE_TYPE mirrorMode);
 	void startPreview();
 	void stopPreview();
 
-	int joinChannel(const std::string& key, const std::string& channel, unsigned uid);
+	int joinChannel(const std::string &key, const std::string &channel,
+			unsigned uid);
 	int leaveChannel();
 
 	bool  keepPreRotation(bool bRotate);
@@ -56,12 +60,11 @@ public:
 	struct encoder_packet* packet, bool *receive_packet);
 
 	bool setRecordingAudioFrameParameters(int nSampleRate, int nChannels, int nSamplesPerCall);
-	bool setExternalAudioSource(bool bEnabled, int nSampleRate, int nChannels);
 	bool enableExtendPlayDevice(bool bEnable);
 
 	void* AgoraAudioObserver_Create();
 	void  AgoraAudioObserver_Destroy();
-	bool  AgoraAudioObserver_Encode(void* data, struct encoder_frame* frame,
+	bool  AgoraAudioObserver_Encode( struct encoder_frame* frame,
 	struct encoder_packet* packet, bool *receive_packet);
 
 	int AddPublishStreamUrl(const char *url, bool transcodingEnabled);
@@ -69,7 +72,7 @@ public:
 	int SetLiveTranscoding(const LiveTranscoding &transcoding);
 
 	int EnableWebSdkInteroperability(bool enabled);
-	//�豸
+	//设备
 	int getRecordingDeviceVolume();
 	int getPalyoutDeviceVolume();
 	int setRecordingDeviceVolume(int volume);
@@ -94,21 +97,30 @@ public:
 	int audioChannel = 2;
 	int sampleRate = 44100;
 	void pushVideoFrame(struct encoder_frame* frame);
- void logAudioFrameTimestamp();
- void enableLogTimestamp(bool bEnable);
+	void logAudioFrameTimestamp();
+	void enableLogTimestamp(bool bEnable);
+	std::string CalculateToken(std::string appid, const std::string &key,
+				   const std::string &channel, unsigned int uid,
+				   unsigned int privilegeExpiredTs);
+
 private:
 	friend class AgoraRtcEngineEvent;
 private:
-	agora::rtc::IRtcEngine* m_rtcEngine;
+	agora::rtc::IRtcEngine* m_rtcEngine = nullptr;
 	std::unique_ptr<agora::rtc::IRtcEngineEventHandler> m_eventHandler;
-	static char* m_appid;
 	static AgoraRtcEngine* m_agoraEngine;
 	
 	std::unique_ptr<CExtendVideoFrameObserver> m_videoObserver;
- std::unique_ptr<CExtendAudioFrameObserver> m_audioObserver;
- bool logFirstPushVideo;
- int logVideoFrameTimeCount;
- int logAudioFrameTimeCount;
- bool logAudioVideoTimestamp;
+	std::unique_ptr<CExtendAudioFrameObserver> m_audioObserver;
+	bool logFirstPushVideo;
+	int logVideoFrameTimeCount;
+	int logAudioFrameTimeCount;
+	bool logAudioVideoTimestamp;
+
+	agora::util::AutoPtr< agora::media::IMediaEngine> m_pMediaEngine;
+	int m_externalAudioFrameSize;
+	agora::media::IAudioFrameObserver::AudioFrame m_externalAudioframe;
+	int m_externalVideoFrameSize;
+	agora::media::ExternalVideoFrame m_externalVideoFrame;
 };
 

@@ -31,19 +31,19 @@ bool CExtendAudioFrameObserver::onRecordAudioFrame(AudioFrame& audioFrame)
 {
 	if (!pPlayerData || !pCircleBuffer)
 		return false;
-
-	SIZE_T nSize = audioFrame.channels*audioFrame.samples * audioFrame.bytesPerSample;
+	int64_t audioTime = 0;
+	/*SIZE_T nSize = audioFrame.channels*audioFrame.samples * audioFrame.bytesPerSample;
 	unsigned int datalen = 0;
- int64_t audioTime = 0;
+	
 	pCircleBuffer->readBuffer(this->pPlayerData, nSize, &datalen, audioTime);
 
- if (nSize > 0 && datalen == nSize)
- {
-     if (agora_sdk_captrue_mic_audio) {
+	if (nSize > 0 && datalen == nSize)
+	{
+	    if (agora_sdk_captrue_mic_audio) {
 
          //int nMixLen = datalen > nSize ? nSize : datalen;
-         int len = datalen / sizeof(int16_t);
-         for (int i = 0; i < len; i++) {
+	      int len = datalen / sizeof(int16_t);
+        	for (int i = 0; i < len; i++) {
              int16_t* buffer = (int16_t*)(audioFrame.buffer) + i * sizeof(int16_t);
              int16_t* obsbuffer = (int16_t*)(pPlayerData)+i * sizeof(int16_t);
              int mix = *buffer + *obsbuffer;
@@ -62,20 +62,18 @@ bool CExtendAudioFrameObserver::onRecordAudioFrame(AudioFrame& audioFrame)
  }
 	/**/
 
- audioFrame.renderTimeMs = GetTickCount();
+	audioFrame.renderTimeMs = GetTickCount();
 
- if (logAudioTimestamp && logAudioFrameTimeCount < LOG_AUDIO_FRAME_TIME_COUNT) {
-     blog(LOG_INFO, "Agora Info onRecordAudioFrame , agora sdk get obs audio frame time: %lld, agora audio frame time %lld(%lldms)", audioTime, audioFrame.renderTimeMs, audioFrame.renderTimeMs - audioTime);
-     logAudioFrameTimeCount++;
-}
+	if (logAudioTimestamp && logAudioFrameTimeCount < LOG_AUDIO_FRAME_TIME_COUNT) {
+		blog(LOG_INFO, "Agora Info onRecordAudioFrame , agora sdk get obs audio frame time: %lld, agora audio frame time %lld(%lldms)", audioTime, audioFrame.renderTimeMs, audioFrame.renderTimeMs - audioTime);
+		logAudioFrameTimeCount++;
+	}
 
 	return true;
 }
 
 bool CExtendAudioFrameObserver::onPlaybackAudioFrame(AudioFrame& audioFrame)
 {
-	SIZE_T nSize = audioFrame.channels*audioFrame.samples * 2;
-	
 	return true;
 }
 
