@@ -6,8 +6,8 @@ Unicode true
 !define APPNAME "OBS Studio"
 
 !ifndef APPVERSION
-!define APPVERSION "25.0.0"
-!define SHORTVERSION "25.0.0"
+!define APPVERSION "21.1.0"
+!define SHORTVERSION "21.1.0"
 !define AGORASDKVERSION "3.0.0"
 !endif
 
@@ -201,11 +201,11 @@ Section "OBS Studio" SecCore
 	SetOutPath "$INSTDIR"
 	OBSInstallerUtils::KillProcess "obs-plugins\32bit\cef-bootstrap.exe"
 	OBSInstallerUtils::KillProcess "obs-plugins\64bit\cef-bootstrap.exe"
-	File /r "..\..\build_main\rundir\Release\data"
+	File /r "..\..\build\rundir\Release\data"
 	SetOutPath "$INSTDIR\bin"
-	File /r "..\..\build_main\rundir\Release\bin\32bit"
+	File /r "..\..\build\rundir\Release\bin\32bit"
 	SetOutPath "$INSTDIR\obs-plugins"
-	File /r "..\..\build_main\rundir\Release\obs-plugins\32bit"
+	File /r "..\..\build\rundir\Release\obs-plugins\32bit"
 
 	ClearErrors
 
