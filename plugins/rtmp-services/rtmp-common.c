@@ -6,6 +6,7 @@
 #include "rtmp-format-ver.h"
 #include "twitch.h"
 #include "younow.h"
+#include "nimotv.h"
 
 struct rtmp_common {
 	char *service;
@@ -340,13 +341,14 @@ static void fill_servers(obs_property_t *servers_prop, json_t *service,
 		return;
 	}
 
-	if (strcmp(name, "Mixer.com - FTL") == 0) {
-		obs_property_list_add_string(
-			servers_prop, obs_module_text("Server.Auto"), "auto");
-	}
 	if (strcmp(name, "Twitch") == 0) {
 		if (fill_twitch_servers(servers_prop))
 			return;
+	}
+
+	if (strcmp(name, "Nimo TV") == 0) {
+		obs_property_list_add_string(
+			servers_prop, obs_module_text("Server.Auto"), "auto");
 	}
 
 	json_array_foreach (servers, index, server) {
@@ -493,6 +495,8 @@ static void apply_video_encoder_settings(obs_data_t *settings,
 		obs_data_set_string(settings, "profile", profile);
 	}
 
+	obs_data_item_release(&enc_item);
+
 	item = json_object_get(recommended, "max video bitrate");
 	if (json_is_integer(item)) {
 		int max_bitrate = (int)json_integer_value(item);
@@ -600,6 +604,12 @@ static const char *rtmp_common_url(void *data)
 	if (service->service && strcmp(service->service, "YouNow") == 0) {
 		if (service->server && service->key) {
 			return younow_get_ingest(service->server, service->key);
+		}
+	}
+
+	if (service->service && strcmp(service->service, "Nimo TV") == 0) {
+		if (service->server && strcmp(service->server, "auto") == 0) {
+			return nimotv_get_ingest(service->key);
 		}
 	}
 

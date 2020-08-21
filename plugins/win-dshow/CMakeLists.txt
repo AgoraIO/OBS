@@ -21,6 +21,14 @@ set(win-dshow_SOURCES
 	ffmpeg-decode.c
 	win-dshow.rc)
 
+set(virtualcam-output_SOURCES
+	tiny-nv12-scale.c
+	shared-memory-queue.c
+	virtualcam.c)
+set(virtualcam-output_HEADERS
+	tiny-nv12-scale.h
+	shared-memory-queue.h)
+
 set(libdshowcapture_SOURCES
 	libdshowcapture/source/capture-filter.cpp
 	libdshowcapture/source/output-filter.cpp
@@ -38,6 +46,7 @@ set(libdshowcapture_SOURCES
 
 set(libdshowcapture_HEADERS
 	libdshowcapture/dshowcapture.hpp
+	libdshowcapture/source/external/IVideoCaptureFilter.h
 	libdshowcapture/source/capture-filter.hpp
 	libdshowcapture/source/output-filter.hpp
 	libdshowcapture/source/device.hpp
@@ -53,6 +62,8 @@ set(libdshowcapture_HEADERS
 add_library(win-dshow MODULE
 	${win-dshow_SOURCES}
 	${win-dshow_HEADERS}
+	${virtualcam-output_SOURCES}
+	${virtualcam-output_HEADERS}
 	${libdshowcapture_SOURCES}
 	${libdshowcapture_HEADERS})
 target_link_libraries(win-dshow
@@ -60,7 +71,13 @@ target_link_libraries(win-dshow
 	strmiids
 	ksuser
 	wmcodecdspuuid
+	w32-pthreads
 	${FFMPEG_LIBRARIES})
-set_target_properties(win-dshow PROPERTIES FOLDER "plugins")
+set_target_properties(win-dshow PROPERTIES FOLDER "plugins/win-dshow")
+
+source_group("libdshowcapture\\Source Files" FILES ${libdshowcapture_SOURCES})
+source_group("libdshowcapture\\Header Files" FILES ${libdshowcapture_HEADERS})
 
 install_obs_plugin_with_data(win-dshow data)
+
+add_subdirectory(virtualcam-module)

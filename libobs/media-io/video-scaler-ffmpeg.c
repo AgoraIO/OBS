@@ -24,7 +24,7 @@
 struct video_scaler {
 	struct SwsContext *swscale;
 	int src_height;
-	int dst_height;
+	int dst_heights[4];
 	uint8_t *dst_pointers[4];
 	int dst_linesizes[4];
 };
@@ -92,12 +92,11 @@ static inline int get_ffmpeg_scale_type(enum video_scale_type type)
 static inline const int *get_ffmpeg_coeffs(enum video_colorspace cs)
 {
 	switch (cs) {
-	case VIDEO_CS_DEFAULT:
-		return sws_getCoefficients(SWS_CS_ITU601);
-	case VIDEO_CS_601:
-		return sws_getCoefficients(SWS_CS_ITU601);
 	case VIDEO_CS_709:
+	case VIDEO_CS_SRGB:
 		return sws_getCoefficients(SWS_CS_ITU709);
+	case VIDEO_CS_DEFAULT:
+	case VIDEO_CS_601:
 	default:
 		return sws_getCoefficients(SWS_CS_ITU601);
 	}
@@ -142,7 +141,20 @@ int video_scaler_create(video_scaler_t **scaler_out,
 
 	scaler = bzalloc(sizeof(struct video_scaler));
 	scaler->src_height = src->height;
-	scaler->dst_height = dst->height;
+
+	const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(format_dst);
+	bool has_plane[4] = {0};
+	for (size_t i = 0; i < 4; i++)
+		has_plane[desc->comp[i].plane] = 1;
+
+	scaler->dst_heights[0] = dst->height;
+	for (size_t i = 1; i < 4; ++i) {
+		if (has_plane[i]) {
+			const int s = (i == 1 || i == 2) ? desc->log2_chroma_h
+							 : 0;
+			scaler->dst_heights[i] = dst->height >> s;
+		}
+	}
 
 	ret = av_image_alloc(scaler->dst_pointers, scaler->dst_linesizes,
 			     dst->width, dst->height, format_dst, 32);
@@ -207,7 +219,6 @@ bool video_scaler_scale(video_scaler_t *scaler, uint8_t *output[],
 		return false;
 	}
 
-	const size_t height = scaler->dst_height;
 	for (size_t plane = 0; plane < 4; ++plane) {
 		if (!scaler->dst_pointers[plane])
 			continue;
@@ -216,6 +227,7 @@ bool video_scaler_scale(video_scaler_t *scaler, uint8_t *output[],
 		const size_t plane_linesize = out_linesize[plane];
 		uint8_t *dst = output[plane];
 		const uint8_t *src = scaler->dst_pointers[plane];
+		const size_t height = scaler->dst_heights[plane];
 		if (scaled_linesize == plane_linesize) {
 			memcpy(dst, src, scaled_linesize * height);
 		} else {

@@ -17,13 +17,7 @@ using namespace std;
 #define FADER_PRECISION 4096.0
 
 QWeakPointer<VolumeMeterTimer> VolumeMeter::updateTimer;
-//add by agora
-void VolControl::MuteVolume(bool bMuted)
-{
-	mute->setChecked(bMuted);
-	SetMuted(bMuted);
-}
-//end
+
 void VolControl::OBSVolumeChanged(void *data, float db)
 {
 	Q_UNUSED(db);

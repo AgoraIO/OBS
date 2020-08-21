@@ -64,7 +64,6 @@ include(ObsCpack)
 include(GNUInstallDirs)
 
 # Must be a string in the format of "x.x.x-rcx"
-set (RELEASE_CANDIDATE "25.0.8-rc1")
 if(DEFINED RELEASE_CANDIDATE)
 	set(OBS_VERSION "${RELEASE_CANDIDATE}")
 	string(REPLACE "-rc" "." RC_SPLIT ${RELEASE_CANDIDATE})

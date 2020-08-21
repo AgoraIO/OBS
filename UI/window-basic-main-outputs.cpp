@@ -14,6 +14,7 @@ volatile bool streaming_active = false;
 volatile bool recording_active = false;
 volatile bool recording_paused = false;
 volatile bool replaybuf_active = false;
+volatile bool virtualcam_active = false;
 
 #define RTMP_PROTOCOL "rtmp"
 
@@ -139,34 +140,28 @@ static void OBSReplayBufferStopping(void *data, calldata_t *params)
 	UNUSED_PARAMETER(params);
 }
 
-static void FindBestFilename(string &strPath, bool noSpace)
+static void OBSStartVirtualCam(void *data, calldata_t *params)
 {
-	int num = 2;
+	BasicOutputHandler *output = static_cast<BasicOutputHandler *>(data);
 
-	if (!os_file_exists(strPath.c_str()))
-		return;
+	output->virtualCamActive = true;
+	os_atomic_set_bool(&virtualcam_active, true);
+	QMetaObject::invokeMethod(output->main, "OnVirtualCamStart");
 
-	const char *ext = strrchr(strPath.c_str(), '.');
-	if (!ext)
-		return;
+	UNUSED_PARAMETER(params);
+}
 
-	int extStart = int(ext - strPath.c_str());
-	for (;;) {
-		string testPath = strPath;
-		string numStr;
+static void OBSStopVirtualCam(void *data, calldata_t *params)
+{
+	BasicOutputHandler *output = static_cast<BasicOutputHandler *>(data);
+	int code = (int)calldata_int(params, "code");
 
-		numStr = noSpace ? "_" : " (";
-		numStr += to_string(num++);
-		if (!noSpace)
-			numStr += ")";
+	output->virtualCamActive = false;
+	os_atomic_set_bool(&virtualcam_active, false);
+	QMetaObject::invokeMethod(output->main, "OnVirtualCamStop",
+				  Q_ARG(int, code));
 
-		testPath.insert(extStart, numStr);
-
-		if (!os_file_exists(testPath.c_str())) {
-			strPath = testPath;
-			break;
-		}
-	}
+	UNUSED_PARAMETER(params);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -192,6 +187,49 @@ static bool CreateAACEncoder(OBSEncoder &res, string &id, int bitrate,
 		return true;
 	}
 
+	return false;
+}
+
+/* ------------------------------------------------------------------------ */
+
+inline BasicOutputHandler::BasicOutputHandler(OBSBasic *main_) : main(main_)
+{
+	if (main->vcamEnabled) {
+		virtualCam = obs_output_create("virtualcam_output",
+					       "virtualcam_output", nullptr,
+					       nullptr);
+		obs_output_release(virtualCam);
+
+		signal_handler_t *signal =
+			obs_output_get_signal_handler(virtualCam);
+		startVirtualCam.Connect(signal, "start", OBSStartVirtualCam,
+					this);
+		stopVirtualCam.Connect(signal, "stop", OBSStopVirtualCam, this);
+	}
+}
+
+bool BasicOutputHandler::StartVirtualCam()
+{
+	if (main->vcamEnabled) {
+		obs_output_set_media(virtualCam, obs_get_video(),
+				     obs_get_audio());
+		return obs_output_start(virtualCam);
+	}
+	return false;
+}
+
+void BasicOutputHandler::StopVirtualCam()
+{
+	if (main->vcamEnabled) {
+		obs_output_stop(virtualCam);
+	}
+}
+
+bool BasicOutputHandler::VirtualCamActive() const
+{
+	if (main->vcamEnabled) {
+		return obs_output_active(virtualCam);
+	}
 	return false;
 }
 
@@ -835,30 +873,6 @@ bool SimpleOutput::StartStreaming(obs_service_t *service)
 	return false;
 }
 
-static void remove_reserved_file_characters(string &s)
-{
-	replace(s.begin(), s.end(), '\\', '/');
-	replace(s.begin(), s.end(), '*', '_');
-	replace(s.begin(), s.end(), '?', '_');
-	replace(s.begin(), s.end(), '"', '_');
-	replace(s.begin(), s.end(), '|', '_');
-	replace(s.begin(), s.end(), ':', '_');
-	replace(s.begin(), s.end(), '>', '_');
-	replace(s.begin(), s.end(), '<', '_');
-}
-
-static void ensure_directory_exists(string &path)
-{
-	replace(path.begin(), path.end(), '\\', '/');
-
-	size_t last = path.rfind('/');
-	if (last == string::npos)
-		return;
-
-	string directory = path.substr(0, last);
-	os_mkdirs(directory.c_str());
-}
-
 void SimpleOutput::UpdateRecording()
 {
 	if (replayBufferActive || recordingActive)
@@ -909,54 +923,15 @@ bool SimpleOutput::ConfigureRecording(bool updateReplayBuffer)
 	int rbSize =
 		config_get_int(main->Config(), "SimpleOutput", "RecRBSize");
 
-	os_dir_t *dir = path && path[0] ? os_opendir(path) : nullptr;
-
-	if (!dir) {
-		if (main->isVisible())
-			OBSMessageBox::warning(main,
-					       QTStr("Output.BadPath.Title"),
-					       QTStr("Output.BadPath.Text"));
-		else
-			main->SysTrayNotify(QTStr("Output.BadPath.Text"),
-					    QSystemTrayIcon::Warning);
-		return false;
-	}
-
-	os_closedir(dir);
-
+	string f;
 	string strPath;
-	strPath += path;
-
-	char lastChar = strPath.back();
-	if (lastChar != '/' && lastChar != '\\')
-		strPath += "/";
-
-	strPath += GenerateSpecifiedFilename(ffmpegOutput ? "avi" : format,
-					     noSpace, filenameFormat);
-	ensure_directory_exists(strPath);
-	if (!overwriteIfExists)
-		FindBestFilename(strPath, noSpace);
 
 	obs_data_t *settings = obs_data_create();
 	if (updateReplayBuffer) {
-		string f;
-
-		if (rbPrefix && *rbPrefix) {
-			f += rbPrefix;
-			if (f.back() != ' ')
-				f += " ";
-		}
-
-		f += filenameFormat;
-
-		if (rbSuffix && *rbSuffix) {
-			if (*rbSuffix != ' ')
-				f += " ";
-			f += rbSuffix;
-		}
-
-		remove_reserved_file_characters(f);
-
+		f = GetFormatString(filenameFormat, rbPrefix, rbSuffix);
+		strPath = GetOutputFilename(path, ffmpegOutput ? "avi" : format,
+					    noSpace, overwriteIfExists,
+					    f.c_str());
 		obs_data_set_string(settings, "directory", path);
 		obs_data_set_string(settings, "format", f.c_str());
 		obs_data_set_string(settings, "extension", format);
@@ -965,6 +940,10 @@ bool SimpleOutput::ConfigureRecording(bool updateReplayBuffer)
 		obs_data_set_int(settings, "max_size_mb",
 				 usingRecordingPreset ? rbSize : 0);
 	} else {
+		f = GetFormatString(filenameFormat, nullptr, nullptr);
+		strPath = GetOutputFilename(path, ffmpegOutput ? "avi" : format,
+					    noSpace, overwriteIfExists,
+					    f.c_str());
 		obs_data_set_string(settings, ffmpegOutput ? "url" : "path",
 				    strPath.c_str());
 	}
@@ -1711,34 +1690,9 @@ bool AdvancedOutput::StartRecording()
 						  ? "FFFileNameWithoutSpace"
 						  : "RecFileNameWithoutSpace");
 
-		os_dir_t *dir = path && path[0] ? os_opendir(path) : nullptr;
-
-		if (!dir) {
-			if (main->isVisible())
-				OBSMessageBox::warning(
-					main, QTStr("Output.BadPath.Title"),
-					QTStr("Output.BadPath.Text"));
-			else
-				main->SysTrayNotify(
-					QTStr("Output.BadPath.Text"),
-					QSystemTrayIcon::Warning);
-			return false;
-		}
-
-		os_closedir(dir);
-
-		string strPath;
-		strPath += path;
-
-		char lastChar = strPath.back();
-		if (lastChar != '/' && lastChar != '\\')
-			strPath += "/";
-
-		strPath += GenerateSpecifiedFilename(recFormat, noSpace,
-						     filenameFormat);
-		ensure_directory_exists(strPath);
-		if (!overwriteIfExists)
-			FindBestFilename(strPath, noSpace);
+		string strPath = GetOutputFilename(path, recFormat, noSpace,
+						   overwriteIfExists,
+						   filenameFormat);
 
 		obs_data_t *settings = obs_data_create();
 		obs_data_set_string(settings, ffmpegRecording ? "url" : "path",
@@ -1811,53 +1765,11 @@ bool AdvancedOutput::StartReplayBuffer()
 		rbTime = config_get_int(main->Config(), "AdvOut", "RecRBTime");
 		rbSize = config_get_int(main->Config(), "AdvOut", "RecRBSize");
 
-		os_dir_t *dir = path && path[0] ? os_opendir(path) : nullptr;
-
-		if (!dir) {
-			if (main->isVisible())
-				OBSMessageBox::warning(
-					main, QTStr("Output.BadPath.Title"),
-					QTStr("Output.BadPath.Text"));
-			else
-				main->SysTrayNotify(
-					QTStr("Output.BadPath.Text"),
-					QSystemTrayIcon::Warning);
-			return false;
-		}
-
-		os_closedir(dir);
-
-		string strPath;
-		strPath += path;
-
-		char lastChar = strPath.back();
-		if (lastChar != '/' && lastChar != '\\')
-			strPath += "/";
-
-		strPath += GenerateSpecifiedFilename(recFormat, noSpace,
-						     filenameFormat);
-		ensure_directory_exists(strPath);
-		if (!overwriteIfExists)
-			FindBestFilename(strPath, noSpace);
+		string f = GetFormatString(filenameFormat, rbPrefix, rbSuffix);
+		string strPath = GetOutputFilename(
+			path, recFormat, noSpace, overwriteIfExists, f.c_str());
 
 		obs_data_t *settings = obs_data_create();
-		string f;
-
-		if (rbPrefix && *rbPrefix) {
-			f += rbPrefix;
-			if (f.back() != ' ')
-				f += " ";
-		}
-
-		f += filenameFormat;
-
-		if (rbSuffix && *rbSuffix) {
-			if (*rbSuffix != ' ')
-				f += " ";
-			f += rbSuffix;
-		}
-
-		remove_reserved_file_characters(f);
 
 		obs_data_set_string(settings, "directory", path);
 		obs_data_set_string(settings, "format", f.c_str());

@@ -291,178 +291,6 @@
             }
         },
         {
-            "name": "Mixer.com - FTL",
-            "common": true,
-            "servers": [
-                {
-                    "name": "US: Dallas, TX",
-                    "url": "ingest-dal.mixer.com"
-                },
-                {
-                    "name": "US: San Jose, CA",
-                    "url": "ingest-sjc.mixer.com"
-                },
-                {
-                    "name": "US: Seattle, WA",
-                    "url": "ingest-sea.mixer.com"
-                },
-                {
-                    "name": "US: Washington DC",
-                    "url": "ingest-wdc.mixer.com"
-                },
-                {
-                    "name": "Canada: Toronto",
-                    "url": "ingest-tor.mixer.com"
-                },
-                {
-                    "name": "EU: London",
-                    "url": "ingest-lon.mixer.com"
-                },
-                {
-                    "name": "EU: Amsterdam",
-                    "url": "ingest-ams.mixer.com"
-                },
-                {
-                    "name": "EU: Milan",
-                    "url": "ingest-mil.mixer.com"
-                },
-                {
-                    "name": "EU: Paris",
-                    "url": "ingest-par.mixer.com"
-                },
-                {
-                    "name": "EU: Frankfurt",
-                    "url": "ingest-fra.mixer.com"
-                },
-                {
-                    "name": "Brazil: Sao Paulo",
-                    "url": "ingest-sao.mixer.com"
-                },
-                {
-                    "name": "Australia: Melbourne",
-                    "url": "ingest-mel.mixer.com"
-                },
-                {
-                    "name": "Australia: Sydney",
-                    "url": "ingest-syd.mixer.com"
-                },
-                {
-                    "name": "Mexico: Mexico City",
-                    "url": "ingest-mex.mixer.com"
-                },
-                {
-                    "name": "Asia: Hong Kong",
-                    "url": "ingest-hkg.mixer.com"
-                },
-                {
-                    "name": "Asia: Tokyo",
-                    "url": "ingest-tok.mixer.com"
-                },
-                {
-                    "name": "South Korea: Seoul",
-                    "url": "ingest-seo.mixer.com"
-                },
-                {
-                    "name": "India: Chennai",
-                    "url": "ingest-che.mixer.com"
-                }
-            ],
-            "recommended": {
-                "keyint": 2,
-                "output": "ftl_output",
-                "max audio bitrate": 160,
-                "max video bitrate": 10000,
-                "profile": "main",
-                "bframes": 0,
-                "x264opts": "scenecut=0"
-            }
-        },
-        {
-            "name": "Mixer.com - RTMP",
-            "common": true,
-            "servers": [
-                {
-                    "name": "US: Dallas, TX",
-                    "url": "rtmp://ingest-dal.mixer.com:1935/beam"
-                },
-                {
-                    "name": "US: San Jose, CA",
-                    "url": "rtmp://ingest-sjc.mixer.com:1935/beam"
-                },
-                {
-                    "name": "US: Seattle, WA",
-                    "url": "rtmp://ingest-sea.mixer.com:1935/beam"
-                },
-                {
-                    "name": "US: Washington DC",
-                    "url": "rtmp://ingest-wdc.mixer.com:1935/beam"
-                },
-                {
-                    "name": "Canada: Toronto",
-                    "url": "rtmp://ingest-tor.mixer.com:1935/beam"
-                },
-                {
-                    "name": "EU: London",
-                    "url": "rtmp://ingest-lon.mixer.com:1935/beam"
-                },
-                {
-                    "name": "EU: Amsterdam",
-                    "url": "rtmp://ingest-ams.mixer.com:1935/beam"
-                },
-                {
-                    "name": "EU: Milan",
-                    "url": "rtmp://ingest-mil.mixer.com:1935/beam"
-                },
-                {
-                    "name": "EU: Paris",
-                    "url": "rtmp://ingest-par.mixer.com:1935/beam"
-                },
-                {
-                    "name": "EU: Frankfurt",
-                    "url": "rtmp://ingest-fra.mixer.com:1935/beam"
-                },
-                {
-                    "name": "Brazil: Sao Paulo",
-                    "url": "rtmp://ingest-sao.mixer.com:1935/beam"
-                },
-                {
-                    "name": "Australia: Melbourne",
-                    "url": "rtmp://ingest-mel.mixer.com:1935/beam"
-                },
-                {
-                    "name": "Australia: Sydney",
-                    "url": "rtmp://ingest-syd.mixer.com:1935/beam"
-                },
-                {
-                    "name": "Mexico: Mexico City",
-                    "url": "rtmp://ingest-mex.mixer.com:1935/beam"
-                },
-                {
-                    "name": "Asia: Hong Kong",
-                    "url": "rtmp://ingest-hkg.mixer.com:1935/beam"
-                },
-                {
-                    "name": "Asia: Tokyo",
-                    "url": "rtmp://ingest-tok.mixer.com:1935/beam"
-                },
-                {
-                    "name": "South Korea: Seoul",
-                    "url": "rtmp://ingest-seo.mixer.com:1935/beam"
-                },
-                {
-                    "name": "India: Chennai",
-                    "url": "rtmp://ingest-che.mixer.com:1935/beam"
-                }
-            ],
-            "recommended": {
-                "keyint": 2,
-                "max audio bitrate": 160,
-                "max video bitrate": 10000,
-                "profile": "main",
-                "x264opts": "scenecut=0"
-            }
-        },
-        {
             "name": "Mobcrush",
             "servers": [
                 {
@@ -587,9 +415,10 @@
             }
         },
         {
-            "name": "Restream.io - RTMP",
+            "name": "Restream.io",
             "alt_names": [
-                "Restream.io"
+                "Restream.io - RTMP",
+                "Restream.io - FTL"
             ],
             "common": true,
             "servers": [
@@ -700,124 +529,6 @@
             ],
             "recommended": {
                 "keyint": 2
-            }
-        },
-        {
-            "name": "Restream.io - FTL",
-            "common": true,
-            "servers": [
-                {
-                    "name": "Autodetect",
-                    "url": "live.restream.io"
-                },
-                {
-                    "name": "EU-West (London, GB)",
-                    "url": "london.restream.io"
-                },
-                {
-                    "name": "EU-West (Amsterdam, NL)",
-                    "url": "amsterdam.restream.io"
-                },
-                {
-                    "name": "EU-West (Luxembourg)",
-                    "url": "luxembourg.restream.io"
-                },
-                {
-                    "name": "EU-West (Paris, FR)",
-                    "url": "paris.restream.io"
-                },
-                {
-                    "name": "EU-West (Milan, IT)",
-                    "url": "milan.restream.io"
-                },
-                {
-                    "name": "EU-Central (Frankfurt, DE)",
-                    "url": "frankfurt.restream.io"
-                },
-                {
-                    "name": "EU-East (Falkenstein, DE)",
-                    "url": "falkenstein.restream.io"
-                },
-                {
-                    "name": "EU-East (Prague, Czech)",
-                    "url": "prague.restream.io"
-                },
-                {
-                    "name": "EU-South (Madrid, Spain)",
-                    "url": "madrid.restream.io"
-                },
-                {
-                    "name": "Russia (Moscow)",
-                    "url": "moscow.restream.io"
-                },
-                {
-                    "name": "Turkey (Istanbul)",
-                    "url": "istanbul.restream.io"
-                },
-                {
-                    "name": "Israel (Tel Aviv)",
-                    "url": "telaviv.restream.io"
-                },
-                {
-                    "name": "US-West (Seattle, WA)",
-                    "url": "seattle.restream.io"
-                },
-                {
-                    "name": "US-West (San Jose, CA)",
-                    "url": "sanjose.restream.io"
-                },
-                {
-                    "name": "US-Central (Dallas, TX)",
-                    "url": "dallas.restream.io"
-                },
-                {
-                    "name": "US-East (Washington, DC)",
-                    "url": "washington.restream.io"
-                },
-                {
-                    "name": "US-East (Miami, FL)",
-                    "url": "miami.restream.io"
-                },
-                {
-                    "name": "US-East (Chicago, IL)",
-                    "url": "chicago.restream.io"
-                },
-                {
-                    "name": "NA-East (Toronto, Canada)",
-                    "url": "toronto.restream.io"
-                },
-                {
-                    "name": "SA (Saint Paul, Brazil)",
-                    "url": "saopaulo.restream.io"
-                },
-                {
-                    "name": "India (Bangalore)",
-                    "url": "bangalore.restream.io"
-                },
-                {
-                    "name": "Asia (Singapore)",
-                    "url": "singapore.restream.io"
-                },
-                {
-                    "name": "Asia (Seoul, South Korea)",
-                    "url": "seoul.restream.io"
-                },
-                {
-                    "name": "Asia (Tokyo, Japan)",
-                    "url": "tokyo.restream.io"
-                },
-                {
-                    "name": "Australia (Sydney)",
-                    "url": "sydney.restream.io"
-                }
-            ],
-            "recommended": {
-                "keyint": 2,
-                "output": "ftl_output",
-                "max audio bitrate": 160,
-                "max video bitrate": 10000,
-                "profile": "main",
-                "bframes": 0
             }
         },
         {
@@ -1096,9 +807,14 @@
             "servers": [
                 {
                     "name": "Default",
-                    "url": "rtmp://live.uscreen.app/app"
+                    "url": "rtmp://global-live.uscreen.app:5222/app"
                 }
-            ]
+            ],
+            "recommended": {
+                "keyint": 2,
+                "max video bitrate": 8000,
+                "max audio bitrate": 192
+            }
         },
         {
             "name": "Stripchat",
@@ -2010,6 +1726,35 @@
                 "keyint": 2,
                 "max audio bitrate": 256,
                 "max video bitrate": 20480
+            }
+        },
+        {
+            "name": "Taryana - Apachat | تاریانا - آپاچت",
+            "servers": [
+                {
+                    "name": "Global: Fastest (Recommended)",
+                    "url": "rtmp://cdn.apachat.com:443/multistream"
+                }
+            ],
+            "recommended": {
+                "keyint": 2,
+                "profile": "main",
+                "max video bitrate": 4000,
+                "max audio bitrate": 192
+            }
+        },
+        {
+            "name": "api.video",
+            "servers": [
+                {
+                    "name": "Default",
+                    "url": "rtmp://broadcast.api.video/s"
+                }
+            ],
+            "recommended": {
+                "keyint": 2,
+                "max video bitrate": 20000,
+                "max audio bitrate": 192
             }
         }
     ]

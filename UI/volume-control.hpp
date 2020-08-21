@@ -254,6 +254,4 @@ public:
 	void setPeakMeterType(enum obs_peak_meter_type peakMeterType);
 
 	void EnableSlider(bool enable);
-
-	void MuteVolume(bool bMuted);//agora
 };

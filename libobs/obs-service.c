@@ -22,6 +22,7 @@ static const char *service_signals[] = {"void firstRemoteVideoDecoded()",
 					"void userOffline()",
 					"int joinChannelSuccess()",
 					"void initRtcEngineFailed()",
+					"void TokenPrivilegeWillExpire()",
 					NULL};
 // end
 const struct obs_service_info *find_service(const char *id)
@@ -463,3 +464,4 @@ bool obs_service_agora_remove_publish_stream_url(const obs_service_t *service,
 
 	return false;
 }
+//end

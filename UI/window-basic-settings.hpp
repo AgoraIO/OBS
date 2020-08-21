@@ -43,7 +43,7 @@ class OBSHotkeyWidget;
 #define VOLUME_METER_DECAY_FAST 23.53
 #define VOLUME_METER_DECAY_MEDIUM 11.76
 #define VOLUME_METER_DECAY_SLOW 8.57
-
+#define AGORA_SETTINGS_EXPIREDTS 24
 class SilentUpdateCheckBox : public QCheckBox {
 	Q_OBJECT
 
@@ -248,7 +248,6 @@ private slots:
 	void on_disconnectAccount_clicked();
 	void on_useStreamKey_clicked();
 	void on_useAuth_toggled();
-	void on_loadConfigButton_clicked();
 
 private:
 	/* output */
@@ -294,6 +293,8 @@ private:
 
 	void RecalcOutputResPixels(const char *resText);
 
+	bool AskIfCanCloseSettings();
+
 	QIcon generalIcon;
 	QIcon streamIcon;
 	QIcon outputIcon;
@@ -314,7 +315,7 @@ private:
 
 private slots:
 	void on_theme_activated(int idx);
-
+	void on_loadConfigButton_clicked();
 	void on_listWidget_itemSelectionChanged();
 	void on_buttonBox_clicked(QAbstractButton *button);
 
@@ -378,10 +379,11 @@ private slots:
 	void SetVideoIcon(const QIcon &icon);
 	void SetHotkeysIcon(const QIcon &icon);
 	void SetAdvancedIcon(const QIcon &icon);
-
 	void AgoraChanged();
+
 protected:
-	virtual void closeEvent(QCloseEvent *event);
+	virtual void closeEvent(QCloseEvent *event) override;
+	void reject() override;
 
 public:
 	OBSBasicSettings(QWidget *parent);

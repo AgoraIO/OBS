@@ -69,6 +69,18 @@ AutoConfigStartPage::AutoConfigStartPage(QWidget *parent)
 	ui->setupUi(this);
 	setTitle(QTStr("Basic.AutoConfig.StartPage"));
 	setSubTitle(QTStr("Basic.AutoConfig.StartPage.SubTitle"));
+
+	OBSBasic *main = OBSBasic::Get();
+	if (main->VCamEnabled()) {
+		QRadioButton *prioritizeVCam = new QRadioButton(
+			QTStr("Basic.AutoConfig.StartPage.PrioritizeVirtualCam"),
+			this);
+		QBoxLayout *box = reinterpret_cast<QBoxLayout *>(layout());
+		box->insertWidget(2, prioritizeVCam);
+
+		connect(prioritizeVCam, &QPushButton::clicked, this,
+			&AutoConfigStartPage::PrioritizeVCam);
+	}
 }
 
 AutoConfigStartPage::~AutoConfigStartPage()
@@ -78,7 +90,9 @@ AutoConfigStartPage::~AutoConfigStartPage()
 
 int AutoConfigStartPage::nextId() const
 {
-	return AutoConfig::VideoPage;
+	return wiz->type == AutoConfig::Type::VirtualCam
+		       ? AutoConfig::TestPage
+		       : AutoConfig::VideoPage;
 }
 
 void AutoConfigStartPage::on_prioritizeStreaming_clicked()
@@ -89,6 +103,11 @@ void AutoConfigStartPage::on_prioritizeStreaming_clicked()
 void AutoConfigStartPage::on_prioritizeRecording_clicked()
 {
 	wiz->type = AutoConfig::Type::Recording;
+}
+
+void AutoConfigStartPage::PrioritizeVCam()
+{
+	wiz->type = AutoConfig::Type::VirtualCam;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -573,7 +592,8 @@ void AutoConfigStreamPage::UpdateKeyLink()
 		streamKeyLink =
 			"https://restream.io/settings/streaming-setup?from=OBS";
 	} else if (serviceName == "Facebook Live") {
-		streamKeyLink = "https://www.facebook.com/live/create?ref=OBS";
+		streamKeyLink =
+			"https://www.facebook.com/live/producer?ref=OBS";
 	} else if (serviceName.startsWith("Twitter")) {
 		streamKeyLink = "https://www.pscp.tv/account/producer";
 	} else if (serviceName.startsWith("YouStreamer")) {
@@ -622,7 +642,7 @@ void AutoConfigStreamPage::LoadServices(bool showAll)
 	}
 
 	if (showAll)
-		names.sort();
+		names.sort(Qt::CaseInsensitive);
 
 	for (QString &name : names)
 		ui->service->addItem(name);
@@ -725,7 +745,7 @@ AutoConfig::AutoConfig(QWidget *parent) : QWizard(parent)
 
 	std::string serviceType;
 	GetServiceInfo(serviceType, serviceName, server, key);
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__APPLE__)
 	setWizardStyle(QWizard::ModernStyle);
 #endif
 	streamPage = new AutoConfigStreamPage();
@@ -830,7 +850,7 @@ AutoConfig::AutoConfig(QWidget *parent) : QWizard(parent)
 		streamPage->ui->preferHardware->setChecked(preferHardware);
 	}
 
-	setOptions(0);
+	setOptions(QWizard::WizardOptions());
 	setButtonText(QWizard::FinishButton,
 		      QTStr("Basic.AutoConfig.ApplySettings"));
 	setButtonText(QWizard::BackButton, QTStr("Back"));

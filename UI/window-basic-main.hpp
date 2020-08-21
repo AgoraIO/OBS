@@ -21,10 +21,6 @@
 #include <QAction>
 #include <QWidgetAction>
 #include <QSystemTrayIcon>
-#ifdef _WIN32
-#include <QWinTaskbarButton>
-#include <QWinTaskbarProgress>
-#endif
 #include <QStyledItemDelegate>
 #include <obs.hpp>
 #include <vector>
@@ -38,6 +34,7 @@
 #include "window-projector.hpp"
 #include "window-basic-about.hpp"
 #include "auth-base.hpp"
+#include "log-viewer.hpp"
 
 #include <obs-frontend-internal.hpp>
 
@@ -88,6 +85,8 @@ typedef struct tagAgoraSettings {
 	std::string appToken = "";
 	unsigned int uid = 0;
 	std::string channelName = "";
+	uint32_t expiredTime = 24;
+	uint32_t expiredTimeTs = 0;
 } AgoraSettings, *PAgoraSettings;
 
 struct AgoraOutputHandler;
@@ -186,6 +185,7 @@ class OBSBasic : public OBSMainWindow {
 	friend class ReplayBufferButton;
 	friend class ExtraBrowsersModel;
 	friend class ExtraBrowsersDelegate;
+	friend struct BasicOutputHandler;
 	friend struct OBSStudioAPI;
 
 	enum class MoveDir { Up, Down, Left, Right };
@@ -233,6 +233,8 @@ private:
 	QPointer<QDockWidget> statsDock;
 	QPointer<OBSAbout> about;
 
+	OBSLogViewer *logView;
+
 	QPointer<QTimer> cpuUsageTimer;
 	QPointer<QTimer> diskFullTimer;
 
@@ -252,7 +254,6 @@ private:
 	gs_vertbuffer_t *circle = nullptr;
 
 	bool sceneChanging = false;
-	bool ignoreSelectionUpdate = false;
 
 	int previewX = 0, previewY = 0;
 	int previewCX = 0, previewCY = 0;
@@ -276,6 +277,9 @@ private:
 	QScopedPointer<QPushButton> pause;
 	QScopedPointer<QPushButton> replay;
 
+	QPointer<QPushButton> vcamButton;
+	bool vcamEnabled = false;
+
 	QScopedPointer<QSystemTrayIcon> trayIcon;
 	QPointer<QAction> sysTrayStream;
 	QPointer<QAction> sysTrayRecord;
@@ -297,11 +301,6 @@ private:
 	QPointer<QMenu> deinterlaceMenu;
 	QPointer<QMenu> perSceneTransitionMenu;
 	QPointer<QObject> shortcutFilter;
-
-#ifdef _WIN32
-	QWinTaskbarButton *taskBtn = new QWinTaskbarButton(this);
-	QWinTaskbarProgress *taskProg = taskBtn->progress();
-#endif
 
 	QPointer<QWidget> programWidget;
 	QPointer<QVBoxLayout> programLayout;
@@ -402,7 +401,8 @@ private:
 	QModelIndexList GetAllSelectedSourceItems();
 
 	obs_hotkey_pair_id streamingHotkeys, recordingHotkeys, pauseHotkeys,
-		replayBufHotkeys, togglePreviewHotkeys;
+		replayBufHotkeys, vcamHotkeys, togglePreviewHotkeys,
+		contextBarHotkeys;
 	obs_hotkey_id forceStreamingStopHotkey;
 
 	void InitDefaultTransitions();
@@ -457,6 +457,8 @@ private:
 	obs_hotkey_id togglePreviewProgramHotkey = 0;
 	obs_hotkey_id transitionHotkey = 0;
 	obs_hotkey_id statsHotkey = 0;
+	obs_hotkey_id screenshotHotkey = 0;
+	obs_hotkey_id sourceScreenshotHotkey = 0;
 	int quickTransitionIdCounter = 1;
 	bool overridingTransition = false;
 
@@ -550,6 +552,8 @@ private:
 	void UpdateProjectorHideCursor();
 	void UpdateProjectorAlwaysOnTop(bool top);
 
+	QPointer<QObject> screenshotData;
+
 public slots:
 	void DeferSaveBegin();
 	void DeferSaveEnd();
@@ -581,6 +585,12 @@ public slots:
 	void ReplayBufferStopping();
 	void ReplayBufferStop(int code);
 
+	void StartVirtualCam();
+	void StopVirtualCam();
+
+	void OnVirtualCamStart();
+	void OnVirtualCamStop(int code);
+
 	void SaveProjectDeferred();
 	void SaveProject();
 
@@ -598,6 +608,8 @@ public slots:
 
 	void UpdatePatronJson(const QString &text, const QString &error);
 
+	void ShowContextBar();
+	void HideContextBar();
 	void PauseRecording();
 	void UnpauseRecording();
 
@@ -606,8 +618,6 @@ private slots:
 	void AddScene(OBSSource source);
 	void RemoveScene(OBSSource source);
 	void RenameSources(OBSSource source, QString newName, QString prevName);
-
-	void SelectSceneItem(OBSScene scene, OBSSceneItem item, bool select);
 
 	void ActivateAudioSource(OBSSource source);
 	void DeactivateAudioSource(OBSSource source);
@@ -623,7 +633,7 @@ private slots:
 
 	void ProcessHotkey(obs_hotkey_id id, bool pressed);
 
-	void AddTransition();
+	void AddTransition(QString id);
 	void RenameTransition();
 	void TransitionClicked();
 	void TransitionStopped();
@@ -705,8 +715,6 @@ private:
 	static void SceneReordered(void *data, calldata_t *params);
 	static void SceneRefreshed(void *data, calldata_t *params);
 	static void SceneItemAdded(void *data, calldata_t *params);
-	static void SceneItemSelected(void *data, calldata_t *params);
-	static void SceneItemDeselected(void *data, calldata_t *params);
 	static void SourceCreated(void *data, calldata_t *params);
 	static void SourceRemoved(void *data, calldata_t *params);
 	static void SourceActivated(void *data, calldata_t *params);
@@ -760,6 +768,8 @@ public:
 		return os_atomic_load_bool(&previewProgramMode);
 	}
 
+	inline bool VCamEnabled() const { return vcamEnabled; }
+
 	bool StreamingActive() const;
 	bool Active() const;
 
@@ -767,6 +777,7 @@ public:
 	int ResetVideo();
 	bool ResetAudio();
 
+	void AddVCamButton();
 	void ResetOutputs();
 
 	void ResetAudioDevice(const char *sourceId, const char *deviceId,
@@ -844,7 +855,7 @@ protected:
 
 private slots:
 	void on_actionFullscreenInterface_triggered();
-
+	void on_agoraPKButton_clicked();
 	void on_actionShow_Recordings_triggered();
 	void on_actionRemux_triggered();
 	void on_action_Settings_triggered();
@@ -907,7 +918,12 @@ private slots:
 
 	void on_streamButton_clicked();
 	void on_recordButton_clicked();
+	void VCamButtonClicked();
 	void on_settingsButton_clicked();
+	void Screenshot(OBSSource source_ = nullptr);
+	void ScreenshotSelectedSource();
+	void ScreenshotProgram();
+	void ScreenshotScene();
 
 	void on_actionHelpPortal_triggered();
 	void on_actionWebsite_triggered();
@@ -937,16 +953,20 @@ private slots:
 	void on_actionAlwaysOnTop_triggered();
 
 	void on_toggleListboxToolbars_toggled(bool visible);
+	void on_toggleContextBar_toggled(bool visible);
 	void on_toggleStatusBar_toggled(bool visible);
 	void on_toggleSourceIcons_toggled(bool visible);
 
 	void on_transitions_currentIndexChanged(int index);
-	void on_transitionAdd_clicked();
 	void on_transitionRemove_clicked();
 	void on_transitionProps_clicked();
 	void on_transitionDuration_valueChanged(int value);
 
 	void on_modeSwitch_clicked();
+
+	// Source Context Buttons
+	void on_sourcePropertiesButton_clicked();
+	void on_sourceFiltersButton_clicked();
 
 	void on_autoConfigure_triggered();
 	void on_stats_triggered();
@@ -1001,13 +1021,15 @@ private slots:
 	void StackedMixerAreaContextMenuRequested();
 
 	void ResizeOutputSizeOfSource();
-	void on_agoraPKButton_clicked();
+
 public slots:
 	void on_actionResetTransform_triggered();
 
 	bool StreamingActive();
 	bool RecordingActive();
 	bool ReplayBufferActive();
+
+	void UpdateContextBar();
 
 public:
 	explicit OBSBasic(QWidget *parent = 0);
@@ -1021,11 +1043,11 @@ public:
 				   const char *file) const override;
 
 	static void InitBrowserPanelSafeBlock();
-
-private:
+	
+ private:
 	std::unique_ptr<Ui::OBSBasic> ui;
 
-public:
+ public:
 	//agora
 	obs_service_t *GetAgoraService();
 	void InitAgoraService();
@@ -1033,7 +1055,7 @@ public:
 	void SetAgoraService(obs_service_t *service);
 	void ResetAgoraOutput();
 	void SetAgoraSettings(AgoraSettings settings);
-	void GetAgoraSettings(AgoraSettings& settings);
+	void GetAgoraSettings(AgoraSettings &settings);
 	static void AgoraInitRtcEngineFailed(void *data, calldata_t *params);
 	static void AgoraFirstRemoteVideoDecoded(void *data,
 						 calldata_t *params);
@@ -1041,6 +1063,9 @@ public:
 	static void AgoraUserOffline(void *data, calldata_t *params);
 	static void AgoraJoinChannelSuccess(void *data, calldata_t *params);
 	static void AgoraError(void *data, calldata_t *params);
+	static void AgoraTokenPrivilegeWillExpire(void *data,
+						  calldata_t *params);
+
 	void CreateAgoraRemoteVideo();
 	void CreateRemoteVideos();
 	void DestroyRemoteVideos();
@@ -1067,7 +1092,7 @@ private:
 	std::list<uint32_t> m_lstRemoteVideoUids;
 	uint32_t remote_uid = 0;
 	uint32_t loacal_uid = 0;
-	
+
 	std::map<unsigned int, QWidget *> m_mapUidWidget;
 	AgoraSettings m_agoraSettings;
 private slots:
@@ -1078,6 +1103,7 @@ private slots:
 	void OnUserJoined(long long uid);
 	void OnJoinChannelSuccess(QString channel, long long uid,
 				  long long elapsed);
+	void OnTokenPrivilegeWillExpire();
 	void OnError(int err, const char *msg);
 	void OnInitRtcEngineFailed(long long code);
 	// end agora
