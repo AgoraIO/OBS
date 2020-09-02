@@ -160,8 +160,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>870</width>
-              <height>1373</height>
+              <width>580</width>
+              <height>984</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_19">
@@ -1259,8 +1259,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>985</width>
-              <height>811</height>
+              <width>666</width>
+              <height>594</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_21">
@@ -3754,8 +3754,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>951</width>
-              <height>604</height>
+              <width>634</width>
+              <height>453</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_50">
@@ -4610,8 +4610,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>982</width>
-              <height>1009</height>
+              <width>660</width>
+              <height>758</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_23">
@@ -5437,8 +5437,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>809</width>
-              <height>575</height>
+              <width>820</width>
+              <height>617</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_23">
@@ -5572,6 +5572,13 @@
                    </item>
                    <item row="8" column="1">
                     <widget class="QLineEdit" name="lineEditExpiredTs"/>
+                   </item>
+                   <item row="10" column="0" colspan="2">
+                    <widget class="QCheckBox" name="chkPersistSaving">
+                     <property name="text">
+                      <string>Basic.Settings.Agora.PersistSave</string>
+                     </property>
+                    </widget>
                    </item>
                   </layout>
                  </widget>

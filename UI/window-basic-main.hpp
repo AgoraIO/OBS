@@ -87,6 +87,7 @@ typedef struct tagAgoraSettings {
 	std::string channelName = "";
 	uint32_t expiredTime = 24;
 	uint32_t expiredTimeTs = 0;
+	bool savePersist = false;
 } AgoraSettings, *PAgoraSettings;
 
 struct AgoraOutputHandler;

@@ -4885,7 +4885,7 @@ void OBSBasicSettings::LoadAgoraSettings()
 		QString strUid = QString("%1").arg(settings.uid);
 		ui->lineEditUID->setText(strUid);
 	}
-
+	ui->chkPersistSaving->setChecked(settings.savePersist);
 	QString strExpired = QString("%1").arg(settings.expiredTime);
 	ui->lineEditExpiredTs->setText(strExpired);
 	loading = false;
@@ -4911,7 +4911,30 @@ void OBSBasicSettings::SaveAgoraSettings()
 	else
 		settings.expiredTime = AGORA_SETTINGS_EXPIREDTS;
 	settings.expiredTimeTs = settings.expiredTime * 60 * 60;
+	settings.savePersist = ui->chkPersistSaving->isChecked();
 	main->SetAgoraSettings(settings);
+
+	SaveCheckBox(ui->chkPersistSaving, "AgoraSettings", "PersistSave",
+		     settings.savePersist);
+	if (settings.savePersist) {
+		if (!strAppid.isEmpty())
+			SaveEdit(ui->lineEditAppid, "AgoraSettings", "AppId");
+		if (!strUid.isEmpty())
+			SaveEdit(ui->lineEditAppid, "AgoraSettings", "UID");
+		if (!strExpired.isEmpty())
+			SaveEdit(ui->lineEditAppid, "AgoraSettings",
+				 "TokenExpired");
+
+		if (!settings.appToken.empty())
+			SaveEdit(ui->lineEditToken, "AgoraSettings",
+				 "AppToken");
+		if (!settings.channelName.empty())
+			SaveEdit(ui->lineEditChannel, "AgoraSettings",
+				 "ChannelName");
+	}
+
+	//SaveCheckBox(ui->chkPersistSaving, "AgoraSettings", "PersistSave",
+	//	     settings.savePersist);
 }
 void OBSBasicSettings::on_loadConfigButton_clicked()
 {

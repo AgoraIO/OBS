@@ -1411,7 +1411,7 @@ bool OBSBasic::InitBasicConfigDefaults()
 				  m_agoraSettings.appid.c_str());
 	//end
 	CheckExistingCookieId();
-	
+
 	return true;
 }
 
@@ -2477,7 +2477,6 @@ OBSBasic::~OBSBasic()
 
 	agoraService = nullptr;
 	agoraOutputHandler.reset();
-
 
 	if (interaction)
 		delete interaction;
@@ -5317,7 +5316,7 @@ void OBSBasic::on_actionUploadLastCrashLog_triggered()
 
 void OBSBasic::on_actionCheckForUpdates_triggered()
 {
-	CheckForUpdates(false);//agora
+	CheckForUpdates(false); //agora
 }
 
 void OBSBasic::logUploadFinished(const QString &text, const QString &error)
@@ -8326,9 +8325,6 @@ void OBSBasic::SetAgoraService(obs_service_t *service)
 void OBSBasic::SetAgoraSettings(AgoraSettings settings)
 {
 	m_agoraSettings = settings;
-	/*#if 1
-	m_agoraSettings.expiredTimeTs = 60;
-#endif*/
 }
 
 void OBSBasic::GetAgoraSettings(AgoraSettings &settings)
@@ -8390,6 +8386,40 @@ void OBSBasic::InitAgoraServiceSettings()
 			    m_agoraSettings.appToken.c_str());
 	obs_data_set_bool(settings, "enableWebSdkInteroperability",
 			  true); //允许与websdk互通
+
+	
+	if (config_has_user_value(basicConfig, "AgoraSettings", "PersistSave"))
+		m_agoraSettings.savePersist = config_get_bool(
+			basicConfig, "AgoraSettings", "PersistSave");
+	if (m_agoraSettings.savePersist) {
+		if (config_has_user_value(basicConfig, "AgoraSettings",
+					  "AppId"))
+			m_agoraSettings.appid = config_get_string(
+				basicConfig, "AgoraSettings", "AppId");
+
+		if (config_has_user_value(basicConfig, "AgoraSettings", "UID"))
+			m_agoraSettings.uid = strtoul(
+				config_get_string(basicConfig, "AgoraSettings",
+						  "UID"),
+				nullptr, 10);
+
+		if (config_has_user_value(basicConfig, "AgoraSettings",
+					  "TokenExpired"))
+			m_agoraSettings.expiredTime = strtoul(
+				config_get_string(basicConfig, "AgoraSettings",
+						  "TokenExpired"),
+				nullptr, 10);
+		if (config_has_user_value(basicConfig, "AgoraSettings",
+					  "AppToken"))
+			m_agoraSettings.appToken = config_get_string(
+				basicConfig, "AgoraSettings", "AppToken");
+
+		if (config_has_user_value(basicConfig, "AgoraSettings",
+					  "ChannelName"))
+			m_agoraSettings.channelName = config_get_string(
+				basicConfig, "AgoraSettings", "ChannelName");
+	}
+	
 
 	struct obs_audio_info ai;
 	obs_get_audio_info(&ai);
