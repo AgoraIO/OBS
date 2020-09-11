@@ -20,6 +20,7 @@ struct agora_data
 	bool  enableAgoraRawDataTimelog;
 	unsigned int privilegeExpiredTs = 60;
 	bool bRenewToken = false;
+	bool muteAllRemoteAudioVideo = false;
 };
 
 const char * AgoraService_GetName(void *type_data)
@@ -96,6 +97,9 @@ void AgoraService_Update(void *data, obs_data_t *settings)
 			settings, "agora_sdk_capture_mic_audio");
 		AgoraRtcEngine::GetInstance()->agora_sdk_captrue_mic_audio =
 			agora_sdk_capture_mic_audio;
+
+		service->muteAllRemoteAudioVideo =
+			obs_data_get_bool(settings, "muteAllRemoteAudioVideo");
 
 		if (!AgoraRtcEngine::GetInstance()->bInit &&
 		    service->agora_sdk_capture_mic_audio !=
@@ -181,6 +185,7 @@ bool AgoraService_Initialize(void *data, obs_output_t *output)
 	agora_engine->enableLocalCameara(false);// stop agora camera capture
 	agora_engine->enableLocalRender(false); // stop agora local render
 	agora_engine->keepPreRotation(false);
+
 	return true;
 }
 
@@ -192,14 +197,17 @@ void AgoraService_Activate(void *data, obs_data_t *settings)
 	agora_engine->setVideoProfileEx(service_data->out_cx, service_data->out_cy, service_data->fps, service_data->video_bitrate);
 	//agora_engine->setRecordingAudioFrameParameters(/*44100, 2*/service_data->sample_rate, service_data->audio_channel, service_data->sample_rate / AUDIO_CALLBACK_TIMES * service_data->audio_channel);
 
-
+	AgoraRtcEngine::GetInstance()->getRtcEngine()->muteAllRemoteVideoStreams(
+		service_data->muteAllRemoteAudioVideo);
+	AgoraRtcEngine::GetInstance()->getRtcEngine()->muteAllRemoteAudioStreams(
+		service_data->muteAllRemoteAudioVideo);
 	std::string token = "";
 	if (strlen(service_data->agora_certificate))
-		agora_engine->CalculateToken(service_data->agora_appid,
-					     service_data->agora_certificate,
-					     service_data->channel_name,
-					     service_data->uid,
-					     service_data->privilegeExpiredTs);
+		token = agora_engine->CalculateToken(
+			service_data->agora_appid,
+			service_data->agora_certificate,
+			service_data->channel_name, service_data->uid,
+			service_data->privilegeExpiredTs);
 
 	agora_engine->joinChannel(token, service_data->channel_name,
 				  service_data->uid);

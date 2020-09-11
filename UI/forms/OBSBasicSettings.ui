@@ -160,8 +160,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>583</width>
-              <height>988</height>
+              <width>580</width>
+              <height>984</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_19">
@@ -1272,8 +1272,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>668</width>
-              <height>606</height>
+              <width>666</width>
+              <height>594</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_21">
@@ -3767,8 +3767,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>637</width>
-              <height>464</height>
+              <width>634</width>
+              <height>453</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_50">
@@ -4623,8 +4623,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>657</width>
-              <height>769</height>
+              <width>653</width>
+              <height>758</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_23">
@@ -5580,6 +5580,20 @@
                    </item>
                    <item row="8" column="1">
                     <widget class="QLineEdit" name="lineEditExpiredTs"/>
+                   </item>
+                   <item row="10" column="0">
+                    <widget class="QCheckBox" name="chkPersistSaving">
+                     <property name="text">
+                      <string>Basic.Settings.Agora.PersistSave</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="10" column="1">
+                    <widget class="QCheckBox" name="chkMuteAllRemoteAV">
+                     <property name="text">
+                      <string>Basic.Settings.Agora.MutAllRemoteAudioVideo</string>
+                     </property>
+                    </widget>
                    </item>
                   </layout>
                  </widget>

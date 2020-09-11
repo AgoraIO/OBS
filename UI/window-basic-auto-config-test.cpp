@@ -250,9 +250,10 @@ void AutoConfigTestPage::TestBandwidthThread()
 		GetServers(servers);
 
 	/* just use the first server if it only has one alternate server,
-	 * or if using Mixer or Restream due to their "auto" servers */
-	if (servers.size() < 3 || wiz->serviceName == "Mixer.com - FTL" ||
-	    wiz->serviceName.substr(0, 11) == "Restream.io") {
+	 * or if using Restream or Nimo TV due to their "auto" servers */
+	if (servers.size() < 3 ||
+	    wiz->serviceName.substr(0, 11) == "Restream.io" ||
+	    wiz->serviceName == "Nimo TV") {
 		servers.resize(1);
 
 	} else if (wiz->service == AutoConfig::Service::Twitch &&
@@ -990,7 +991,7 @@ void AutoConfigTestPage::FinalizeResults()
 		return new QLabel(QTStr(str), this);
 	};
 
-	if (wiz->type != AutoConfig::Type::Recording) {
+	if (wiz->type == AutoConfig::Type::Streaming) {
 		const char *serverType = wiz->customServer ? "rtmp_custom"
 							   : "rtmp_common";
 
@@ -1093,7 +1094,7 @@ void AutoConfigTestPage::NextStage()
 			started = true;
 		}
 
-		if (wiz->type == AutoConfig::Type::Recording) {
+		if (wiz->type != AutoConfig::Type::Streaming) {
 			stage = Stage::StreamEncoder;
 		} else if (!wiz->bandwidthTest) {
 			stage = Stage::BandwidthTest;
@@ -1163,8 +1164,17 @@ AutoConfigTestPage::~AutoConfigTestPage()
 
 void AutoConfigTestPage::initializePage()
 {
+	if (wiz->type == AutoConfig::Type::VirtualCam) {
+		wiz->idealResolutionCX = wiz->baseResolutionCX;
+		wiz->idealResolutionCY = wiz->baseResolutionCY;
+		wiz->idealFPSNum = 30;
+		wiz->idealFPSDen = 1;
+		stage = Stage::Finished;
+	} else {
+		stage = Stage::Starting;
+	}
+
 	setSubTitle(QTStr(SUBTITLE_TESTING));
-	stage = Stage::Starting;
 	softwareTested = false;
 	cancel = false;
 	DeleteLayout(results);

@@ -248,7 +248,6 @@ private slots:
 	void on_disconnectAccount_clicked();
 	void on_useStreamKey_clicked();
 	void on_useAuth_toggled();
-	void on_loadConfigButton_clicked();
 
 private:
 	/* output */
@@ -293,6 +292,8 @@ private:
 	void FillAudioMonitoringDevices();
 
 	void RecalcOutputResPixels(const char *resText);
+
+	bool AskIfCanCloseSettings();
 
 	QIcon generalIcon;
 	QIcon streamIcon;
@@ -378,10 +379,12 @@ private slots:
 	void SetVideoIcon(const QIcon &icon);
 	void SetHotkeysIcon(const QIcon &icon);
 	void SetAdvancedIcon(const QIcon &icon);
-
 	void AgoraChanged();
+	void on_loadConfigButton_clicked();//agora
+
 protected:
-	virtual void closeEvent(QCloseEvent *event);
+	virtual void closeEvent(QCloseEvent *event) override;
+	void reject() override;
 
 public:
 	OBSBasicSettings(QWidget *parent);

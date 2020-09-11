@@ -27,7 +27,6 @@
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QCloseEvent>
-#include <QFileDialog>
 #include <QDirIterator>
 #include <QVariant>
 #include <QTreeView>
@@ -49,11 +48,43 @@
 
 #include <util/platform.h>
 #include "ui-config.h"
+//agora
 #include <QSettings>
+#include <QFileDialog>
+//end
 #define ENCODER_HIDE_FLAGS \
 	(OBS_ENCODER_CAP_DEPRECATED | OBS_ENCODER_CAP_INTERNAL)
 
 using namespace std;
+
+class SettingsEventFilter : public QObject {
+	QScopedPointer<OBSEventFilter> shortcutFilter;
+
+public:
+	inline SettingsEventFilter()
+		: shortcutFilter((OBSEventFilter *)CreateShortcutFilter())
+	{
+	}
+
+protected:
+	bool eventFilter(QObject *obj, QEvent *event) override
+	{
+		int key;
+
+		switch (event->type()) {
+		case QEvent::KeyPress:
+		case QEvent::KeyRelease:
+			key = static_cast<QKeyEvent *>(event)->key();
+			if (key == Qt::Key_Escape) {
+				return false;
+			}
+		default:
+			break;
+		}
+
+		return shortcutFilter->filter(obj, event);
+	}
+};
 
 // Used for QVariant in codec comboboxes
 namespace {
@@ -395,7 +426,6 @@ OBSBasicSettings::OBSBasicSettings(QWidget *parent)
 	HookWidget(ui->key,                  EDIT_CHANGED,   STREAM1_CHANGED);
 	HookWidget(ui->bandwidthTestEnable,  CHECK_CHANGED,  STREAM1_CHANGED);
 	HookWidget(ui->twitchAddonDropdown,  COMBO_CHANGED,  STREAM1_CHANGED);
-	HookWidget(ui->mixerAddonDropdown,   COMBO_CHANGED,  STREAM1_CHANGED);
 	HookWidget(ui->useAuth,              CHECK_CHANGED,  STREAM1_CHANGED);
 	HookWidget(ui->authUsername,         EDIT_CHANGED,   STREAM1_CHANGED);
 	HookWidget(ui->authPw,               EDIT_CHANGED,   STREAM1_CHANGED);
@@ -533,13 +563,15 @@ OBSBasicSettings::OBSBasicSettings(QWidget *parent)
 	HookWidget(ui->autoRemux,            CHECK_CHANGED,  ADV_CHANGED);
 	HookWidget(ui->dynBitrate,           CHECK_CHANGED,  ADV_CHANGED);
 	/* clang-format on */
-
 	//Agora Settings
 	HookWidget(ui->lineEditAppid, EDIT_CHANGED, AGORA_CHANGED);
 	HookWidget(ui->lineEditToken, EDIT_CHANGED, AGORA_CHANGED);
 	HookWidget(ui->lineEditUID, EDIT_CHANGED, AGORA_CHANGED);
 	HookWidget(ui->lineEditChannel, EDIT_CHANGED, AGORA_CHANGED);
-	//endd
+	HookWidget(ui->lineEditExpiredTs, EDIT_CHANGED, AGORA_CHANGED);
+	HookWidget(ui->chkPersistSaving, CHECK_CHANGED, AGORA_CHANGED);
+	HookWidget(ui->chkMuteAllRemoteAV, CHECK_CHANGED, AGORA_CHANGED);
+	//end
 #define ADD_HOTKEY_FOCUS_TYPE(s)      \
 	ui->hotkeyFocusType->addItem( \
 		QTStr("Basic.Settings.Advanced.Hotkeys." s), s)
@@ -663,7 +695,7 @@ OBSBasicSettings::OBSBasicSettings(QWidget *parent)
 	// Initialize libff library
 	ff_init();
 
-	installEventFilter(CreateShortcutFilter());
+	installEventFilter(new SettingsEventFilter());
 
 	LoadEncoderTypes();
 	LoadColorRanges();
@@ -2715,7 +2747,7 @@ void OBSBasicSettings::LoadHotkeySettings(obs_hotkey_id ignoreKey)
 
 		if (obs_scene_from_source(source))
 			scenes.emplace_back(source, label, hw);
-		else
+		else if (obs_source_get_name(source) != NULL)
 			sources.emplace_back(source, label, hw);
 
 		return false;
@@ -2839,7 +2871,6 @@ void OBSBasicSettings::LoadSettings(bool changedOnly)
 		LoadHotkeySettings();
 	if (!changedOnly || advancedChanged)
 		LoadAdvancedSettings();
-
 	if (!changedOnly || agoraChanged)
 		LoadAgoraSettings();
 }
@@ -2941,8 +2972,12 @@ void OBSBasicSettings::SaveGeneralSettings()
 		config_set_bool(GetGlobalConfig(), "BasicWindow",
 				"ProjectorAlwaysOnTop",
 				ui->projectorAlwaysOnTop->isChecked());
+#if defined(_WIN32) || defined(__APPLE__)
 		main->UpdateProjectorAlwaysOnTop(
 			ui->projectorAlwaysOnTop->isChecked());
+#else
+		main->ResetProjectors();
+#endif
 	}
 
 	if (WidgetChanged(ui->recordWhenStreaming))
@@ -3548,7 +3583,6 @@ void OBSBasicSettings::SaveSettings()
 		SaveHotkeySettings();
 	if (advancedChanged)
 		SaveAdvancedSettings();
-
 	if (agoraChanged)
 		SaveAgoraSettings();
 
@@ -3626,14 +3660,14 @@ bool OBSBasicSettings::QueryChanges()
 
 void OBSBasicSettings::closeEvent(QCloseEvent *event)
 {
-	if (Changed() && !QueryChanges())
+	if (!AskIfCanCloseSettings())
 		event->ignore();
+}
 
-	if (forceAuthReload) {
-		main->auth->Save();
-		main->auth->Load();
-		forceAuthReload = false;
-	}
+void OBSBasicSettings::reject()
+{
+	if (AskIfCanCloseSettings())
+		close();
 }
 
 void OBSBasicSettings::on_theme_activated(int idx)
@@ -3688,10 +3722,9 @@ void OBSBasicSettings::on_buttonBox_clicked(QAbstractButton *button)
 
 void OBSBasicSettings::on_simpleOutputBrowse_clicked()
 {
-	QString dir = QFileDialog::getExistingDirectory(
+	QString dir = SelectDirectory(
 		this, QTStr("Basic.Settings.Output.SelectDirectory"),
-		ui->simpleOutputPath->text(),
-		QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+		ui->simpleOutputPath->text());
 	if (dir.isEmpty())
 		return;
 
@@ -3700,10 +3733,9 @@ void OBSBasicSettings::on_simpleOutputBrowse_clicked()
 
 void OBSBasicSettings::on_advOutRecPathBrowse_clicked()
 {
-	QString dir = QFileDialog::getExistingDirectory(
+	QString dir = SelectDirectory(
 		this, QTStr("Basic.Settings.Output.SelectDirectory"),
-		ui->advOutRecPath->text(),
-		QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+		ui->advOutRecPath->text());
 	if (dir.isEmpty())
 		return;
 
@@ -3712,10 +3744,9 @@ void OBSBasicSettings::on_advOutRecPathBrowse_clicked()
 
 void OBSBasicSettings::on_advOutFFPathBrowse_clicked()
 {
-	QString dir = QFileDialog::getExistingDirectory(
+	QString dir = SelectDirectory(
 		this, QTStr("Basic.Settings.Output.SelectDirectory"),
-		ui->advOutRecPath->text(),
-		QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+		ui->advOutRecPath->text());
 	if (dir.isEmpty())
 		return;
 
@@ -3885,6 +3916,22 @@ void OBSBasicSettings::RecalcOutputResPixels(const char *resText)
 				.arg(QString::number(std::get<0>(aspect)),
 				     QString::number(std::get<1>(aspect))));
 	}
+}
+
+bool OBSBasicSettings::AskIfCanCloseSettings()
+{
+	bool canCloseSettings = false;
+
+	if (!Changed() || QueryChanges())
+		canCloseSettings = true;
+
+	if (forceAuthReload) {
+		main->auth->Save();
+		main->auth->Load();
+		forceAuthReload = false;
+	}
+
+	return canCloseSettings;
 }
 
 void OBSBasicSettings::on_filenameFormatting_textEdited(const QString &text)
@@ -4838,14 +4885,15 @@ void OBSBasicSettings::LoadAgoraSettings()
 	main->GetAgoraSettings(settings);
 
 	ui->lineEditAppid->setText(QString::fromUtf8(settings.appid.data()));
-	ui->lineEditToken->setText(QString::fromUtf8(settings.appToken.data()));
+	ui->lineEditToken->setText(QString::fromUtf8(settings.appCerf.data()));
 	ui->lineEditChannel->setText(
 		QString::fromUtf8(settings.channelName.data()));
 	if (settings.uid > 0) {
 		QString strUid = QString("%1").arg(settings.uid);
 		ui->lineEditUID->setText(strUid);
 	}
-
+	ui->chkPersistSaving->setChecked(settings.savePersist);
+	ui->chkMuteAllRemoteAV->setChecked(settings.muteAllRemoteAudioVideo);
 	QString strExpired = QString("%1").arg(settings.expiredTime);
 	ui->lineEditExpiredTs->setText(strExpired);
 	loading = false;
@@ -4857,7 +4905,7 @@ void OBSBasicSettings::SaveAgoraSettings()
 	QString strAppid = ui->lineEditAppid->text().toUtf8();
 	if (!strAppid.isEmpty())
 		settings.appid = strAppid.toUtf8();
-	settings.appToken = ui->lineEditToken->text().toUtf8();
+	settings.appCerf = ui->lineEditToken->text().toUtf8();
 	settings.channelName = ui->lineEditChannel->text().toUtf8();
 	QString strUid = ui->lineEditUID->text();
 	if (strUid.length() > 0)
@@ -4866,12 +4914,39 @@ void OBSBasicSettings::SaveAgoraSettings()
 		settings.uid = 0;
 	QString strExpired = ui->lineEditExpiredTs->text();
 	if (strExpired.length() > 0)
-		settings.expiredTime = strtoul(strExpired.toUtf8().data(), NULL, 10);
+		settings.expiredTime =
+			strtoul(strExpired.toUtf8().data(), NULL, 10);
 	else
 		settings.expiredTime = AGORA_SETTINGS_EXPIREDTS;
 	settings.expiredTimeTs = settings.expiredTime * 60 * 60;
+	settings.savePersist = ui->chkPersistSaving->isChecked();
+	settings.muteAllRemoteAudioVideo = ui->chkMuteAllRemoteAV->isChecked();
 	main->SetAgoraSettings(settings);
+
+	SaveCheckBox(ui->chkPersistSaving, "AgoraSettings", "PersistSave");
+	if (settings.savePersist) {
+		if (!strAppid.isEmpty())
+			SaveEdit(ui->lineEditAppid, "AgoraSettings", "AppId");
+		if (!strUid.isEmpty())
+			SaveEdit(ui->lineEditUID, "AgoraSettings", "UID");
+		if (!strExpired.isEmpty())
+			SaveEdit(ui->lineEditExpiredTs, "AgoraSettings",
+				 "TokenExpired");
+
+		if (!settings.appCerf.empty())
+			SaveEdit(ui->lineEditToken, "AgoraSettings",
+				 "AppCertificate");
+		if (!settings.channelName.empty())
+			SaveEdit(ui->lineEditChannel, "AgoraSettings",
+				 "ChannelName");
+
+		SaveCheckBox(ui->chkMuteAllRemoteAV, "AgoraSettings",
+			     "MuteAllRemoteAudioVideo",
+			     settings.muteAllRemoteAudioVideo);
+		
+	}
 }
+
 void OBSBasicSettings::on_loadConfigButton_clicked()
 {
 	QFileDialog *fileDialog = new QFileDialog(this);
@@ -4883,26 +4958,27 @@ void OBSBasicSettings::on_loadConfigButton_clicked()
 	}
 
 	for (auto iter : fileNames) {
-		std::shared_ptr<QSettings> spConfig = std::make_shared<QSettings>(iter, QSettings::IniFormat);
+		std::shared_ptr<QSettings> spConfig =
+			std::make_shared<QSettings>(iter, QSettings::IniFormat);
 		ui->loadConfiglineEdit->setText(iter);
 		QString str;
 		str = spConfig->value("/BaseInfo/AppId").toString();
 		if (!str.isEmpty())
 			ui->lineEditAppid->setText(str);
 
-		str = spConfig->value("/BaseInfo/AppToken").toString();
+		str = spConfig->value("/BaseInfo/AppCertifacte").toString();
 		if (!str.isEmpty())
 			ui->lineEditToken->setText(str);
 		str = spConfig->value("/BaseInfo/ChannelName").toString();
 		if (!str.isEmpty())
 			ui->lineEditChannel->setText(str);
-		
+
 		str = spConfig->value("/BaseInfo/UID").toString();
 		if (!str.isEmpty())
 			ui->lineEditUID->setText(str);
 
 		str = spConfig->value("/BaseInfo/TokenExpired").toString();
 		if (!str.isEmpty())
-			ui->lineEditExpiredTs->setText(str);	
+			ui->lineEditExpiredTs->setText(str);
 	}
 }

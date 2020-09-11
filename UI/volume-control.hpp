@@ -255,5 +255,5 @@ public:
 
 	void EnableSlider(bool enable);
 
-	void MuteVolume(bool bMuted);//agora
+	void MuteVolume(bool bMuted); //agora
 };
