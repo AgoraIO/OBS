@@ -3,7 +3,7 @@
 *English: [English](README.md)*
 
 * 编译基于win32(x86)
-* agora sdk版本2.2.1
+* agora sdk版本2.3.3
 * obs stduio 版本21.1
 
 ## 编译环境
@@ -22,10 +22,10 @@
 * 设置windows环境变量：
     * DepsPath 
 
-          **解压dedependencies2013.zip** 之后的目录下有个win32文件夹，作为路径。(vs2015对应dedependencies2015.zip，vs2017对应dedependencies2017.zip) 
+         下载[dependencies2013.zip](https://github.com//AgoraIO/OBS/releases/download/2.3.3/dependencies2013.zip)**解压(dedependencies2013.zip)** 之后的目录下有个win32文件夹，作为路径。
     * QTDir
 
-           QT 5.8 目录下的msvc2013。其他5.0以上版本的QT也可以，只要支持对应的vs版本即可。比如：QT5.8对应的vs2013的版本应该选择msvc2013。QT 5.9对应的vs2015是msvc_2015。
+           QT 5.8 目录下的msvc2013。其他5.0以上版本的QT也可以，只要支持对应的vs版本即可。比如：QT5.8对应的vs2013的版本应该选择msvc2013。
     * 取消 ENABLE\_SCRIPTING
                
            如果不需要使用python或者lua脚本调用obs库接口，可以取消。
