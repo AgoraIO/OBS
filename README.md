@@ -24,7 +24,7 @@
     * Set variables in windows environment:
         * DepsPath 
 
-               Download [dependencies2013.zip](https://github.com/AgoraIO/OBS/releases/download/2.3.3/dependencies2013.zip).The path where win32 is located after decompressing dedependencies2013.zip 
+               Download [dependencies2013.zip](https://github.com//AgoraIO/OBS/releases/download/2.3.3/dependencies2013.zip).The path where win32 is located after decompressing dedependencies2013.zip 
         * QTDir
 
                The path where win32 is loacted after installed QT 5.8
