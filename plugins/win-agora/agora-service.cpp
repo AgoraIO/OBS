@@ -196,7 +196,6 @@ void AgoraService_Activate(void *data, obs_data_t *settings)
 	agora_engine->EnableWebSdkInteroperability(service_data->enableWebSdkInteroperability);
 	agora_engine->setVideoProfileEx(service_data->out_cx, service_data->out_cy, service_data->fps, service_data->video_bitrate);
 	//agora_engine->setRecordingAudioFrameParameters(/*44100, 2*/service_data->sample_rate, service_data->audio_channel, service_data->sample_rate / AUDIO_CALLBACK_TIMES * service_data->audio_channel);
-
 	AgoraRtcEngine::GetInstance()->getRtcEngine()->muteAllRemoteVideoStreams(
 		service_data->muteAllRemoteAudioVideo);
 	AgoraRtcEngine::GetInstance()->getRtcEngine()->muteAllRemoteAudioStreams(
@@ -205,9 +204,10 @@ void AgoraService_Activate(void *data, obs_data_t *settings)
 	if (strlen(service_data->agora_certificate))
 		token = agora_engine->CalculateToken(
 			service_data->agora_appid,
-			service_data->agora_certificate,
-			service_data->channel_name, service_data->uid,
-			service_data->privilegeExpiredTs);
+					     service_data->agora_certificate,
+					     service_data->channel_name,
+					     service_data->uid,
+					     service_data->privilegeExpiredTs);
 
 	agora_engine->joinChannel(token, service_data->channel_name,
 				  service_data->uid);
