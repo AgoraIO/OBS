@@ -4966,7 +4966,7 @@ void OBSBasicSettings::on_loadConfigButton_clicked()
 		if (!str.isEmpty())
 			ui->lineEditAppid->setText(str);
 
-		str = spConfig->value("/BaseInfo/AppCertifacte").toString();
+		str = spConfig->value("/BaseInfo/AppCertificate").toString();
 		if (!str.isEmpty())
 			ui->lineEditToken->setText(str);
 		str = spConfig->value("/BaseInfo/ChannelName").toString();
