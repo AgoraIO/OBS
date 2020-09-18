@@ -4,7 +4,7 @@
 
 * 编译基于win32(x86)，也支持x64
 * agora sdk版本2.7.1
-* obs stduio 版本25.0
+* obs stduio 版本25.0及以上
 
 ## 编译环境
 
