@@ -8383,7 +8383,7 @@ void OBSBasic::InitAgoraServiceSettings()
 	obs_data_set_string(settings, "agora_appid",
 			    m_agoraSettings.appid.c_str());
 	obs_data_set_string(settings, "agora_certificate",
-			    m_agoraSettings.appToken.c_str());
+			    m_agoraSettings.appCerf.c_str());
 	obs_data_set_bool(settings, "enableWebSdkInteroperability",
 			  true); //允许与websdk互通
 
@@ -8410,9 +8410,9 @@ void OBSBasic::InitAgoraServiceSettings()
 						  "TokenExpired"),
 				nullptr, 10);
 		if (config_has_user_value(basicConfig, "AgoraSettings",
-					  "AppToken"))
-			m_agoraSettings.appToken = config_get_string(
-				basicConfig, "AgoraSettings", "AppToken");
+					  "AppCertificate"))
+			m_agoraSettings.appCerf = config_get_string(
+				basicConfig, "AgoraSettings", "AppCertificate");
 
 		if (config_has_user_value(basicConfig, "AgoraSettings",
 					  "ChannelName"))
@@ -8471,7 +8471,7 @@ void OBSBasic::on_agoraPKButton_clicked()
 			return;
 		}
 
-		if (!m_agoraSettings.appToken.empty() &&
+		if (!m_agoraSettings.appCerf.empty() &&
 		    m_agoraSettings.uid == 0) {
 			strInfo += QString("Uid");
 			QMessageBox::information(NULL, QString(""), strInfo);

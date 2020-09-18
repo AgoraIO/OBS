@@ -214,8 +214,6 @@ AgoraRtcEngine::AgoraRtcEngine()
 
 AgoraRtcEngine::~AgoraRtcEngine()
 {
-	if (m_pMediaEngine)
-		m_pMediaEngine->release();
 	if (m_rtcEngine) {
 		m_rtcEngine->release(true);
 		m_rtcEngine = NULL;
@@ -466,6 +464,7 @@ std::string AgoraRtcEngine::CalculateToken(std::string appid,
 int AgoraRtcEngine::joinChannel(const std::string &key,
 				const std::string &channel, unsigned int uid)
 {
+	m_rtcEngine->enableDualStreamMode(VIDEO_SOURCE_CUSTOM, true);
 	//int r = m_rtcEngine->joinChannel(key.data(), channel.data(), nullptr, uid);
 	ChannelMediaOptions options;
 	options.publishAudioTrack = false;

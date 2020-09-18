@@ -82,12 +82,13 @@ typedef struct tagRemoteVideoInfo {
 
 typedef struct tagAgoraSettings {
 	std::string appid = "";
-	std::string appToken = "";
+	std::string appCerf = "";
 	unsigned int uid = 0;
 	std::string channelName = "";
 	uint32_t expiredTime = 24;
 	uint32_t expiredTimeTs = 0;
 	bool savePersist = false;
+	bool muteAllRemoteAudioVideo;
 } AgoraSettings, *PAgoraSettings;
 
 struct AgoraOutputHandler;
@@ -1044,11 +1045,11 @@ public:
 				   const char *file) const override;
 
 	static void InitBrowserPanelSafeBlock();
-	
- private:
+
+private:
 	std::unique_ptr<Ui::OBSBasic> ui;
 
- public:
+public:
 	//agora
 	obs_service_t *GetAgoraService();
 	void InitAgoraService();
