@@ -6,6 +6,7 @@
 #include <QPushButton>
 #include <QCheckBox>
 #include <QLayout>
+#include <QDesktopServices>
 #include <string>
 
 #include "log-viewer.hpp"
@@ -13,7 +14,8 @@
 
 OBSLogViewer::OBSLogViewer(QWidget *parent) : QDialog(parent)
 {
-	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+	setWindowFlags(windowFlags() & Qt::WindowMaximizeButtonHint &
+		       ~Qt::WindowContextHelpButtonHint);
 
 	QVBoxLayout *layout = new QVBoxLayout();
 	layout->setContentsMargins(0, 0, 0, 0);
@@ -29,17 +31,24 @@ OBSLogViewer::OBSLogViewer(QWidget *parent) : QDialog(parent)
 	QPushButton *clearButton = new QPushButton(QTStr("Clear"));
 	connect(clearButton, &QPushButton::clicked, this,
 		&OBSLogViewer::ClearText);
+	QPushButton *openButton = new QPushButton(QTStr("OpenFile"));
+	connect(openButton, &QPushButton::clicked, this,
+		&OBSLogViewer::OpenFile);
 	QPushButton *closeButton = new QPushButton(QTStr("Close"));
 	connect(closeButton, &QPushButton::clicked, this, &QDialog::hide);
 
+	bool showLogViewerOnStartup = config_get_bool(
+		App()->GlobalConfig(), "LogViewer", "ShowLogStartup");
+
 	QCheckBox *showStartup = new QCheckBox(QTStr("ShowOnStartup"));
-	showStartup->setChecked(ShowOnStartup());
+	showStartup->setChecked(showLogViewerOnStartup);
 	connect(showStartup, SIGNAL(toggled(bool)), this,
 		SLOT(ToggleShowStartup(bool)));
 
 	buttonLayout->addSpacing(10);
 	buttonLayout->addWidget(showStartup);
 	buttonLayout->addStretch();
+	buttonLayout->addWidget(openButton);
 	buttonLayout->addWidget(clearButton);
 	buttonLayout->addWidget(closeButton);
 	buttonLayout->addSpacing(10);
@@ -73,12 +82,6 @@ void OBSLogViewer::ToggleShowStartup(bool checked)
 {
 	config_set_bool(App()->GlobalConfig(), "LogViewer", "ShowLogStartup",
 			checked);
-}
-
-bool OBSLogViewer::ShowOnStartup()
-{
-	return config_get_bool(App()->GlobalConfig(), "LogViewer",
-			       "ShowLogStartup");
 }
 
 extern QPointer<OBSLogViewer> obsLogViewer;
@@ -133,7 +136,9 @@ void OBSLogViewer::AddLine(int type, const QString &str)
 
 	QTextCursor newCursor = textArea->textCursor();
 	newCursor.movePosition(QTextCursor::End);
-	newCursor.insertHtml(msg + QStringLiteral("<br>"));
+	newCursor.insertHtml(
+		QStringLiteral("<pre style=\"white-space: pre-wrap\">") + msg +
+		QStringLiteral("<br></pre>"));
 
 	if (bottomScrolled)
 		scroll->setValue(scroll->maximum());
@@ -142,4 +147,20 @@ void OBSLogViewer::AddLine(int type, const QString &str)
 void OBSLogViewer::ClearText()
 {
 	textArea->clear();
+}
+
+void OBSLogViewer::OpenFile()
+{
+	char logDir[512];
+	if (GetConfigPath(logDir, sizeof(logDir), "obs-studio/logs") <= 0)
+		return;
+
+	const char *log = App()->GetCurrentLog();
+
+	std::string path = logDir;
+	path += "/";
+	path += log;
+
+	QUrl url = QUrl::fromLocalFile(QT_UTF8(path.c_str()));
+	QDesktopServices::openUrl(url);
 }

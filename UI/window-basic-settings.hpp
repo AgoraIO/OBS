@@ -315,7 +315,7 @@ private:
 
 private slots:
 	void on_theme_activated(int idx);
-
+	void on_loadConfigButton_clicked();
 	void on_listWidget_itemSelectionChanged();
 	void on_buttonBox_clicked(QAbstractButton *button);
 
@@ -380,7 +380,6 @@ private slots:
 	void SetHotkeysIcon(const QIcon &icon);
 	void SetAdvancedIcon(const QIcon &icon);
 	void AgoraChanged();
-	void on_loadConfigButton_clicked();//agora
 
 protected:
 	virtual void closeEvent(QCloseEvent *event) override;

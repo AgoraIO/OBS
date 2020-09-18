@@ -43,7 +43,6 @@
 #include "window-basic-settings.hpp"
 #include "crash-report.hpp"
 #include "platform.hpp"
-#include "obs-proxy-style.hpp"
 
 #include <fstream>
 
@@ -194,6 +193,9 @@ QObject *CreateShortcutFilter()
 				hotkey.key = obs_key_from_virtual_key(
 					event->nativeVirtualKey());
 			}
+
+			if (event->isAutoRepeat())
+				return true;
 
 			hotkey.modifiers = TranslateQtKeyboardEventModifiers(
 				event->modifiers());
@@ -1087,7 +1089,6 @@ bool OBSApp::SetTheme(std::string name, std::string path)
 	QString mpath = QString("file:///") + path.c_str();
 	setPalette(defaultPalette);
 	setStyleSheet(mpath);
-	setStyle(new OBSProxyStyle);
 	ParseExtraThemeData(path.c_str());
 
 	emit StyleChanged();

@@ -71,6 +71,10 @@ void OBSBasicSettings::InitStreamPage()
 		SLOT(UpdateServerList()));
 	connect(ui->service, SIGNAL(currentIndexChanged(int)), this,
 		SLOT(UpdateKeyLink()));
+	connect(ui->customServer, SIGNAL(textChanged(const QString &)), this,
+		SLOT(UpdateKeyLink()));
+	connect(ui->customServer, SIGNAL(editingFinished(const QString &)),
+		this, SLOT(UpdateKeyLink()));
 }
 
 void OBSBasicSettings::LoadStream1Settings()
@@ -173,9 +177,6 @@ void OBSBasicSettings::SaveStream1Settings()
 		}
 	}
 
-	obs_data_set_bool(settings, "bwtest",
-			  ui->bandwidthTestEnable->isChecked());
-
 	if (!!auth && strcmp(auth->service(), "Twitch") == 0) {
 		bool choiceExists = config_has_user_value(
 			main->Config(), "Twitch", "AddonChoice");
@@ -188,6 +189,11 @@ void OBSBasicSettings::SaveStream1Settings()
 
 		if (choiceExists && currentChoice != newChoice)
 			forceAuthReload = true;
+
+		obs_data_set_bool(settings, "bwtest",
+				  ui->bandwidthTestEnable->isChecked());
+	} else {
+		obs_data_set_bool(settings, "bwtest", false);
 	}
 
 	obs_data_set_string(settings, "key", QT_TO_UTF8(ui->key->text()));
@@ -208,12 +214,8 @@ void OBSBasicSettings::SaveStream1Settings()
 
 void OBSBasicSettings::UpdateKeyLink()
 {
-	if (IsCustomService()) {
-		ui->getStreamKeyButton->hide();
-		return;
-	}
-
 	QString serviceName = ui->service->currentText();
+	QString customServer = ui->customServer->text();
 	QString streamKeyLink;
 	if (serviceName == "Twitch") {
 		streamKeyLink =
@@ -223,7 +225,8 @@ void OBSBasicSettings::UpdateKeyLink()
 	} else if (serviceName.startsWith("Restream.io")) {
 		streamKeyLink =
 			"https://restream.io/settings/streaming-setup?from=OBS";
-	} else if (serviceName == "Facebook Live") {
+	} else if (serviceName == "Facebook Live" ||
+		   (customServer.contains("fbcdn.net") && IsCustomService())) {
 		streamKeyLink =
 			"https://www.facebook.com/live/producer?ref=OBS";
 	} else if (serviceName.startsWith("Twitter")) {
@@ -469,6 +472,8 @@ void OBSBasicSettings::OnOAuthStreamKeyConnected()
 			ui->bandwidthTestEnable->setVisible(true);
 			ui->twitchAddonLabel->setVisible(true);
 			ui->twitchAddonDropdown->setVisible(true);
+		} else {
+			ui->bandwidthTestEnable->setChecked(false);
 		}
 	}
 
@@ -528,6 +533,8 @@ void OBSBasicSettings::on_disconnectAccount_clicked()
 #ifdef BROWSER_AVAILABLE
 	OAuth::DeleteCookies(service);
 #endif
+
+	ui->bandwidthTestEnable->setChecked(false);
 
 	ui->streamKeyWidget->setVisible(true);
 	ui->streamKeyLabel->setVisible(true);

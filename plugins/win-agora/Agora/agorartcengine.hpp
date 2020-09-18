@@ -128,7 +128,7 @@ public:
 
 	void EnableAgoraCaptureMicAudio(bool bCapture);
 
-	obs_service_t *agoraService;
+	obs_service_t *agoraService = nullptr;
 	bool bInit = false;
 	int setupRemoteVideo(unsigned int uid, void *view);
 	agora::rtc::IRtcEngine *getRtcEngine()
@@ -146,7 +146,7 @@ public:
 
 	int audioChannel = 2;
 	int sampleRate = 44100;
-	void pushVideoFrame(struct encoder_frame *frame);
+	
 	void logAudioFrameTimestamp();
 	void enableLogTimestamp(bool bEnable);
 	std::string CalculateToken(std::string appid, const std::string &key,
@@ -161,8 +161,6 @@ private:
 	std::unique_ptr<agora::rtc::IRtcEngineEventHandler> m_eventHandler;
 	static AgoraRtcEngine *m_agoraEngine;
 
-	std::unique_ptr<CExtendVideoFrameObserver> m_videoObserver;
-	std::unique_ptr<CExtendAudioFrameObserver> m_audioObserver;
 	bool logFirstPushVideo;
 	int logVideoFrameTimeCount;
 	int logAudioFrameTimeCount;
@@ -173,4 +171,5 @@ private:
 	agora::media::IAudioFrameObserver::AudioFrame m_externalAudioframe;
 	int m_externalVideoFrameSize;
 	agora::media::base::ExternalVideoFrame m_externalVideoFrame;
+	agora::rtc::RtcEngineContext context;
 };

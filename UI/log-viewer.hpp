@@ -15,10 +15,9 @@ private slots:
 	void AddLine(int type, const QString &text);
 	void ClearText();
 	void ToggleShowStartup(bool checked);
+	void OpenFile();
 
 public:
 	OBSLogViewer(QWidget *parent = 0);
 	~OBSLogViewer();
-
-	bool ShowOnStartup();
 };

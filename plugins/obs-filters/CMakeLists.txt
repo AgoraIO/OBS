@@ -1,49 +1,38 @@
 project(obs-filters)
 
 option(DISABLE_SPEEXDSP "Disable building of the SpeexDSP-based Noise Suppression filter" OFF)
-option(DISABLE_RNNOISE "Disable building of the RNNoise-based Noise Suppression filter" OFF)
 
-if(DISABLE_SPEEXDSP AND DISABLE_RNNOISE)
-	message(STATUS "SpeexDSP and RNNoise support disabled")
-	set(NOISEREDUCTION_ENABLED FALSE)
+if(DISABLE_SPEEXDSP)
+	message(STATUS "SpeexDSP support disabled")
+	set(LIBSPEEXDSP_FOUND FALSE)
 else()
-	if(DISABLE_SPEEXDSP)
-		message(STATUS "SpeexDSP support disabled")
-		set(LIBSPEEXDSP_FOUND FALSE)
-	else()
-		find_package(Libspeexdsp QUIET)
-		if(NOT LIBSPEEXDSP_FOUND)
-			message(STATUS "SpeexDSP support not found")
-			set(LIBSPEEXDSP_FOUND FALSE)
-		else()
-			message(STATUS "SpeexDSP supported")
-			add_definitions(-DLIBSPEEXDSP_ENABLED)
-		endif()
+	find_package(Libspeexdsp)
+	if(LIBSPEEXDSP_FOUND)
+		add_definitions(-DLIBSPEEXDSP_ENABLED)
 	endif()
+endif()
 
-	if(DISABLE_RNNOISE)
-		message(STATUS "RNNoise support disabled")
-		set(LIBRNNOISE_FOUND FALSE)
-	else()
-		find_package(Librnnoise QUIET)
-		if(NOT LIBRNNOISE_FOUND)
-			message(STATUS "RNNoise support not found")
-			set(LIBRNNOISE_FOUND FALSE)
-		else()
-			message(STATUS "RNNoise supported")
-			add_definitions(-DLIBRNNOISE_ENABLED)
-		endif()
+find_package(Librnnoise QUIET)
+add_definitions(-DLIBRNNOISE_ENABLED)
+if(NOT LIBRNNOISE_FOUND)
+	file(GLOB rnnoise_SOURCES
+		"rnnoise/src/*.c"
+		"rnnoise/src/*.h"
+		"rnnoise/include/*.h")
+	add_definitions(-DCOMPILE_OPUS)
+	include_directories("rnnoise/include")
+	source_group("rnnoise" FILES ${rnnoise_SOURCES})
+	set(LIBRNNOISE_FOUND TRUE)
+endif()
 
-	endif()
-
-	if(LIBSPEEXDSP_FOUND OR LIBRNNOISE_FOUND)
-		message(STATUS "Noise Reduction effect enabled")
-		set(obs-filters_NOISEREDUCTION_SOURCES
-			noise-suppress-filter.c)
-		set(obs-filters_NOISEREDUCTION_LIBRARIES
-			${LIBSPEEXDSP_LIBRARIES} ${LIBRNNOISE_LIBRARIES})
-		set(NOISEREDUCTION_ENABLED TRUE)
-	endif()
+if(LIBSPEEXDSP_FOUND OR LIBRNNOISE_FOUND)
+	set(obs-filters_NOISEREDUCTION_SOURCES
+		noise-suppress-filter.c)
+	set(obs-filters_NOISEREDUCTION_LIBRARIES
+		${LIBSPEEXDSP_LIBRARIES} ${LIBRNNOISE_LIBRARIES})
+	set(NOISEREDUCTION_ENABLED TRUE)
+else()
+	set(NOISEREDUCTION_ENABLED FALSE)
 endif()
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/obs-filters-config.h.in"
@@ -88,6 +77,7 @@ if(WIN32)
 endif()
 
 add_library(obs-filters MODULE
+	${rnnoise_SOURCES}
 	${obs-filters_SOURCES}
 	${obs-filters_config_HEADERS}
 	${obs-filters_NOISEREDUCTION_SOURCES})

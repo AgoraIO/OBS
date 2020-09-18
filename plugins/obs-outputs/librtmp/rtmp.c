@@ -5277,13 +5277,11 @@ fail:
     return total;
 }
 
-static const AVal av_setDataFrame = AVC("@setDataFrame");
-
 int
 RTMP_Write(RTMP *r, const char *buf, int size, int streamIdx)
 {
     RTMPPacket *pkt = &r->m_write;
-    char *pend, *enc;
+    char *enc;
     int s2 = size, ret, num;
 
     pkt->m_nChannel = 0x04;	/* source channel */
@@ -5319,8 +5317,6 @@ RTMP_Write(RTMP *r, const char *buf, int size, int streamIdx)
                     !pkt->m_nTimeStamp) || pkt->m_packetType == RTMP_PACKET_TYPE_INFO)
             {
                 pkt->m_headerType = RTMP_PACKET_SIZE_LARGE;
-                if (pkt->m_packetType == RTMP_PACKET_TYPE_INFO)
-                    pkt->m_nBodySize += 16;
             }
             else
             {
@@ -5333,12 +5329,6 @@ RTMP_Write(RTMP *r, const char *buf, int size, int streamIdx)
                 return FALSE;
             }
             enc = pkt->m_body;
-            pend = enc + pkt->m_nBodySize;
-            if (pkt->m_packetType == RTMP_PACKET_TYPE_INFO)
-            {
-                enc = AMF_EncodeString(enc, pend, &av_setDataFrame);
-                pkt->m_nBytesRead = enc - pkt->m_body;
-            }
         }
         else
         {

@@ -50,6 +50,7 @@ struct BasicOutputHandler {
 	virtual bool VirtualCamActive() const;
 
 	virtual void Update() = 0;
+	virtual void SetupOutputs() = 0;
 
 	inline bool Active() const
 	{

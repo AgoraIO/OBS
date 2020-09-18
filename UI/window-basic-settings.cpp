@@ -33,6 +33,7 @@
 #include <QScreen>
 #include <QStandardItemModel>
 #include <QSpacerItem>
+#include <QFileDialog>
 
 #include "audio-encoders.hpp"
 #include "hotkey-edit.hpp"
@@ -45,13 +46,10 @@
 #include "window-basic-settings.hpp"
 #include "window-basic-main-outputs.hpp"
 #include "window-projector.hpp"
-
+#include "window-basic-main.hpp"
 #include <util/platform.h>
 #include "ui-config.h"
-//agora
 #include <QSettings>
-#include <QFileDialog>
-//end
 #define ENCODER_HIDE_FLAGS \
 	(OBS_ENCODER_CAP_DEPRECATED | OBS_ENCODER_CAP_INTERNAL)
 
@@ -563,6 +561,7 @@ OBSBasicSettings::OBSBasicSettings(QWidget *parent)
 	HookWidget(ui->autoRemux,            CHECK_CHANGED,  ADV_CHANGED);
 	HookWidget(ui->dynBitrate,           CHECK_CHANGED,  ADV_CHANGED);
 	/* clang-format on */
+
 	//Agora Settings
 	HookWidget(ui->lineEditAppid, EDIT_CHANGED, AGORA_CHANGED);
 	HookWidget(ui->lineEditToken, EDIT_CHANGED, AGORA_CHANGED);
@@ -2871,6 +2870,7 @@ void OBSBasicSettings::LoadSettings(bool changedOnly)
 		LoadHotkeySettings();
 	if (!changedOnly || advancedChanged)
 		LoadAdvancedSettings();
+
 	if (!changedOnly || agoraChanged)
 		LoadAgoraSettings();
 }
@@ -3583,11 +3583,11 @@ void OBSBasicSettings::SaveSettings()
 		SaveHotkeySettings();
 	if (advancedChanged)
 		SaveAdvancedSettings();
-	if (agoraChanged)
-		SaveAgoraSettings();
 
 	if (videoChanged || advancedChanged)
 		main->ResetVideo();
+	if (agoraChanged)
+		SaveAgoraSettings();
 
 	config_save_safe(main->Config(), "tmp", nullptr);
 	config_save_safe(GetGlobalConfig(), "tmp", nullptr);
@@ -4899,6 +4899,7 @@ void OBSBasicSettings::LoadAgoraSettings()
 	loading = false;
 }
 
+
 void OBSBasicSettings::SaveAgoraSettings()
 {
 	AgoraSettings settings;
@@ -4943,7 +4944,6 @@ void OBSBasicSettings::SaveAgoraSettings()
 		SaveCheckBox(ui->chkMuteAllRemoteAV, "AgoraSettings",
 			     "MuteAllRemoteAudioVideo",
 			     settings.muteAllRemoteAudioVideo);
-		
 	}
 }
 

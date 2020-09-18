@@ -112,12 +112,18 @@ static inline enum speaker_layout convert_speaker_layout(uint8_t channels)
 static inline enum video_colorspace
 convert_color_space(enum AVColorSpace s, enum AVColorTransferCharacteristic trc)
 {
-	if (s == AVCOL_SPC_BT709) {
+	switch (s) {
+	case AVCOL_SPC_BT709:
 		return (trc == AVCOL_TRC_IEC61966_2_1) ? VIDEO_CS_SRGB
 						       : VIDEO_CS_709;
+	case AVCOL_SPC_FCC:
+	case AVCOL_SPC_BT470BG:
+	case AVCOL_SPC_SMPTE170M:
+	case AVCOL_SPC_SMPTE240M:
+		return VIDEO_CS_601;
+	default:
+		return VIDEO_CS_DEFAULT;
 	}
-
-	return VIDEO_CS_DEFAULT;
 }
 
 static inline enum video_range_type convert_color_range(enum AVColorRange r)
@@ -679,11 +685,14 @@ static inline bool mp_media_thread(mp_media_t *m)
 
 		pthread_mutex_lock(&m->mutex);
 		is_active = m->active;
+		pause = m->pause;
 		pthread_mutex_unlock(&m->mutex);
 
-		if (!is_active) {
+		if (!is_active || pause) {
 			if (os_sem_wait(m->sem) < 0)
 				return false;
+			if (pause)
+				reset_ts(m);
 		} else {
 			timeout = mp_media_sleepto(m);
 		}

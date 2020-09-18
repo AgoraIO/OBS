@@ -31,9 +31,6 @@ SourceToolbar::SourceToolbar(QWidget *parent, OBSSource source)
 	  weakSource(OBSGetWeakRef(source)),
 	  props(obs_source_properties(source), obs_properties_destroy)
 {
-	obs_data_t *settings = obs_source_get_settings(source);
-	obs_properties_apply_settings(props.get(), settings);
-	obs_data_release(settings);
 }
 
 /* ========================================================================= */
@@ -107,13 +104,10 @@ static void SetComboItemDisabled(QComboBox *c, int idx)
 	item->setFlags(Qt::NoItemFlags);
 }
 
-void ComboSelectToolbar::Init()
+void UpdateSourceComboToolbarProperties(QComboBox *combo, OBSSource source,
+					obs_properties_t *props,
+					const char *prop_name, bool is_int)
 {
-	OBSSource source = GetSource();
-	if (!source) {
-		return;
-	}
-
 	std::string cur_id;
 
 	obs_data_t *settings = obs_source_get_settings(source);
@@ -124,41 +118,41 @@ void ComboSelectToolbar::Init()
 	}
 	obs_data_release(settings);
 
-	ui->device->blockSignals(true);
+	combo->blockSignals(true);
 
-	obs_property_t *p = obs_properties_get(props.get(), prop_name);
-	int cur_idx = FillPropertyCombo(ui->device, p, cur_id, is_int);
+	obs_property_t *p = obs_properties_get(props, prop_name);
+	int cur_idx = FillPropertyCombo(combo, p, cur_id, is_int);
 
 	if (cur_idx == -1 || obs_property_list_item_disabled(p, cur_idx)) {
 		if (cur_idx == -1) {
-			ui->device->insertItem(
+			combo->insertItem(
 				0,
 				QTStr("Basic.Settings.Audio.UnknownAudioDevice"));
 			cur_idx = 0;
 		}
 
-		SetComboItemDisabled(ui->device, cur_idx);
-	} else {
-		ui->device->setCurrentIndex(cur_idx);
+		SetComboItemDisabled(combo, cur_idx);
 	}
 
-	ui->device->blockSignals(false);
+	combo->setCurrentIndex(cur_idx);
+	combo->blockSignals(false);
 }
 
-void ComboSelectToolbar::UpdateActivateButtonName()
-{
-	obs_property_t *p = obs_properties_get(props.get(), "activate");
-	ui->activateButton->setText(obs_property_description(p));
-}
-
-void ComboSelectToolbar::on_device_currentIndexChanged(int idx)
+void ComboSelectToolbar::Init()
 {
 	OBSSource source = GetSource();
-	if (idx == -1 || !source) {
+	if (!source) {
 		return;
 	}
 
-	QString id = ui->device->itemData(idx).toString();
+	UpdateSourceComboToolbarProperties(ui->device, source, props.get(),
+					   prop_name, is_int);
+}
+
+void UpdateSourceComboToolbarValue(QComboBox *combo, OBSSource source, int idx,
+				   const char *prop_name, bool is_int)
+{
+	QString id = combo->itemData(idx).toString();
 
 	obs_data_t *settings = obs_data_create();
 	if (is_int) {
@@ -170,20 +164,15 @@ void ComboSelectToolbar::on_device_currentIndexChanged(int idx)
 	obs_data_release(settings);
 }
 
-void ComboSelectToolbar::on_activateButton_clicked()
+void ComboSelectToolbar::on_device_currentIndexChanged(int idx)
 {
 	OBSSource source = GetSource();
-	if (!source) {
+	if (idx == -1 || !source) {
 		return;
 	}
 
-	obs_property_t *p = obs_properties_get(props.get(), "activate");
-	if (!p) {
-		return;
-	}
-
-	obs_property_button_clicked(p, source.Get());
-	UpdateActivateButtonName();
+	UpdateSourceComboToolbarValue(ui->device, source, idx, prop_name,
+				      is_int);
 }
 
 AudioCaptureToolbar::AudioCaptureToolbar(QWidget *parent, OBSSource source)
@@ -264,36 +253,63 @@ void DisplayCaptureToolbar::Init()
 	ComboSelectToolbar::Init();
 }
 
+/* ========================================================================= */
+
 DeviceCaptureToolbar::DeviceCaptureToolbar(QWidget *parent, OBSSource source)
-	: ComboSelectToolbar(parent, source)
+	: QWidget(parent),
+	  weakSource(OBSGetWeakRef(source)),
+	  ui(new Ui_DeviceSelectToolbar)
 {
+	ui->setupUi(this);
+
+	delete ui->deviceLabel;
+	delete ui->device;
+	ui->deviceLabel = nullptr;
+	ui->device = nullptr;
+
+	obs_data_t *settings = obs_source_get_settings(source);
+	active = obs_data_get_bool(settings, "active");
+	obs_data_release(settings);
+
+	obs_module_t *mod = obs_get_module("win-dshow");
+	activateText = obs_module_get_locale_text(mod, "Activate");
+	deactivateText = obs_module_get_locale_text(mod, "Deactivate");
+
+	ui->activateButton->setText(active ? deactivateText : activateText);
 }
 
-void DeviceCaptureToolbar::Init()
+DeviceCaptureToolbar::~DeviceCaptureToolbar()
 {
-#ifndef _WIN32
-	delete ui->activateButton;
-	ui->activateButton = nullptr;
-#endif
+	delete ui;
+}
 
-	obs_module_t *mod =
-		get_os_module("win-dshow", "mac-avcapture", "linux-v4l2");
-	const char *device_str = obs_module_get_locale_text(mod, "Device");
-	ui->deviceLabel->setText(device_str);
+void DeviceCaptureToolbar::on_activateButton_clicked()
+{
+	OBSSource source = OBSGetStrongRef(weakSource);
+	if (!source) {
+		return;
+	}
 
-#ifdef _WIN32
-	prop_name = "video_device_id";
-#elif __APPLE__
-	prop_name = "device";
-#else
-	prop_name = "device_id";
-#endif
+	obs_data_t *settings = obs_source_get_settings(source);
+	bool now_active = obs_data_get_bool(settings, "active");
+	obs_data_release(settings);
 
-#ifdef _WIN32
-	UpdateActivateButtonName();
-#endif
+	bool desyncedSetting = now_active != active;
 
-	ComboSelectToolbar::Init();
+	active = !active;
+
+	const char *text = active ? deactivateText : activateText;
+	ui->activateButton->setText(text);
+
+	if (desyncedSetting) {
+		return;
+	}
+
+	calldata_t cd = {};
+	calldata_set_bool(&cd, "active", active);
+	proc_handler_t *ph = obs_source_get_proc_handler(source);
+	proc_handler_call(ph, "activate", &cd);
+	calldata_free(&cd);
 }
 
 /* ========================================================================= */
@@ -498,7 +514,12 @@ void ColorSourceToolbar::on_choose_clicked()
 	options |= QColorDialog::DontUseNativeDialog;
 #endif
 
-	color = QColorDialog::getColor(color, this, desc, options);
+	QColor newColor = QColorDialog::getColor(color, this, desc, options);
+	if (!newColor.isValid()) {
+		return;
+	}
+
+	color = newColor;
 	UpdateColor();
 
 	obs_data_t *settings = obs_data_create();
@@ -612,7 +633,12 @@ void TextSourceToolbar::on_selectColor_clicked()
 	color = newColor;
 
 	obs_data_t *settings = obs_data_create();
-	obs_data_set_int(settings, "color", color_to_int(color));
+	if (!strncmp(obs_source_get_id(source), "text_ft2_source", 15)) {
+		obs_data_set_int(settings, "color1", color_to_int(color));
+		obs_data_set_int(settings, "color2", color_to_int(color));
+	} else {
+		obs_data_set_int(settings, "color", color_to_int(color));
+	}
 	obs_source_update(source, settings);
 	obs_data_release(settings);
 }

@@ -11,6 +11,11 @@ configure_file(
 	"${CMAKE_CURRENT_SOURCE_DIR}/virtualcam-module.def.in"
 	"${CMAKE_CURRENT_BINARY_DIR}/virtualcam-module.def")
 
+set(MODULE_DESCRIPTION "OBS Virtual Camera output module")
+configure_file(${CMAKE_SOURCE_DIR}/cmake/winrc/obs-module.rc.in virtualcam-module.rc)
+
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/..)
+
 set(libdshowcapture_SOURCES
 	../libdshowcapture/source/log.cpp
 	../libdshowcapture/source/dshow-base.cpp
@@ -38,6 +43,7 @@ set(obs-virtualcam-module_SOURCES
 	placeholder.cpp
 	virtualcam-module.cpp
 	virtualcam-filter.cpp
+	virtualcam-module.rc
 	../shared-memory-queue.c
 	../tiny-nv12-scale.c
 	)

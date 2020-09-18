@@ -20,7 +20,6 @@ struct agora_data
 	bool  enableAgoraRawDataTimelog;
 	unsigned int privilegeExpiredTs = 60;
 	bool bRenewToken = false;
-	bool muteAllRemoteAudioVideo = false;
 };
 
 const char * AgoraService_GetName(void *type_data)
@@ -105,8 +104,7 @@ void AgoraService_Update(void *data, obs_data_t *settings)
 				->EnableAgoraCaptureMicAudio(
 					agora_sdk_capture_mic_audio);
 		}
-		service->muteAllRemoteAudioVideo =
-			obs_data_get_bool(settings, "muteAllRemoteAudioVideo");
+
 		agora::rtc::CLIENT_ROLE_TYPE role =
 			(agora::rtc::CLIENT_ROLE_TYPE)obs_data_get_int(
 				settings, "agora_client_role");
@@ -193,18 +191,15 @@ void AgoraService_Activate(void *data, obs_data_t *settings)
 	agora_engine->EnableWebSdkInteroperability(service_data->enableWebSdkInteroperability);
 	agora_engine->setVideoProfileEx(service_data->out_cx, service_data->out_cy, service_data->fps, service_data->video_bitrate);
 	agora_engine->setRecordingAudioFrameParameters(/*44100, 2*/service_data->sample_rate, service_data->audio_channel, service_data->sample_rate / AUDIO_CALLBACK_TIMES * service_data->audio_channel);
-	AgoraRtcEngine::GetInstance()->getRtcEngine()->muteAllRemoteVideoStreams(
-		service_data->muteAllRemoteAudioVideo);
-	AgoraRtcEngine::GetInstance()->getRtcEngine()->muteAllRemoteAudioStreams(
-		service_data->muteAllRemoteAudioVideo);
+
 	std::string token = "";
 	if (strlen(service_data->agora_certificate))
 		token = agora_engine->CalculateToken(
 			service_data->agora_appid,
-					     service_data->agora_certificate,
-					     service_data->channel_name,
-					     service_data->uid,
-					     service_data->privilegeExpiredTs);
+			service_data->agora_certificate,
+			service_data->channel_name,
+			service_data->uid,
+			service_data->privilegeExpiredTs);
 
 	agora_engine->joinChannel(token, service_data->channel_name,
 				  service_data->uid);

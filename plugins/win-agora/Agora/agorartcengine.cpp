@@ -107,7 +107,6 @@ public:
 	virtual void onFirstRemoteVideoFrame(uid_t uid, int width, int height,
 					     int elapsed) override
 	{
-	
 	}
 
 	virtual void onTokenPrivilegeWillExpire(const char *token)
@@ -161,11 +160,11 @@ bool CAgoraMetaDataObserver::onReadyToSendMetadata(Metadata &metadata)
 
 	if (ts > 0) {
 		char szTs[20] = {0};
-	sprintf_s(szTs, 20, "%lld", ts);
-	int len = strlen(szTs);
-	memcpy_s(metadata.buffer, len, szTs, len);
-	metadata.buffer[len] = 0;
-	metadata.size = len;
+		sprintf_s(szTs, 20, "%lld", ts);
+		int len = strlen(szTs);
+		memcpy_s(metadata.buffer, len, szTs, len);
+		metadata.buffer[len] = 0;
+		metadata.size = len;
 	}
 	return true;
 }
@@ -465,6 +464,7 @@ int AgoraRtcEngine::joinChannel(const std::string &key,
 				const std::string &channel, unsigned int uid)
 {
 	m_rtcEngine->enableDualStreamMode(VIDEO_SOURCE_CUSTOM, true);
+	
 	//int r = m_rtcEngine->joinChannel(key.data(), channel.data(), nullptr, uid);
 	ChannelMediaOptions options;
 	options.publishAudioTrack = false;
@@ -475,8 +475,8 @@ int AgoraRtcEngine::joinChannel(const std::string &key,
 	options.autoSubscribeVideo = true;
 	options.publishCustomAudioTrack = true;
 	options.publishCustomVideoTrack = true;
-	int r = m_rtcEngine->joinChannel(key.length() > 0 ? key.c_str() : NULL, channel.data(), uid,
-					 options);
+	int r = m_rtcEngine->joinChannel(key.length() > 0 ? key.c_str() : NULL,
+					 channel.data(), uid, options);
 	return r;
 }
 
@@ -585,11 +585,7 @@ int AgoraRtcEngine::setRecordingDeviceVolume(int volume)
 	return audioDeviceManager->setRecordingDeviceVolume(volume);
 }
 
-void AgoraRtcEngine::EnableAgoraCaptureMicAudio(bool bCapture)
-{
-	if (m_audioObserver)
-		m_audioObserver->agora_sdk_captrue_mic_audio = bCapture;
-}
+void AgoraRtcEngine::EnableAgoraCaptureMicAudio(bool bCapture) {}
 
 int AgoraRtcEngine::setPalyoutDeviceVolume(int volume)
 {
@@ -645,34 +641,6 @@ int AgoraRtcEngine::EnableWebSdkInteroperability(bool enabled)
 	return m_rtcEngine->enableWebSdkInteroperability(true);
 }
 
-void AgoraRtcEngine::pushVideoFrame(struct encoder_frame *frame)
-{
-	if (agora_out_cx && agora_out_cy &&
-	    agora_out_cx == frame->linesize[0]) {
-		int64_t time = GetTickCount64();
-
-		if (logAudioVideoTimestamp &&
-		    logVideoFrameTimeCount <
-			    agora_fps * LOG_VIDEO_FRAME_TIME_DUARATION) {
-			blog(LOG_INFO,
-			     "win-agora pushVideoFrame , obs output video frame time: %ld",
-			     time);
-			logVideoFrameTimeCount++;
-		}
-		m_videoObserver->pushBackVideoFrame(
-			frame->data[0], agora_out_cx * agora_out_cy * 3 / 2,
-			time);
-	} else {
-		if (!logFirstPushVideo) {
-			blog(LOG_INFO,
-			     "win-agora: pushVideoFrame failed because of width is not equal,"
-			     "agora:width=%d,obs width=%d\n",
-			     agora_out_cx, frame->linesize[0]);
-			logFirstPushVideo = true;
-		}
-	}
-}
-
 void AgoraRtcEngine::logAudioFrameTimestamp()
 {
 	unsigned int audioTime = GetTickCount64();
@@ -688,6 +656,4 @@ void AgoraRtcEngine::logAudioFrameTimestamp()
 void AgoraRtcEngine::enableLogTimestamp(bool bEnable)
 {
 	logAudioVideoTimestamp = bEnable;
-	m_videoObserver->Resetlog(bEnable);
-	m_audioObserver->Resetlog(bEnable);
 }

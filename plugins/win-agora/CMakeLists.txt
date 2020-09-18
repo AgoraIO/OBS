@@ -16,8 +16,6 @@ endif()
 set(win-agora_HEADERS
 	Agora/agorartcengine.hpp
 	Agora/CicleBuffer.hpp
-	Agora/ExtendAudioFrameObserver.hpp
-	Agora/ExtendVideoFrameObserver.hpp
 	Agora/RtcTokenBuilder.h)
 
 set(win-agora_SOURCES
@@ -27,9 +25,7 @@ set(win-agora_SOURCES
 	agora-output.cpp
 	agora-service.cpp
 	Agora/agorartcengine.cpp
-	Agora/CicleBuffer.cpp
-	Agora/ExtendAudioFrameObserver.cpp
-	Agora/ExtendVideoFrameObserver.cpp)
+	Agora/CicleBuffer.cpp)
 
 set(win-agora_DEPS
     agora_rtc_sdk)
