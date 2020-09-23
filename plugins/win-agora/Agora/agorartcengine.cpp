@@ -526,6 +526,7 @@ bool AgoraRtcEngine::setVideoProfileEx(int nWidth, int nHeight, int nFrameRate,
 	config.dimensions.height = nHeight;
 	config.frameRate = (FRAME_RATE)nFrameRate;
 	config.bitrate = nBitRate;
+	config.codecType = VIDEO_CODEC_VP8;
 	if (nWidth < nHeight)
 		config.orientationMode = ORIENTATION_MODE_FIXED_PORTRAIT;
 	else
