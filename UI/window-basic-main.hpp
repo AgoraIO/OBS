@@ -83,6 +83,7 @@ typedef struct tagRemoteVideoInfo {
 typedef struct tagAgoraSettings {
 	std::string appid = "";
 	std::string appCerf = "";
+	std::string token = "";
 	unsigned int uid = 0;
 	std::string channelName = "";
 	uint32_t expiredTime = 24;
@@ -1075,7 +1076,7 @@ public:
 	static void AgoraError(void *data, calldata_t *params);
 	static void AgoraTokenPrivilegeWillExpire(void *data,
 						  calldata_t *params);
-
+	static void AgoraConnectionStateChanged(void *data, calldata_t *params);
 	void CreateAgoraRemoteVideo();
 	void CreateRemoteVideos();
 	void DestroyRemoteVideos();
@@ -1116,6 +1117,7 @@ private slots:
 	void OnTokenPrivilegeWillExpire();
 	void OnError(int err, const char *msg);
 	void OnInitRtcEngineFailed(long long code);
+	void OnConnectionStateChanged(long long reason);
 	// end agora
 };
 

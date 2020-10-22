@@ -4,8 +4,9 @@
 #include <map>
 struct agora_data
 {
-	char* agora_appid;
+	char *agora_appid;
 	char *agora_certificate;
+	char *agora_token;
 	long long uid;
 	char* publish_url, *key, *channel_name;
 	int out_cx, out_cy;
@@ -51,9 +52,11 @@ void AgoraService_Update(void *data, obs_data_t *settings)
 		if (service->agora_appid)
 			bfree(service->agora_appid);
 
-		if (service->agora_certificate)
+		if (service->agora_certificate) {
+	
 			bfree(service->agora_certificate);
-
+			service->agora_certificate = NULL;
+		}
 		if (service->channel_name)
 			bfree(service->channel_name);
 
@@ -63,11 +66,19 @@ void AgoraService_Update(void *data, obs_data_t *settings)
 		if (service->key)
 			bfree(service->key);
 
+		if (service->agora_token)
+			bfree(service->agora_token);
+
 		service->uid = obs_data_get_int(settings, "agora_uid");
 		service->agora_appid = bstrdup(
 			obs_data_get_string(settings, "agora_appid")); //app_id
-		service->agora_certificate = bstrdup(
-			obs_data_get_string(settings, "agora_certificate"));
+
+		service->agora_token = bstrdup(
+			obs_data_get_string(settings, "agora_token"));
+		if (!strlen(service->agora_token))
+			service->agora_certificate = bstrdup(
+				obs_data_get_string(settings,
+						    "agora_certificate"));
 
 		service->publish_url =
 			bstrdup(obs_data_get_string(settings, "agora_url"));
@@ -201,7 +212,9 @@ void AgoraService_Activate(void *data, obs_data_t *settings)
 	AgoraRtcEngine::GetInstance()->getRtcEngine()->muteAllRemoteAudioStreams(
 		service_data->muteAllRemoteAudioVideo);
 	std::string token = "";
-	if (strlen(service_data->agora_certificate))
+	if (strlen(service_data->agora_token))
+		token = service_data->agora_token;
+	else if (strlen(service_data->agora_certificate))
 		token = agora_engine->CalculateToken(
 			service_data->agora_appid,
 					     service_data->agora_certificate,

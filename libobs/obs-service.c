@@ -23,6 +23,7 @@ static const char *service_signals[] = {"void firstRemoteVideoDecoded()",
 					"int joinChannelSuccess()",
 					"void initRtcEngineFailed()",
 					"void TokenPrivilegeWillExpire()",
+					"void ConnectionStateChanged()",
 					NULL};
 // end
 const struct obs_service_info *find_service(const char *id)

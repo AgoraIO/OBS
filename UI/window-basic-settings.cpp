@@ -565,6 +565,7 @@ OBSBasicSettings::OBSBasicSettings(QWidget *parent)
 	/* clang-format on */
 	//Agora Settings
 	HookWidget(ui->lineEditAppid, EDIT_CHANGED, AGORA_CHANGED);
+	HookWidget(ui->lineEditAppCertificate, EDIT_CHANGED, AGORA_CHANGED);
 	HookWidget(ui->lineEditToken, EDIT_CHANGED, AGORA_CHANGED);
 	HookWidget(ui->lineEditUID, EDIT_CHANGED, AGORA_CHANGED);
 	HookWidget(ui->lineEditChannel, EDIT_CHANGED, AGORA_CHANGED);
@@ -4884,8 +4885,11 @@ void OBSBasicSettings::LoadAgoraSettings()
 	AgoraSettings settings;
 	main->GetAgoraSettings(settings);
 
+	ui->lineEditToken->setText(
+		QString::fromUtf8(settings.token.data()));
+
 	ui->lineEditAppid->setText(QString::fromUtf8(settings.appid.data()));
-	ui->lineEditToken->setText(QString::fromUtf8(settings.appCerf.data()));
+	ui->lineEditAppCertificate->setText(QString::fromUtf8(settings.appCerf.data()));
 	ui->lineEditChannel->setText(
 		QString::fromUtf8(settings.channelName.data()));
 	if (settings.uid > 0) {
@@ -4905,7 +4909,8 @@ void OBSBasicSettings::SaveAgoraSettings()
 	QString strAppid = ui->lineEditAppid->text().toUtf8();
 	if (!strAppid.isEmpty())
 		settings.appid = strAppid.toUtf8();
-	settings.appCerf = ui->lineEditToken->text().toUtf8();
+	settings.token = ui->lineEditToken->text().toUtf8();
+	settings.appCerf = ui->lineEditAppCertificate->text().toUtf8();
 	settings.channelName = ui->lineEditChannel->text().toUtf8();
 	QString strUid = ui->lineEditUID->text();
 	if (strUid.length() > 0)
@@ -4934,8 +4939,13 @@ void OBSBasicSettings::SaveAgoraSettings()
 				 "TokenExpired");
 
 		if (!settings.appCerf.empty())
-			SaveEdit(ui->lineEditToken, "AgoraSettings",
+			SaveEdit(ui->lineEditAppCertificate, "AgoraSettings",
 				 "AppCertificate");
+
+		if (!settings.token.empty())
+			SaveEdit(ui->lineEditToken, "AgoraSettings",
+				 "AppTopken");
+
 		if (!settings.channelName.empty())
 			SaveEdit(ui->lineEditChannel, "AgoraSettings",
 				 "ChannelName");
@@ -4968,7 +4978,12 @@ void OBSBasicSettings::on_loadConfigButton_clicked()
 
 		str = spConfig->value("/BaseInfo/AppCertificate").toString();
 		if (!str.isEmpty())
+			ui->lineEditAppCertificate->setText(str);
+
+		str = spConfig->value("/BaseInfo/AppToken").toString();
+		if (!str.isEmpty())
 			ui->lineEditToken->setText(str);
+
 		str = spConfig->value("/BaseInfo/ChannelName").toString();
 		if (!str.isEmpty())
 			ui->lineEditChannel->setText(str);

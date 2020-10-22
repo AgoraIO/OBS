@@ -27,7 +27,6 @@ public:
 			"joinChannelSuccess", &params);
 	}
 
-
 	virtual void onLeaveChannel(const RtcStats &stats) override
 	{
 		struct calldata params;
@@ -116,7 +115,18 @@ public:
 		signal_handler_signal(
 			obs_service_get_signal_handler(m_engine.agoraService),
 			"TokenPrivilegeWillExpire", &params);
-		 
+	}
+
+	virtual void onConnectionStateChanged(
+		CONNECTION_STATE_TYPE state,
+		CONNECTION_CHANGED_REASON_TYPE reason)
+	{
+		struct calldata params;
+		calldata_init(&params);
+		calldata_set_int(&params, "reason", reason);
+		signal_handler_signal(
+			obs_service_get_signal_handler(m_engine.agoraService),
+			"ConnectionStateChanged", &params);
 	}
 };
 
@@ -149,7 +159,6 @@ AgoraRtcEngine::AgoraRtcEngine()
 	  m_externalAudioFrameSize(441 * 2 * 2),
 	  m_externalVideoFrameSize(640 * 480 * 3 / 2)
 {
-	
 }
 
 AgoraRtcEngine::~AgoraRtcEngine()
@@ -195,7 +204,8 @@ bool AgoraRtcEngine::InitEngine(std::string appid)
 	m_externalAudioframe.samples = sampleRate / AUDIO_CALLBACK_TIMES;
 	m_externalAudioframe.samplesPerSec = sampleRate;
 	m_externalAudioframe.bytesPerSample = 2;
-	m_externalAudioframe.type = agora::media::IAudioFrameObserver::FRAME_TYPE_PCM16;
+	m_externalAudioframe.type =
+		agora::media::IAudioFrameObserver::FRAME_TYPE_PCM16;
 	m_externalAudioframe.buffer = NULL;
 	m_externalAudioframe.avsync_type = 0;
 	m_externalAudioframe.renderTimeMs = 0;
@@ -205,7 +215,8 @@ bool AgoraRtcEngine::InitEngine(std::string appid)
 	m_externalVideoFrame.cropTop = 0;
 	m_externalVideoFrame.cropRight = 0;
 	m_externalVideoFrame.cropBottom = 0;
-	m_externalVideoFrame.format = agora::media::ExternalVideoFrame::VIDEO_PIXEL_I420;
+	m_externalVideoFrame.format =
+		agora::media::ExternalVideoFrame::VIDEO_PIXEL_I420;
 	m_externalVideoFrame.rotation = 0;
 	m_externalVideoFrame.height = agora_out_cx;
 	m_externalVideoFrame.stride = agora_out_cy;
@@ -317,7 +328,9 @@ void *AgoraRtcEngine::AgoraAudioObserver_Create()
 	logAudioFrameTimeCount = 0;
 	m_rtcEngine->setExternalAudioSource(true, sampleRate, audioChannel);
 	m_externalAudioframe.channels = audioChannel;
-	m_externalAudioframe.samples = sampleRate / AUDIO_CALLBACK_TIMES; //samplerate/100  10ms one audio frame
+	m_externalAudioframe.samples =
+		sampleRate /
+		AUDIO_CALLBACK_TIMES; //samplerate/100  10ms one audio frame
 	m_externalAudioframe.samplesPerSec = sampleRate;
 	m_externalAudioframe.bytesPerSample = 2;
 	m_externalAudioframe.type =
@@ -327,8 +340,8 @@ void *AgoraRtcEngine::AgoraAudioObserver_Create()
 	m_externalAudioframe.avsync_type = 0;
 	m_externalAudioframe.renderTimeMs = 0;
 
-	m_externalAudioFrameSize = m_externalAudioframe.samples * 2 *
-				   audioChannel;
+	m_externalAudioFrameSize =
+		m_externalAudioframe.samples * 2 * audioChannel;
 	return &m_externalAudioframe;
 }
 
@@ -354,7 +367,8 @@ bool AgoraRtcEngine::AgoraAudioObserver_Encode(struct encoder_frame *frame,
 	memcpy_s(m_externalAudioframe.buffer, m_externalAudioFrameSize,
 		 frame->data[0], m_externalAudioFrameSize);
 	m_externalAudioframe.renderTimeMs = GetTickCount();
-	int ret = m_pMediaEngine->pushAudioFrame(AUDIO_RECORDING_SOURCE , &m_externalAudioframe, false);
+	int ret = m_pMediaEngine->pushAudioFrame(AUDIO_RECORDING_SOURCE,
+						 &m_externalAudioframe, false);
 	return true;
 }
 

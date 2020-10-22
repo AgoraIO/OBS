@@ -8470,6 +8470,10 @@ void OBSBasic::InitAgoraServiceSettings()
 			    m_agoraSettings.appid.c_str());
 	obs_data_set_string(settings, "agora_certificate",
 			    m_agoraSettings.appCerf.c_str());
+
+	obs_data_set_string(settings, "agora_token",
+			    m_agoraSettings.token.c_str());
+
 	obs_data_set_bool(settings, "enableWebSdkInteroperability",
 			  true); //允许与websdk互通
 
@@ -8497,7 +8501,12 @@ void OBSBasic::InitAgoraServiceSettings()
 		if (config_has_user_value(basicConfig, "AgoraSettings",
 					  "AppCertificate"))
 			m_agoraSettings.appCerf = config_get_string(
-				basicConfig, "AgoraSettings", "AppCertifacte");
+				basicConfig, "AgoraSettings", "AppCertificate");
+
+		if (config_has_user_value(basicConfig, "AgoraSettings",
+					  "ApptToken"))
+			m_agoraSettings.appCerf = config_get_string(
+				basicConfig, "AgoraSettings", "ApptToken");
 
 		if (config_has_user_value(basicConfig, "AgoraSettings",
 					  "ChannelName"))
@@ -8506,9 +8515,9 @@ void OBSBasic::InitAgoraServiceSettings()
 
 		if (config_has_user_value(basicConfig, "AgoraSettings",
 					  "muteAllRemoteAudioVideo"))
-			m_agoraSettings.muteAllRemoteAudioVideo = config_get_bool(
-				basicConfig, "AgoraSettings", "muteAllRemoteAudioVideo");
-		
+			m_agoraSettings.muteAllRemoteAudioVideo =
+				config_get_bool(basicConfig, "AgoraSettings",
+						"muteAllRemoteAudioVideo");
 	}
 	obs_data_set_bool(settings, "muteAllRemoteAudioVideo",
 			  m_agoraSettings.muteAllRemoteAudioVideo);
@@ -8655,6 +8664,11 @@ void OBSBasic::SetControlWhenPK(bool bPK)
 			obs_service_get_signal_handler(agoraService),
 			"TokenPrivilegeWillExpire",
 			AgoraTokenPrivilegeWillExpire, &params);
+
+		signal_handler_connect(
+			obs_service_get_signal_handler(agoraService),
+			"ConnectionStateChanged", AgoraConnectionStateChanged,
+			&params);
 
 		obsColorFormatReplacedByAgora =
 			config_get_string(basicConfig, "Video", "ColorFormat");
@@ -8814,6 +8828,15 @@ void OBSBasic::AgoraTokenPrivilegeWillExpire(void *data, calldata_t *params)
 {
 	QMetaObject::invokeMethod(App()->GetMainWindow(),
 				  "OnTokenPrivilegeWillExpire");
+}
+
+void OBSBasic::AgoraConnectionStateChanged(void *data, calldata_t *params)
+{
+	long long reason = 0;
+	calldata_get_int(params, "reason", &reason);
+	QMetaObject::invokeMethod(App()->GetMainWindow(),
+				  "OnConnectionStateChanged",
+				  Q_ARG(long long, reason));
 }
 
 void OBSBasic::OnInitRtcEngineFailed(long long code)
@@ -9043,12 +9066,38 @@ void OBSBasic::OnJoinChannelSuccess(QString channel, long long uid,
 
 void OBSBasic::OnTokenPrivilegeWillExpire()
 {
-	obs_data_t *settings = obs_service_get_settings(agoraService);
-	obs_data_set_bool(settings, "bRenewToken", true);
-	//agoraService->privilegeExpiredTs =
-	obs_data_set_int(settings, "privilegeExpiredTs",
-			 m_agoraSettings.expiredTimeTs);
-	obs_service_update(agoraService, settings);
+	if (m_agoraSettings.token.empty()) {
+		obs_data_t *settings = obs_service_get_settings(agoraService);
+		obs_data_set_bool(settings, "bRenewToken", true);
+		//agoraService->privilegeExpiredTs =
+		obs_data_set_int(settings, "privilegeExpiredTs",
+				 m_agoraSettings.expiredTimeTs);
+		obs_service_update(agoraService, settings);
+	}
+}
+
+void OBSBasic::OnConnectionStateChanged(long long reason)
+{
+	if (reason == 8) { //CONNECTION_CHANGED_INVALID_TOKEN
+		OBSErrorBox(NULL,QTStr("Basic.Main.Agora.Invalid.Token").toStdString().c_str());
+		on_agoraPKButton_clicked();
+	} else if (reason == 9) {//CONNECTION_CHANGED_TOKEN_EXPIRED
+		OBSErrorBox(NULL, QTStr("Basic.Main.Agora.Token.Expired")
+					  .toStdString()
+					  .c_str());
+		on_agoraPKButton_clicked();
+	} else if (reason == 6) { //CONNECTION_CHANGED_INVALID_APP_ID
+		OBSErrorBox(NULL, QTStr("Basic.Main.Agora.Invalid.Appid")
+					  .toStdString()
+					  .c_str());
+		on_agoraPKButton_clicked();
+		 
+	} else if (reason == 7) { //CONNECTION_CHANGED_INVALID_CHANNEL_NAME
+		OBSErrorBox(NULL, QTStr("Basic.Main.Agora.Invalid.Channel")
+					  .toStdString()
+					  .c_str());
+		on_agoraPKButton_clicked();
+	}
 }
 
 void OBSBasic::OnError(int err, const char *msg) {}
