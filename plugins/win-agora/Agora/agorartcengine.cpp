@@ -464,6 +464,17 @@ int AgoraRtcEngine::joinChannel(const std::string &key,
 				const std::string &channel, unsigned int uid)
 {
 	m_rtcEngine->enableDualStreamMode(VIDEO_SOURCE_CUSTOM, true);
+
+	AParameter apm(*m_rtcEngine);
+	auto ret = -1;
+	ret = apm->setParameters("{\"rtc.enable_debug_log\":true}");
+
+	SimulcastStreamConfig lowStreamConfig;
+	lowStreamConfig.dimensions = VideoDimensions(360, 640);
+	lowStreamConfig.framerate = 30;
+	lowStreamConfig.bitrate = 582;
+	m_rtcEngine->enableDualStreamMode(VIDEO_SOURCE_CUSTOM, true,
+					  lowStreamConfig);
 	
 	//int r = m_rtcEngine->joinChannel(key.data(), channel.data(), nullptr, uid);
 	ChannelMediaOptions options;
@@ -526,6 +537,7 @@ bool AgoraRtcEngine::setVideoProfileEx(int nWidth, int nHeight, int nFrameRate,
 	config.dimensions.height = nHeight;
 	config.frameRate = (FRAME_RATE)nFrameRate;
 	config.bitrate = nBitRate;
+	config.codecType = VIDEO_CODEC_VP8;
 	if (nWidth < nHeight)
 		config.orientationMode = ORIENTATION_MODE_FIXED_PORTRAIT;
 	else
