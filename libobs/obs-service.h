@@ -79,6 +79,9 @@ struct obs_service_info {
 	bool (*setup_agora_remote_video)(uint32_t uid, void *view);
 	bool (*add_agora_publish_stream_url)(const char *url, bool transcoding);
 	bool (*remove_agora_publish_stream_url)(const char *url);
+	bool (*set_agora_live_transcoding)(const unsigned *uids, int count,
+					   int fps, int bitrate,
+					   int width, int height);
 	//end
 };
 

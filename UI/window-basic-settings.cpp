@@ -374,7 +374,7 @@ OBSBasicSettings::OBSBasicSettings(QWidget *parent)
 	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
 	ui->setupUi(this);
-
+	ui->checkBox->setVisible(false);
 	main->EnableOutputs(false);
 
 	PopulateAACBitrates({ui->simpleOutputABitrate, ui->advOutTrack1Bitrate,
@@ -567,6 +567,11 @@ OBSBasicSettings::OBSBasicSettings(QWidget *parent)
 	HookWidget(ui->lineEditToken, EDIT_CHANGED, AGORA_CHANGED);
 	HookWidget(ui->lineEditUID, EDIT_CHANGED, AGORA_CHANGED);
 	HookWidget(ui->lineEditChannel, EDIT_CHANGED, AGORA_CHANGED);
+	HookWidget(ui->lineEditAgoraRTmp, EDIT_CHANGED, AGORA_CHANGED);
+	HookWidget(ui->lineEditAgoraRtmpFPS, EDIT_CHANGED, AGORA_CHANGED);
+	HookWidget(ui->lineEditAgoraRtmpBitrate, EDIT_CHANGED, AGORA_CHANGED);
+	HookWidget(ui->lineEditAgoraRtmpWidth, EDIT_CHANGED, AGORA_CHANGED);
+	HookWidget(ui->lineEditAgoraRtmpHeight, EDIT_CHANGED, AGORA_CHANGED);
 	HookWidget(ui->lineEditExpiredTs, EDIT_CHANGED, AGORA_CHANGED);
 	HookWidget(ui->chkPersistSaving, CHECK_CHANGED, AGORA_CHANGED);
 	HookWidget(ui->chkMuteAllRemoteAV, CHECK_CHANGED, AGORA_CHANGED);
@@ -4897,6 +4902,17 @@ void OBSBasicSettings::LoadAgoraSettings()
 	QString strExpired = QString("%1").arg(settings.expiredTime);
 	ui->lineEditExpiredTs->setText(strExpired);
 	loading = false;
+
+	ui->lineEditAgoraRTmp->setText(
+		QString::fromUtf8(settings.rtmp_url.data()));
+
+	ui->lineEditAgoraRtmpFPS->setText(
+		QString("%1").arg( settings.rtmp_fps));
+	ui->lineEditAgoraRtmpBitrate->setText(
+		QString("%1").arg(settings.rtmp_bitrate));
+
+	ui->lineEditAgoraRtmpWidth->setText(QString("%1").arg(settings.rtmp_width));
+	ui->lineEditAgoraRtmpHeight->setText(QString("%1").arg(settings.rtmp_height));
 }
 
 
@@ -4922,6 +4938,12 @@ void OBSBasicSettings::SaveAgoraSettings()
 	settings.expiredTimeTs = settings.expiredTime * 60 * 60;
 	settings.savePersist = ui->chkPersistSaving->isChecked();
 	settings.muteAllRemoteAudioVideo = ui->chkMuteAllRemoteAV->isChecked();
+	settings.rtmp_url = ui->lineEditAgoraRTmp->text().toUtf8();
+	settings.rtmp_fps = ui->lineEditAgoraRtmpFPS->text().toInt();
+	settings.rtmp_bitrate = ui->lineEditAgoraRtmpBitrate->text().toInt();
+	settings.rtmp_width = ui->lineEditAgoraRtmpWidth->text().toInt();
+	settings.rtmp_height = ui->lineEditAgoraRtmpHeight->text().toInt();
+
 	main->SetAgoraSettings(settings);
 
 	SaveCheckBox(ui->chkPersistSaving, "AgoraSettings", "PersistSave");
@@ -4940,6 +4962,20 @@ void OBSBasicSettings::SaveAgoraSettings()
 		if (!settings.channelName.empty())
 			SaveEdit(ui->lineEditChannel, "AgoraSettings",
 				 "ChannelName");
+
+		if (!settings.rtmp_url.empty())
+			SaveEdit(ui->lineEditAgoraRTmp, "AgoraSettings",
+				 "AgoraRtmpUrl");
+
+		SaveEdit(ui->lineEditAgoraRtmpFPS, "AgoraSettings",
+			 "AgoraRtmpFPS");
+		SaveEdit(ui->lineEditAgoraRtmpBitrate, "AgoraSettings",
+			 "AgoraRtmpBirate");
+
+		SaveEdit(ui->lineEditAgoraRtmpWidth, "AgoraSettings",
+			 "AgoraRtmpWidth");
+		SaveEdit(ui->lineEditAgoraRtmpHeight, "AgoraSettings",
+			 "AgoraRtmpHeight");
 
 		SaveCheckBox(ui->chkMuteAllRemoteAV, "AgoraSettings",
 			     "MuteAllRemoteAudioVideo",
@@ -4980,5 +5016,27 @@ void OBSBasicSettings::on_loadConfigButton_clicked()
 		str = spConfig->value("/BaseInfo/TokenExpired").toString();
 		if (!str.isEmpty())
 			ui->lineEditExpiredTs->setText(str);
+
+		str = spConfig->value("/BaseInfo/AgoraRtmpUrl").toString();
+		if (!str.isEmpty())
+			ui->lineEditAgoraRTmp->setText(str);
+
+		str = spConfig->value("/BaseInfo/AgoraRtmpFPS").toString();
+		if (!str.isEmpty())
+			ui->lineEditAgoraRtmpFPS->setText(str);
+
+		str = spConfig->value("/BaseInfo/AgoraRtmpBitrate").toString();
+		if (!str.isEmpty())
+			ui->lineEditAgoraRtmpBitrate->setText(str);
+
+
+		str = spConfig->value("/BaseInfo/AgoraRtmpWidth").toString();
+		if (!str.isEmpty())
+			ui->lineEditAgoraRtmpWidth->setText(str);
+
+		str = spConfig->value("/BaseInfo/AgoraRtmpHeight").toString();
+		if (!str.isEmpty())
+			ui->lineEditAgoraRtmpHeight->setText(str);
+		
 	}
 }

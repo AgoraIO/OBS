@@ -201,11 +201,11 @@ Section "OBS Studio" SecCore
 	SetOutPath "$INSTDIR"
 	OBSInstallerUtils::KillProcess "obs-plugins\32bit\cef-bootstrap.exe"
 	OBSInstallerUtils::KillProcess "obs-plugins\64bit\cef-bootstrap.exe"
-	File /r "..\..\vs2017_64\rundir\Release\data"
+	File /r "..\..\build64\rundir\Release\data"
 	SetOutPath "$INSTDIR\bin"
-	File /r "..\..\vs2017_64\rundir\Release\bin\64bit"
+	File /r "..\..\build64\rundir\Release\bin\64bit"
 	SetOutPath "$INSTDIR\obs-plugins"
-	File /r "..\..\vs2017_64\rundir\Release\obs-plugins\64bit"
+	File /r "..\..\build64\rundir\Release\obs-plugins\64bit"
 
 	ClearErrors
 

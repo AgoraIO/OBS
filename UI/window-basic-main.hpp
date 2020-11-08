@@ -89,6 +89,12 @@ typedef struct tagAgoraSettings {
 	uint32_t expiredTimeTs = 0;
 	bool savePersist = false;
 	bool muteAllRemoteAudioVideo;
+	std::string rtmp_url = "";
+	int rtmp_fps = 15;
+	int rtmp_bitrate = 1000;
+
+	int rtmp_width = 1920;
+	int rtmp_height = 1080;
 } AgoraSettings, *PAgoraSettings;
 
 struct AgoraOutputHandler;
@@ -1053,11 +1059,11 @@ public:
 				   const char *file) const override;
 
 	static void InitBrowserPanelSafeBlock();
-	
- private:
+
+private:
 	std::unique_ptr<Ui::OBSBasic> ui;
 
- public:
+public:
 	//agora
 	obs_service_t *GetAgoraService();
 	void InitAgoraService();
@@ -1082,6 +1088,7 @@ public:
 	void UpdateAgoraClientRole(int role);          // 1 或2
 	void UpdateAgoraLogPath(std::string filePath); //valid path utf-8
 private:
+	void SetLiveTranscoding();
 	void SetControlWhenPK(bool bPK);
 	void SetPreviewPK(bool bPK);
 	bool GetObsRtmpUrl(std::string &rtmp_url);
@@ -1102,7 +1109,7 @@ private:
 	std::list<uint32_t> m_lstRemoteVideoUids;
 	uint32_t remote_uid = 0;
 	uint32_t loacal_uid = 0;
-
+	unsigned int uids[17];
 	std::map<unsigned int, QWidget *> m_mapUidWidget;
 	AgoraSettings m_agoraSettings;
 private slots:

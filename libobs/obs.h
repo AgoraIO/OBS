@@ -2221,6 +2221,9 @@ EXPORT bool obs_service_agora_add_publish_stream_url(const obs_service_t *servic
 					 const char *url, bool transcoding);
 EXPORT bool obs_service_agora_remove_publish_stream_url(const obs_service_t *service,
 					    const char *url);
+EXPORT bool
+obs_service_agora_add_set_livetranscoding(const obs_service_t *service, int width, int height, int fps, int bitrate,
+					 const unsigned int *uids, int count);
 //end
 /* ------------------------------------------------------------------------- */
 /* Source frame allocation functions */

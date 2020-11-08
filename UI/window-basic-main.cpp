@@ -1415,7 +1415,7 @@ bool OBSBasic::InitBasicConfigDefaults()
 				  m_agoraSettings.appid.c_str());
 	//end
 	CheckExistingCookieId();
-	
+
 	return true;
 }
 
@@ -2487,7 +2487,6 @@ OBSBasic::~OBSBasic()
 
 	agoraService = nullptr;
 	agoraOutputHandler.reset();
-
 
 	if (interaction)
 		delete interaction;
@@ -5377,7 +5376,7 @@ void OBSBasic::on_actionUploadLastCrashLog_triggered()
 
 void OBSBasic::on_actionCheckForUpdates_triggered()
 {
-	CheckForUpdates(false);//agora
+	CheckForUpdates(false); //agora
 }
 
 void OBSBasic::logUploadFinished(const QString &text, const QString &error)
@@ -8474,18 +8473,21 @@ void OBSBasic::InitAgoraServiceSettings()
 	obs_data_set_int(settings, "fps", fps_num / fps_den);
 	obs_data_set_int(settings, "agora_client_role", 1);
 	obs_data_set_int(settings, "agora_uid", m_agoraSettings.uid);
+
 	obs_data_set_string(settings, "agora_channel",
 			    m_agoraSettings.channelName.c_str());
 	obs_data_set_string(settings, "agora_appid",
 			    m_agoraSettings.appid.c_str());
 	obs_data_set_string(settings, "agora_certificate",
 			    m_agoraSettings.appCerf.c_str());
+	
 	obs_data_set_bool(settings, "enableWebSdkInteroperability",
 			  true); //允许与websdk互通
 
 	if (config_has_user_value(basicConfig, "AgoraSettings", "PersistSave"))
 		m_agoraSettings.savePersist = config_get_bool(
 			basicConfig, "AgoraSettings", "PersistSave");
+
 	if (m_agoraSettings.savePersist) {
 		if (config_has_user_value(basicConfig, "AgoraSettings",
 					  "AppId"))
@@ -8518,6 +8520,35 @@ void OBSBasic::InitAgoraServiceSettings()
 			m_agoraSettings.muteAllRemoteAudioVideo =
 				config_get_bool(basicConfig, "AgoraSettings",
 						"muteAllRemoteAudioVideo");
+
+		if (config_has_user_value(basicConfig, "AgoraSettings",
+					  "AgoraRtmpUrl"))
+			m_agoraSettings.rtmp_url = config_get_string(
+				basicConfig, "AgoraSettings", "AgoraRtmpUrl");
+
+		if (config_has_user_value(basicConfig, "AgoraSettings",
+					  "AgoraRtmpFPS"))
+			m_agoraSettings.rtmp_fps = config_get_int(
+				basicConfig, "AgoraSettings", "AgoraRtmpFPS");
+
+		if (config_has_user_value(basicConfig, "AgoraSettings",
+					  "AgoraRtmpBitrate"))
+			m_agoraSettings.rtmp_bitrate = config_get_int(
+				basicConfig, "AgoraSettings", "AgoraRtmpBitrate");
+
+		
+		if (config_has_user_value(basicConfig, "AgoraSettings",
+					  "AgoraRtmpWidth"))
+			m_agoraSettings.rtmp_width =
+				config_get_int(basicConfig, "AgoraSettings",
+					       "AgoraRtmpWidth");
+
+		
+		if (config_has_user_value(basicConfig, "AgoraSettings",
+					  "AgoraRtmpHeight"))
+			m_agoraSettings.rtmp_height =
+				config_get_int(basicConfig, "AgoraSettings",
+					       "AgoraRtmpHeight");
 	}
 	obs_data_set_bool(settings, "muteAllRemoteAudioVideo",
 			  m_agoraSettings.muteAllRemoteAudioVideo);
@@ -8546,7 +8577,8 @@ void OBSBasic::on_agoraPKButton_clicked()
 {
 	if (agoraOutputHandler->AgoraActive()) {
 		std::string rtmp_url = "";
-		if (GetObsRtmpUrl(rtmp_url) && !rtmp_url.empty()) {
+		//if (GetObsRtmpUrl(rtmp_url) && !rtmp_url.empty())
+		if (!m_agoraSettings.rtmp_url.empty()) {
 			obs_service_agora_remove_publish_stream_url(
 				GetAgoraService(), rtmp_url.c_str());
 		}
@@ -8892,6 +8924,15 @@ void OBSBasic::OnUserOffline(long long uid)
 		}
 	}
 
+	if (m_lstRemoteVideoUids.size() < 16) {
+		int i = 0;
+		uids[i++] = loacal_uid;
+		for (auto iter : m_lstRemoteVideoUids) {
+			uids[i++] = iter;
+		}
+		SetLiveTranscoding();
+	}
+
 	if (!bFind)
 		return;
 
@@ -9034,6 +9075,16 @@ void OBSBasic::OnFirstRemoteVideoDecoded(long long uid, long long width,
 				.remoteVideo->winId());
 		//if (count < REMOTE_VIDEO_COUNT)
 	}
+
+	//set live transcoding
+	if (m_lstRemoteVideoUids.size() > 15)
+		return;
+	int i = 0;
+	uids[i++] = loacal_uid;
+	for (auto iter : m_lstRemoteVideoUids) {
+		uids[i++] = iter;
+	}
+	SetLiveTranscoding();
 }
 
 void OBSBasic::OnUserJoined(long long uid)
@@ -9041,13 +9092,24 @@ void OBSBasic::OnUserJoined(long long uid)
 	m_lstUids.push_back(uid);
 }
 
+void OBSBasic::SetLiveTranscoding()
+{
+	obs_service_agora_add_set_livetranscoding(GetAgoraService(), m_agoraSettings.rtmp_width, m_agoraSettings.rtmp_height,
+						  m_agoraSettings.rtmp_fps, m_agoraSettings.rtmp_bitrate,
+						  uids, m_lstUids.size() + 1);
+}
+
 void OBSBasic::OnJoinChannelSuccess(QString channel, long long uid,
 				    long long elapsed)
 {
-	std::string rtmp_url = "";
-	if (GetObsRtmpUrl(rtmp_url) && !rtmp_url.empty()) {
+	loacal_uid = uid;
+	uids[0] = uid;
+	SetLiveTranscoding();
+	if (!m_agoraSettings.rtmp_url.empty()) {
+
 		obs_service_agora_add_publish_stream_url(
-			GetAgoraService(), rtmp_url.c_str(), false);
+			GetAgoraService(), m_agoraSettings.rtmp_url.c_str(),
+			true);
 	}
 }
 

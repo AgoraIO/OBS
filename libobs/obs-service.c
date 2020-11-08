@@ -464,4 +464,17 @@ bool obs_service_agora_remove_publish_stream_url(const obs_service_t *service,
 
 	return false;
 }
+
+bool obs_service_agora_add_set_livetranscoding(const obs_service_t *service, int width, int height,
+	int fps, int bitrate, const unsigned int *uids,  int count)
+{
+	if (!obs_service_valid(service,
+			       "obs_service_agora_add_set_livetranscoding"))
+		return false;
+
+	if (service->info.set_agora_live_transcoding)
+		return service->info.set_agora_live_transcoding(uids, count, fps, bitrate, width, height);
+
+	return false;
+}
 //end
