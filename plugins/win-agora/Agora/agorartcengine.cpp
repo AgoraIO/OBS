@@ -521,6 +521,9 @@ bool AgoraRtcEngine::setVideoProfileEx(int nWidth, int nHeight, int nFrameRate,
 {
 	AParameter apm(m_rtcEngine);
 	apm->setParameters("{\"che.video.freestyle_customer\": true}");
+	//apm->setParameters("{\"enable_hw_encoder\": false}");
+	apm->setParameters("{\"engine.video.enable_hw_encoder\": \"false\"}");
+	
 	VideoEncoderConfiguration config;
 	config.dimensions.width = nWidth;
 	config.dimensions.height = nHeight;
@@ -530,6 +533,7 @@ bool AgoraRtcEngine::setVideoProfileEx(int nWidth, int nHeight, int nFrameRate,
 		config.orientationMode = ORIENTATION_MODE_FIXED_PORTRAIT;
 	else
 		config.orientationMode = ORIENTATION_MODE_FIXED_LANDSCAPE;
+
 	int nRet = m_rtcEngine->setVideoEncoderConfiguration(config);
 
 	return nRet == 0 ? true : false;
