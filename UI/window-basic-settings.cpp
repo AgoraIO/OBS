@@ -4920,6 +4920,7 @@ void OBSBasicSettings::SaveAgoraSettings()
 {
 	AgoraSettings settings;
 	QString strAppid = ui->lineEditAppid->text().toUtf8();
+	strAppid = strAppid.trimmed();
 	if (!strAppid.isEmpty())
 		settings.appid = strAppid.toUtf8();
 	settings.appCerf = ui->lineEditToken->text().toUtf8();

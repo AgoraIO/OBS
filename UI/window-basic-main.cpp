@@ -8618,13 +8618,13 @@ void OBSBasic::on_agoraPKButton_clicked()
 		}
 
 		ui->agoraPKButton->setText(
-			QTStr("Basic.Main.StartAgoraStreaming"));
+			QTStr("Basic.Main.StopAgoraStreaming"));
 		SetControlWhenPK(true);
 		MuteAudioDevice(true);
 		if (!agoraOutputHandler->StartAgora(agoraService)) {
 			SetControlWhenPK(false);
 			ui->agoraPKButton->setText(
-				QTStr("Basic.Main.StopAgoraStreaming"));
+				QTStr("Basic.Main.StartAgoraStreaming"));
 		}
 
 		//for test
@@ -8867,7 +8867,7 @@ void OBSBasic::OnInitRtcEngineFailed(long long code)
 		OBSMessageBox::information(this, QString("Agora"),
 					   QString("Init Agora Engine Failed"));
 	}
-	SetControlWhenPK(false);
+	
 	//SetPreviewPK(false);
 }
 
@@ -9123,4 +9123,7 @@ void OBSBasic::OnTokenPrivilegeWillExpire()
 	obs_service_update(agoraService, settings);
 }
 
-void OBSBasic::OnError(int err, const char *msg) {}
+void OBSBasic::OnError(int err, const char *msg)
+{
+	blog(LOG_ERROR, "Agora initialize ret error, err:%d, msg:%s", err, msg);
+}

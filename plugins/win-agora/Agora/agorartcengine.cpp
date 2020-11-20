@@ -241,6 +241,7 @@ bool AgoraRtcEngine::InitEngine(std::string appid)
 		signal_handler_signal(
 			obs_service_get_signal_handler(agoraService),
 			"initRtcEngineFailed", &params);
+		blog(LOG_ERROR, "Agora initialize ret, appid: %s, error: %d", appid.c_str(), ret);
 		return false;
 	}
 

@@ -148,7 +148,7 @@ private:
 	std::unique_ptr<Ui::ColorSelect> ui;
 };
 
-class OBSBasic : public OBSMainWindow {
+class OBSBasic : public OBSMainWindow  {
 	Q_OBJECT
 	Q_PROPERTY(QIcon imageIcon READ GetImageIcon WRITE SetImageIcon
 			   DESIGNABLE true)

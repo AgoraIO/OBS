@@ -170,9 +170,7 @@ bool AgoraService_Initialize(void *data, obs_output_t *output)
 	AgoraRtcEngine *agora_engine = AgoraRtcEngine::GetInstance();
 
 	if (!agora_engine->bInit) {
-		if (!agora_engine->InitEngine(
-			    service_data
-				    ->agora_appid)) // init agora engine failed
+		if (!agora_engine->InitEngine(service_data->agora_appid)) // init agora engine failed
 			return false;
 		agora_engine->bInit = true;
 	}
