@@ -23,7 +23,7 @@
 * 设置windows环境变量：
     * DepsPath 
 
-          **下载并解压[dedependencies2017_agora.zip](github.com/AgoraIO/OBS/releases/download/2.7.1/dependencies2017_agora.zip)** 之后的目录下有个win32或者win64文件夹，作为路径。
+          **下载并解压[dedependencies2017_2.7.1.1.zip](github.com/AgoraIO/OBS/releases/download/2.7.1.1/dependencies2017_2.7.1.1.zip)** 之后的目录下有个win32或者win64文件夹，作为路径。
     * QTDir
 
            QT 5.14.2 目录下的msvc2017。其他5.0以上版本的QT也可以，只要支持对应的vs版本即可。

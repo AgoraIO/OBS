@@ -25,7 +25,7 @@
     * Set variables in windows environment:
         * DepsPath 
 
-               The path where win32 or win64 is located after decompressing [dedependencies2017_agora.zip](github.com/AgoraIO/OBS/releases/download/2.7.1/dependencies2017_agora.zip)
+               The path where win32 or win64 is located after decompressing [dedependencies2017_2.7.1.1.zip](github.com/AgoraIO/OBS/releases/download/2.7.1.1/dependencies2017_2.7.1.1.zip)
         * QTDir
 
                The path where win32 is loacted after installed QT 5.14.2
