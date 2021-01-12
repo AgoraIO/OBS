@@ -8518,7 +8518,46 @@ void OBSBasic::InitAgoraServiceSettings()
 			m_agoraSettings.muteAllRemoteAudioVideo =
 				config_get_bool(basicConfig, "AgoraSettings",
 						"muteAllRemoteAudioVideo");
+
+		if (config_has_user_value(basicConfig, "AgoraSettings",
+					  "AudioProfileScenario"))
+			m_agoraSettings.audioProfileScenario =
+				config_get_bool(basicConfig, "AgoraSettings",
+						"AudioProfileScenario");
+
+		if (config_has_user_value(basicConfig, "AgoraSettings",
+					  "AudioHighQuality"))
+			m_agoraSettings.bAudioHighQuality =
+				config_get_bool(basicConfig, "AgoraSettings",
+						"AudioHighQuality");
 	}
+
+	int audio_profile = 0;
+
+	uint32_t audio_bitrate =
+		config_get_uint(basicConfig, "SimpleOutput", "ABitrate");
+	const char *speakers =
+		config_get_string(basicConfig, "Audio", "ChannelSetup");
+
+	if (strcmp(speakers, "Mono") == 0) { //
+		if (m_agoraSettings.bAudioHighQuality) {
+			audio_profile = 4; //AUDIO_PROFILE_MUSIC_HIGH_QUALITY
+		} else {
+			audio_profile = 2; //AUDIO_PROFILE_MUSIC_STANDARD
+		}
+	} else { //stereo 2.1 3.1
+		if (m_agoraSettings.bAudioHighQuality) {
+			audio_profile = 5; //AUDIO_PROFILE_MUSIC_HIGH_QUALITY_STEREO
+		} else {
+			audio_profile = 3; //AUDIO_PROFILE_MUSIC_STANDARD_STEREO
+		}
+	}
+
+	obs_data_set_int(settings, "agora_audio_profile",
+			 audio_profile);
+	obs_data_set_int(settings, "agora_audio_scenario",
+			 m_agoraSettings.audioProfileScenario);
+
 	obs_data_set_bool(settings, "muteAllRemoteAudioVideo",
 			  m_agoraSettings.muteAllRemoteAudioVideo);
 	struct obs_audio_info ai;
@@ -9079,9 +9118,11 @@ void OBSBasic::OnTokenPrivilegeWillExpire()
 void OBSBasic::OnConnectionStateChanged(long long reason)
 {
 	if (reason == 8) { //CONNECTION_CHANGED_INVALID_TOKEN
-		OBSErrorBox(NULL,QTStr("Basic.Main.Agora.Invalid.Token").toStdString().c_str());
+		OBSErrorBox(NULL, QTStr("Basic.Main.Agora.Invalid.Token")
+					  .toStdString()
+					  .c_str());
 		on_agoraPKButton_clicked();
-	} else if (reason == 9) {//CONNECTION_CHANGED_TOKEN_EXPIRED
+	} else if (reason == 9) { //CONNECTION_CHANGED_TOKEN_EXPIRED
 		OBSErrorBox(NULL, QTStr("Basic.Main.Agora.Token.Expired")
 					  .toStdString()
 					  .c_str());
@@ -9091,7 +9132,7 @@ void OBSBasic::OnConnectionStateChanged(long long reason)
 					  .toStdString()
 					  .c_str());
 		on_agoraPKButton_clicked();
-		 
+
 	} else if (reason == 7) { //CONNECTION_CHANGED_INVALID_CHANNEL_NAME
 		OBSErrorBox(NULL, QTStr("Basic.Main.Agora.Invalid.Channel")
 					  .toStdString()

@@ -866,6 +866,32 @@ OBSBasicSettings::OBSBasicSettings(QWidget *parent)
 	QValidator *validator = new QRegExpValidator(rx, this);
 	ui->baseResolution->lineEdit()->setValidator(validator);
 	ui->outputResolution->lineEdit()->setValidator(validator);
+
+	int index = 0;
+	ui->cmbAgoraAudioProfile->insertItem(
+		index++,
+		QTStr("Basic.Settings.Agora.AudioProfile.DefaultScenario"));
+	ui->cmbAgoraAudioProfile->insertItem(
+		index++,
+		QTStr("Basic.Settings.Agora.AudioProfile.ChatRoomScenario"));
+	ui->cmbAgoraAudioProfile->insertItem(
+		index++,
+		QTStr("Basic.Settings.Agora.AudioProfile.EducationScenario"));
+	ui->cmbAgoraAudioProfile->insertItem(
+		index++,
+		QTStr("Basic.Settings.Agora.AudioProfile.GameStreamingScenario"));
+	ui->cmbAgoraAudioProfile->insertItem(
+		index++,
+		QTStr("Basic.Settings.Agora.AudioProfile.ShowRoomScenario"));
+	ui->cmbAgoraAudioProfile->insertItem(
+		index++,
+		QTStr("Basic.Settings.Agora.AudioProfile.ChatRoomGameScenario"));
+	ui->cmbAgoraAudioProfile->insertItem(
+		index++,
+		QTStr("Basic.Settings.Agora.AudioProfile.IOTScenario"));
+	ui->cmbAgoraAudioProfile->insertItem(
+		index++,
+		QTStr("Basic.Settings.Agora.AudioProfile.MettingScenario"));
 }
 
 OBSBasicSettings::~OBSBasicSettings()
@@ -4885,11 +4911,11 @@ void OBSBasicSettings::LoadAgoraSettings()
 	AgoraSettings settings;
 	main->GetAgoraSettings(settings);
 
-	ui->lineEditToken->setText(
-		QString::fromUtf8(settings.token.data()));
+	ui->lineEditToken->setText(QString::fromUtf8(settings.token.data()));
 
 	ui->lineEditAppid->setText(QString::fromUtf8(settings.appid.data()));
-	ui->lineEditAppCertificate->setText(QString::fromUtf8(settings.appCerf.data()));
+	ui->lineEditAppCertificate->setText(
+		QString::fromUtf8(settings.appCerf.data()));
 	ui->lineEditChannel->setText(
 		QString::fromUtf8(settings.channelName.data()));
 	if (settings.uid > 0) {
@@ -4901,6 +4927,10 @@ void OBSBasicSettings::LoadAgoraSettings()
 	QString strExpired = QString("%1").arg(settings.expiredTime);
 	ui->lineEditExpiredTs->setText(strExpired);
 	loading = false;
+
+	ui->cmbAgoraAudioProfile->setCurrentIndex(
+		settings.audioProfileScenario);
+	ui->chkAudioHighQuality->setChecked(settings.bAudioHighQuality);
 }
 
 void OBSBasicSettings::SaveAgoraSettings()
@@ -4926,6 +4956,11 @@ void OBSBasicSettings::SaveAgoraSettings()
 	settings.expiredTimeTs = settings.expiredTime * 60 * 60;
 	settings.savePersist = ui->chkPersistSaving->isChecked();
 	settings.muteAllRemoteAudioVideo = ui->chkMuteAllRemoteAV->isChecked();
+
+	settings.audioProfileScenario =
+		ui->cmbAgoraAudioProfile->currentIndex();
+	settings.bAudioHighQuality = ui->chkAudioHighQuality->isChecked();
+
 	main->SetAgoraSettings(settings);
 
 	SaveCheckBox(ui->chkPersistSaving, "AgoraSettings", "PersistSave");
@@ -4950,10 +4985,14 @@ void OBSBasicSettings::SaveAgoraSettings()
 			SaveEdit(ui->lineEditChannel, "AgoraSettings",
 				 "ChannelName");
 
+		SaveCombo(ui->cmbAgoraAudioProfile, "AgoraSettings",
+			  "AudioProfileScenario");
+
+		SaveCheckBox(ui->chkAudioHighQuality, "AgoraSettings",
+			     "AudioHighQuality");
 		SaveCheckBox(ui->chkMuteAllRemoteAV, "AgoraSettings",
 			     "MuteAllRemoteAudioVideo",
 			     settings.muteAllRemoteAudioVideo);
-		
 	}
 }
 

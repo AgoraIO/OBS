@@ -160,8 +160,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>438</width>
-              <height>832</height>
+              <width>841</width>
+              <height>1233</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_19">
@@ -1272,8 +1272,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>469</width>
-              <height>561</height>
+              <width>965</width>
+              <height>711</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_21">
@@ -3767,8 +3767,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>444</width>
-              <height>433</height>
+              <width>922</width>
+              <height>540</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_50">
@@ -4623,8 +4623,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>472</width>
-              <height>710</height>
+              <width>940</width>
+              <height>903</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_23">
@@ -5445,8 +5445,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>820</width>
-              <height>627</height>
+              <width>863</width>
+              <height>583</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_23">
@@ -5537,6 +5537,16 @@
                      </property>
                     </spacer>
                    </item>
+                   <item row="7" column="0">
+                    <widget class="QLabel" name="labelToken">
+                     <property name="text">
+                      <string>Basic.Settings.Agora.APPTOKEN</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="7" column="1">
+                    <widget class="QLineEdit" name="lineEditToken"/>
+                   </item>
                    <item row="8" column="0">
                     <widget class="QLabel" name="labelAppCertificate">
                      <property name="text">
@@ -5546,6 +5556,16 @@
                    </item>
                    <item row="8" column="1">
                     <widget class="QLineEdit" name="lineEditAppCertificate"/>
+                   </item>
+                   <item row="9" column="0">
+                    <widget class="QLabel" name="label_45">
+                     <property name="text">
+                      <string>Basic.Settings.Agora.Token.Expired</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="9" column="1">
+                    <widget class="QLineEdit" name="lineEditExpiredTs"/>
                    </item>
                    <item row="10" column="0">
                     <widget class="QLabel" name="labelChannelName">
@@ -5571,16 +5591,6 @@
                      </item>
                     </layout>
                    </item>
-                   <item row="9" column="0">
-                    <widget class="QLabel" name="label_45">
-                     <property name="text">
-                      <string>Basic.Settings.Agora.Token.Expired</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="9" column="1">
-                    <widget class="QLineEdit" name="lineEditExpiredTs"/>
-                   </item>
                    <item row="11" column="0">
                     <widget class="QCheckBox" name="chkPersistSaving">
                      <property name="text">
@@ -5595,15 +5605,29 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="7" column="0">
-                    <widget class="QLabel" name="labelToken">
+                   <item row="12" column="0">
+                    <widget class="QLabel" name="labelAudioProfile">
                      <property name="text">
-                      <string>Basic.Settings.Agora.APPTOKEN</string>
+                      <string>Basic.Settings.Agora.AudioProfile.Scenario</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="7" column="1">
-                    <widget class="QLineEdit" name="lineEditToken"/>
+                   <item row="12" column="1">
+                    <widget class="QComboBox" name="cmbAgoraAudioProfile"/>
+                   </item>
+                   <item row="13" column="1">
+                    <widget class="QLabel" name="labAudioProfileInfo">
+                     <property name="text">
+                      <string>Basic.Settings.Agora.AudioProfile.SuggestScenario</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="13" column="0">
+                    <widget class="QCheckBox" name="chkAudioHighQuality">
+                     <property name="text">
+                      <string>Basic.Settings.Agora.AudioProfile.High</string>
+                     </property>
+                    </widget>
                    </item>
                   </layout>
                  </widget>

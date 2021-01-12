@@ -49,6 +49,7 @@ public:
 	int joinChannel(const std::string &key, const std::string &channel,
 			unsigned uid);
 	int leaveChannel();
+	void SetAudioProfile(int profile, int scenario);
 
 	bool  keepPreRotation(bool bRotate);
 	bool  setVideoProfileEx(int nWidth, int nHeight, int nFrameRate, int nBitRate);

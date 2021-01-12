@@ -90,6 +90,9 @@ typedef struct tagAgoraSettings {
 	uint32_t expiredTimeTs = 0;
 	bool savePersist = false;
 	bool muteAllRemoteAudioVideo = false;
+	int audioProfileScenario = 0;
+	bool bAudioHighQuality = false;
+	
 } AgoraSettings, *PAgoraSettings;
 
 struct AgoraOutputHandler;

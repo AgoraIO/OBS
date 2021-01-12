@@ -428,6 +428,11 @@ int AgoraRtcEngine::leaveChannel()
 	return r;
 }
 
+void AgoraRtcEngine::SetAudioProfile(int profile, int scenario) {
+	m_rtcEngine->setAudioProfile((agora::rtc::AUDIO_PROFILE_TYPE)profile,
+				     (agora::rtc::AUDIO_SCENARIO_TYPE)scenario);
+}
+
 int AgoraRtcEngine::enableVideo(bool enabled)
 {
 	return enabled ? m_rtcEngine->enableVideo()
