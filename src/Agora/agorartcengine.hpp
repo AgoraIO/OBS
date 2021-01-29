@@ -1,0 +1,127 @@
+#pragma once
+
+#include <QObject>
+#include <memory>
+#include <IAgoraRtcEngine.h>
+#include <IAgoraMediaEngine.h>
+#include <string>
+#include "obs.h"
+#include <mutex>
+
+using namespace agora;
+using namespace agora::rtc;
+using namespace agora::util;
+using namespace agora::base;
+using namespace agora::media;
+
+Q_DECLARE_METATYPE(RtcStats)
+typedef struct _DEVICEINFO {
+	std::string id;
+	std::string name;
+}DEVICEINFO,*PDEVICEINFO;
+class AgoraRtcEngine : public QObject
+{
+	 Q_OBJECT
+public:
+	explicit AgoraRtcEngine();
+	~AgoraRtcEngine();
+	static AgoraRtcEngine* GetInstance();
+	static void ReleaseInstance();
+	bool IsInitialize() { return m_bInitialize; }
+	bool IsJoinChannel() { return m_bJoinChannel; }
+	bool InitEngine(std::string appid);
+
+	BOOL setLogPath(std::string path);
+	BOOL setClientRole(CLIENT_ROLE_TYPE role, LPCSTR lpPermissionKey = NULL);
+	int  setChannelProfile(CHANNEL_PROFILE_TYPE profile);
+
+	int enableVideo(bool enabled);
+	int  setLocalVideoMirrorMode(VIDEO_MIRROR_MODE_TYPE mirrorMode);
+	void startPreview();
+	void stopPreview();
+
+	int joinChannel(const std::string &key, const std::string &channel,
+			unsigned uid);
+	int leaveChannel();
+	
+	bool  keepPreRotation(bool bRotate);
+	bool  setVideoProfileEx(int nWidth, int nHeight, int nFrameRate, int nBitRate);
+	bool  enableLocalCameara(bool bEnable);
+
+	bool enableExtendPlayDevice(bool bEnable);
+
+	void* AgoraAudioObserver_Create();
+	void  AgoraAudioObserver_Destroy();
+	
+	int AddPublishStreamUrl(const char *url, bool transcodingEnabled);
+	int RemovePublishStreamUrl(const char *url);
+	int SetLiveTranscoding(const LiveTranscoding &transcoding);
+
+	int EnableWebSdkInteroperability(bool enabled);
+	//playout device
+	int  getPalyoutDeviceVolume();
+	int  setPalyoutDeviceVolume(int volume);
+	bool getPlayoutDevices(std::vector<DEVICEINFO>& devices);
+	void SetPlayoutDevice(const char* id);
+	int  testSpeaker(bool start);
+	void EnableAgoraCaptureMicAudio(bool bCapture);
+
+	void PushVideoFrame(struct video_data *frame);
+	void PushAudioFrame(struct encoder_frame *frame);
+	
+	int setupRemoteVideo(unsigned int uid, void* view);
+	agora::rtc::IRtcEngine* getRtcEngine() { return m_rtcEngine; }//.get();}
+
+	int agora_fps = 15;
+	int agora_out_cx = 640;
+	int agora_out_cy = 360;
+	int agora_video_bitrate = 500;
+	
+	void joinedChannelSuccess(const char* channel, unsigned int uid, int elapsed);
+	int audioChannel = 2;
+	int sampleRate = 44100;
+	
+	void logAudioFrameTimestamp();
+	void enableLogTimestamp(bool bEnable);
+	std::string CalculateToken(std::string appid, const std::string &key,
+				   const std::string &channel, unsigned int uid,
+				   unsigned int privilegeExpiredTs);
+
+	void SetAudioProfile(int scenario, int channels, bool bHighQuality);
+
+signals:
+	void onJoinChannelSuccess(const char* channel, unsigned int uid, int elapsed);
+	void onLeaveChannel(const RtcStats &stats);
+	void onError(int err, const char *msg);
+	void onUserJoined(unsigned int uid, int elapsed);
+	void onUserOffline(unsigned int uid, int reason);
+	void onFirstRemoteVideoDecoded(unsigned int uid, int width, int height,
+		int elapsed);
+private:
+	friend class AgoraRtcEngineEvent;
+private:
+	
+	agora::rtc::IRtcEngine* m_rtcEngine = nullptr;
+	static AgoraRtcEngine* m_agoraEngine;
+	std::unique_ptr<agora::rtc::IRtcEngineEventHandler> m_eventHandler;
+	bool m_bJoinChannel = false;
+	bool m_bInitialize = false;
+	bool logFirstPushVideo = false;
+	bool bInit = false;
+
+	agora::media::IMediaEngine* m_pMediaEngine = nullptr;
+	
+	int m_externalVideoFrameSize;
+	enum video_format m_format;
+	agora::media::ExternalVideoFrame m_externalVideoFrame;
+	int m_externalAudioFrameSize;
+	static agora::media::IAudioFrameObserver::AudioFrame m_externalAudioframe;
+	
+	bool m_bHighQuality = false;
+	AUDIO_SCENARIO_TYPE m_scenario = AUDIO_SCENARIO_DEFAULT;
+
+	void SetExternalVideoFrame();
+	
+	AAudioDeviceManager* m_audioDeviceManager = nullptr;
+};
+

@@ -100,3 +100,8 @@ tags
 .DS_Store
 */.DS_Store
 */**/.DS_Store
+*.exe
+
+deps/libyuv/x86
+deps/libyuv/x64
+deps/Agora/
