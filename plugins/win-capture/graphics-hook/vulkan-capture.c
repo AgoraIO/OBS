@@ -13,6 +13,8 @@
 #include <dxgi.h>
 #include <d3d11.h>
 
+#include "dxgi-helpers.hpp"
+
 #include "vulkan-capture.h"
 
 /* ======================================================================== */
@@ -79,6 +81,8 @@ struct vk_surf_data {
 
 struct vk_inst_data {
 	struct vk_obj_node node;
+
+	VkInstance instance;
 
 	bool valid;
 
@@ -489,20 +493,22 @@ static struct vk_inst_data *alloc_inst_data(const VkAllocationCallbacks *ac)
 	return idata;
 }
 
-static void init_inst_data(struct vk_inst_data *data, VkInstance inst)
+static void init_inst_data(struct vk_inst_data *idata, VkInstance instance)
 {
-	add_obj_data(&instances, (uint64_t)GET_LDT(inst), data);
+	add_obj_data(&instances, (uint64_t)GET_LDT(instance), idata);
+	idata->instance = instance;
 }
 
-static struct vk_inst_data *get_inst_data(VkInstance inst)
+static struct vk_inst_data *get_inst_data(VkInstance instance)
 {
 	return (struct vk_inst_data *)get_obj_data(&instances,
-						   (uint64_t)GET_LDT(inst));
+						   (uint64_t)GET_LDT(instance));
 }
 
-static struct vk_inst_funcs *get_inst_funcs(VkInstance inst)
+static struct vk_inst_funcs *get_inst_funcs(VkInstance instance)
 {
-	struct vk_inst_data *idata = (struct vk_inst_data *)get_inst_data(inst);
+	struct vk_inst_data *idata =
+		(struct vk_inst_data *)get_inst_data(instance);
 	return &idata->funcs;
 }
 
@@ -627,12 +633,13 @@ static inline bool vk_shtex_init_d3d11_tex(struct vk_data *data,
 	desc.Height = height;
 	desc.MipLevels = 1;
 	desc.ArraySize = 1;
-	desc.Format = format;
+	desc.Format = apply_dxgi_format_typeless(
+		format, global_hook_info->allow_srgb_alias);
 	desc.SampleDesc.Count = 1;
 	desc.SampleDesc.Quality = 0;
 	desc.Usage = D3D11_USAGE_DEFAULT;
 	desc.MiscFlags = D3D11_RESOURCE_MISC_SHARED;
-	desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 
 	hr = ID3D11Device_CreateTexture2D(data->d3d11_device, &desc, NULL,
 					  &swap->d3d11_tex);
@@ -1439,7 +1446,7 @@ static VkResult VKAPI_CALL OBS_CreateDevice(VkPhysicalDevice phy_device,
 	/* create device and initialize hook data                   */
 
 	PFN_vkCreateDevice createFunc =
-		(PFN_vkCreateDevice)gipa(VK_NULL_HANDLE, "vkCreateDevice");
+		(PFN_vkCreateDevice)gipa(idata->instance, "vkCreateDevice");
 
 	ret = createFunc(phy_device, info, ac, p_device);
 	if (ret != VK_SUCCESS) {
@@ -1742,21 +1749,21 @@ static void VKAPI_CALL OBS_DestroySurfaceKHR(VkInstance inst, VkSurfaceKHR surf,
 	destroy_surface(inst, surf, ac);
 }
 
-#define GETPROCADDR(func)              \
-	if (!strcmp(name, "vk" #func)) \
+#define GETPROCADDR(func)               \
+	if (!strcmp(pName, "vk" #func)) \
 		return (PFN_vkVoidFunction)&OBS_##func;
 
-#define GETPROCADDR_IF_SUPPORTED(func) \
-	if (!strcmp(name, "vk" #func)) \
+#define GETPROCADDR_IF_SUPPORTED(func)  \
+	if (!strcmp(pName, "vk" #func)) \
 		return funcs->func ? (PFN_vkVoidFunction)&OBS_##func : NULL;
 
-static PFN_vkVoidFunction VKAPI_CALL OBS_GetDeviceProcAddr(VkDevice dev,
-							   const char *name)
+static PFN_vkVoidFunction VKAPI_CALL OBS_GetDeviceProcAddr(VkDevice device,
+							   const char *pName)
 {
-	struct vk_data *data = get_device_data(dev);
+	struct vk_data *data = get_device_data(device);
 	struct vk_device_funcs *funcs = &data->funcs;
 
-	debug_procaddr("vkGetDeviceProcAddr(%p, \"%s\")", dev, name);
+	debug_procaddr("vkGetDeviceProcAddr(%p, \"%s\")", device, pName);
 
 	GETPROCADDR(GetDeviceProcAddr);
 	GETPROCADDR(DestroyDevice);
@@ -1766,24 +1773,43 @@ static PFN_vkVoidFunction VKAPI_CALL OBS_GetDeviceProcAddr(VkDevice dev,
 
 	if (funcs->GetDeviceProcAddr == NULL)
 		return NULL;
-	return funcs->GetDeviceProcAddr(dev, name);
+	return funcs->GetDeviceProcAddr(device, pName);
 }
 
-static PFN_vkVoidFunction VKAPI_CALL OBS_GetInstanceProcAddr(VkInstance inst,
-							     const char *name)
+/* bad layers require spec violation */
+#define RETURN_FP_FOR_NULL_INSTANCE 1
+
+static PFN_vkVoidFunction VKAPI_CALL
+OBS_GetInstanceProcAddr(VkInstance instance, const char *pName)
 {
-	debug_procaddr("vkGetInstanceProcAddr(%p, \"%s\")", inst, name);
+	debug_procaddr("vkGetInstanceProcAddr(%p, \"%s\")", instance, pName);
 
 	/* instance chain functions we intercept */
 	GETPROCADDR(GetInstanceProcAddr);
 	GETPROCADDR(CreateInstance);
 
-	if (inst == NULL)
+#if RETURN_FP_FOR_NULL_INSTANCE
+	/* other instance chain functions we intercept */
+	GETPROCADDR(DestroyInstance);
+	GETPROCADDR(CreateWin32SurfaceKHR);
+	GETPROCADDR(DestroySurfaceKHR);
+
+	/* device chain functions we intercept */
+	GETPROCADDR(GetDeviceProcAddr);
+	GETPROCADDR(CreateDevice);
+	GETPROCADDR(DestroyDevice);
+
+	if (instance == NULL)
 		return NULL;
 
-	struct vk_inst_funcs *funcs = get_inst_funcs(inst);
+	struct vk_inst_funcs *const funcs = get_inst_funcs(instance);
+#else
+	if (instance == NULL)
+		return NULL;
 
-	/* instance chain functions we intercept */
+	struct vk_inst_funcs *const funcs = get_inst_funcs(instance);
+
+	/* other instance chain functions we intercept */
 	GETPROCADDR(DestroyInstance);
 	GETPROCADDR_IF_SUPPORTED(CreateWin32SurfaceKHR);
 	GETPROCADDR_IF_SUPPORTED(DestroySurfaceKHR);
@@ -1792,9 +1818,10 @@ static PFN_vkVoidFunction VKAPI_CALL OBS_GetInstanceProcAddr(VkInstance inst,
 	GETPROCADDR(GetDeviceProcAddr);
 	GETPROCADDR(CreateDevice);
 	GETPROCADDR(DestroyDevice);
-	if (funcs->GetInstanceProcAddr == NULL)
-		return NULL;
-	return funcs->GetInstanceProcAddr(inst, name);
+#endif
+
+	const PFN_vkGetInstanceProcAddr gipa = funcs->GetInstanceProcAddr;
+	return gipa ? gipa(instance, pName) : NULL;
 }
 
 #undef GETPROCADDR

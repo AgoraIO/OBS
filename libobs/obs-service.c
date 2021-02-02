@@ -55,7 +55,7 @@ static obs_service_t *obs_service_create_internal(const char *id,
 		blog(LOG_ERROR, "Service '%s' not found", id);
 		return NULL;
 	}
-
+	
 	service = bzalloc(sizeof(struct obs_service));
 
 	if (!obs_context_data_init(&service->context, OBS_OBJ_TYPE_SERVICE,
@@ -427,6 +427,55 @@ const char *obs_service_get_output_type(const obs_service_t *service)
 		return service->info.get_output_type(service->context.data);
 	return NULL;
 }
+
+void obs_service_get_supported_resolutions(
+	const obs_service_t *service,
+	struct obs_service_resolution **resolutions, size_t *count)
+{
+	if (!obs_service_valid(service, "obs_service_supported_resolutions"))
+		return;
+	if (!obs_ptr_valid(resolutions, "obs_service_supported_resolutions"))
+		return;
+	if (!obs_ptr_valid(count, "obs_service_supported_resolutions"))
+		return;
+
+	*resolutions = NULL;
+	*count = 0;
+
+	if (service->info.get_supported_resolutions)
+		service->info.get_supported_resolutions(service->context.data,
+							resolutions, count);
+}
+
+void obs_service_get_max_fps(const obs_service_t *service, int *fps)
+{
+	if (!obs_service_valid(service, "obs_service_get_max_fps"))
+		return;
+	if (!obs_ptr_valid(fps, "obs_service_get_max_fps"))
+		return;
+
+	*fps = 0;
+
+	if (service->info.get_max_fps)
+		service->info.get_max_fps(service->context.data, fps);
+}
+
+void obs_service_get_max_bitrate(const obs_service_t *service,
+				 int *video_bitrate, int *audio_bitrate)
+{
+	if (video_bitrate)
+		*video_bitrate = 0;
+	if (audio_bitrate)
+		*audio_bitrate = 0;
+
+	if (!obs_service_valid(service, "obs_service_get_max_bitrate"))
+		return;
+
+	if (service->info.get_max_bitrate)
+		service->info.get_max_bitrate(service->context.data,
+					      video_bitrate, audio_bitrate);
+}
+
 //add by agora
 bool obs_service_agora_setup_remote_video(const obs_service_t *service,
 					  unsigned int uid, void *view)

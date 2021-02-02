@@ -61,7 +61,7 @@
          <number>2</number>
         </property>
         <item>
-         <widget class="QWidget" name="previewDisabledWidget" native="true">
+         <widget class="QWidget" name="previewDisabledWidget">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>0</horstretch>
@@ -167,7 +167,7 @@
            </widget>
           </item>
           <item>
-           <widget class="OBSBasicPreview" name="preview" native="true">
+           <widget class="OBSBasicPreview" name="preview">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
               <horstretch>0</horstretch>
@@ -196,7 +196,7 @@
      </layout>
     </item>
     <item>
-     <widget class="QWidget" name="contextContainer" native="true">
+     <widget class="QWidget" name="contextContainer">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
         <horstretch>0</horstretch>
@@ -235,7 +235,7 @@
         <number>4</number>
        </property>
        <item>
-        <widget class="QWidget" name="contextSubContainer" native="true">
+        <widget class="QWidget" name="contextSubContainer">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
            <horstretch>0</horstretch>
@@ -367,6 +367,35 @@
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="sourceInteractButton">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>22</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>22</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Interact</string>
+            </property>
+            <property name="icon">
+             <iconset resource="obs.qrc">
+              <normaloff>:/res/images/interact.svg</normaloff>:/res/images/interact.svg</iconset>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+            <property name="themeID2" stdset="0">
+             <string notr="true">contextBarButton</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="Line" name="line">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
@@ -377,7 +406,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QWidget" name="emptySpace" native="true">
+        <widget class="QWidget" name="emptySpace">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -426,7 +455,7 @@
      <x>0</x>
      <y>0</y>
      <width>1079</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -649,7 +678,7 @@
   <widget class="OBSBasicStatusBar" name="statusbar"/>
   <widget class="OBSDock" name="scenesDock">
    <property name="features">
-    <set>QDockWidget::AllDockWidgetFeatures</set>
+    <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable|QDockWidget::DockWidgetFloatable</set>
    </property>
    <property name="windowTitle">
     <string>Basic.Main.Scenes</string>
@@ -784,7 +813,7 @@
   </widget>
   <widget class="OBSDock" name="sourcesDock">
    <property name="features">
-    <set>QDockWidget::AllDockWidgetFeatures</set>
+    <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable|QDockWidget::DockWidgetFloatable</set>
    </property>
    <property name="windowTitle">
     <string>Basic.Main.Sources</string>
@@ -920,7 +949,7 @@
   </widget>
   <widget class="OBSDock" name="mixerDock">
    <property name="features">
-    <set>QDockWidget::AllDockWidgetFeatures</set>
+    <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable|QDockWidget::DockWidgetFloatable</set>
    </property>
    <property name="windowTitle">
     <string>Mixer</string>
@@ -971,7 +1000,7 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>81</width>
+           <width>94</width>
            <height>16</height>
           </rect>
          </property>
@@ -1060,7 +1089,7 @@
   </widget>
   <widget class="OBSDock" name="transitionsDock">
    <property name="features">
-    <set>QDockWidget::AllDockWidgetFeatures</set>
+    <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable|QDockWidget::DockWidgetFloatable</set>
    </property>
    <property name="windowTitle">
     <string>Basic.SceneTransitions</string>
@@ -1083,7 +1112,7 @@
       <number>4</number>
      </property>
      <item>
-      <widget class="QWidget" name="transitionsContainer" native="true">
+      <widget class="QWidget" name="transitionsContainer">
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <property name="spacing">
          <number>2</number>
@@ -1221,7 +1250,7 @@
   </widget>
   <widget class="OBSDock" name="controlsDock">
    <property name="features">
-    <set>QDockWidget::AllDockWidgetFeatures</set>
+    <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable|QDockWidget::DockWidgetFloatable</set>
    </property>
    <property name="windowTitle">
     <string>Basic.Main.Controls</string>
@@ -1273,8 +1302,26 @@
      </item>
      <item>
       <widget class="QPushButton" name="agoraPKButton">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>150</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="text">
         <string>Basic.Main.StartAgoraStreaming</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

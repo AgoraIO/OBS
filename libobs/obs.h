@@ -68,6 +68,7 @@ typedef struct obs_weak_output obs_weak_output_t;
 typedef struct obs_weak_encoder obs_weak_encoder_t;
 typedef struct obs_weak_service obs_weak_service_t;
 
+#include "obs-missing-files.h"
 #include "obs-source.h"
 #include "obs-encoder.h"
 #include "obs-output.h"
@@ -209,6 +210,12 @@ struct obs_source_audio {
 	enum audio_format format;
 	uint32_t samples_per_sec;
 
+	uint64_t timestamp;
+};
+
+struct obs_source_cea_708 {
+	const uint8_t *data;
+	uint32_t packets;
 	uint64_t timestamp;
 };
 
@@ -422,6 +429,9 @@ EXPORT bool obs_init_module(obs_module_t *module);
 
 /** Returns a module based upon its name, or NULL if not found */
 EXPORT obs_module_t *obs_get_module(const char *name);
+
+/** Gets library of module */
+EXPORT void *obs_get_module_lib(obs_module_t *module);
 
 /** Returns locale text from a specific module */
 EXPORT bool obs_module_get_locale_string(const obs_module_t *mod,
@@ -900,6 +910,13 @@ EXPORT obs_data_t *obs_get_source_defaults(const char *id);
 /** Returns the property list, if any.  Free with obs_properties_destroy */
 EXPORT obs_properties_t *obs_get_source_properties(const char *id);
 
+EXPORT obs_missing_files_t *
+obs_source_get_missing_files(const obs_source_t *source);
+
+EXPORT void obs_source_replace_missing_file(obs_missing_file_cb cb,
+					    obs_source_t *source,
+					    const char *new_path, void *data);
+
 /** Returns whether the source has custom properties or not */
 EXPORT bool obs_is_source_configurable(const char *id);
 
@@ -1085,6 +1102,8 @@ EXPORT obs_source_t *obs_source_get_filter_by_name(obs_source_t *source,
 						   const char *name);
 
 EXPORT void obs_source_copy_filters(obs_source_t *dst, obs_source_t *src);
+EXPORT void obs_source_copy_single_filter(obs_source_t *dst,
+					  obs_source_t *filter);
 
 EXPORT bool obs_source_enabled(const obs_source_t *source);
 EXPORT void obs_source_set_enabled(obs_source_t *source, bool enabled);
@@ -1114,6 +1133,16 @@ EXPORT void obs_source_add_audio_capture_callback(
 	obs_source_t *source, obs_source_audio_capture_t callback, void *param);
 EXPORT void obs_source_remove_audio_capture_callback(
 	obs_source_t *source, obs_source_audio_capture_t callback, void *param);
+
+typedef void (*obs_source_caption_t)(void *param, obs_source_t *source,
+				     const struct obs_source_cea_708 *captions);
+
+EXPORT void obs_source_add_caption_callback(obs_source_t *source,
+					    obs_source_caption_t callback,
+					    void *param);
+EXPORT void obs_source_remove_caption_callback(obs_source_t *source,
+					       obs_source_caption_t callback,
+					       void *param);
 
 enum obs_deinterlace_mode {
 	OBS_DEINTERLACE_MODE_DISABLE,
@@ -1205,6 +1234,9 @@ EXPORT void obs_source_output_video2(obs_source_t *source,
 				     const struct obs_source_frame2 *frame);
 
 EXPORT void obs_source_set_async_rotation(obs_source_t *source, long rotation);
+
+EXPORT void obs_source_output_cea708(obs_source_t *source,
+				     const struct obs_source_cea_708 *captions);
 
 /**
  * Preloads asynchronous video data to allow instantaneous playback
@@ -1882,13 +1914,14 @@ EXPORT uint32_t obs_output_get_height(const obs_output_t *output);
 
 EXPORT const char *obs_output_get_id(const obs_output_t *output);
 
-#if BUILD_CAPTIONS
+EXPORT void obs_output_caption(obs_output_t *output,
+			       const struct obs_source_cea_708 *captions);
+
 EXPORT void obs_output_output_caption_text1(obs_output_t *output,
 					    const char *text);
 EXPORT void obs_output_output_caption_text2(obs_output_t *output,
 					    const char *text,
 					    double display_duration);
-#endif
 
 EXPORT float obs_output_get_congestion(obs_output_t *output);
 EXPORT int obs_output_get_connect_time_ms(obs_output_t *output);
@@ -2209,18 +2242,28 @@ EXPORT void *obs_service_get_type_data(obs_service_t *service);
 
 EXPORT const char *obs_service_get_id(const obs_service_t *service);
 
+EXPORT void obs_service_get_supported_resolutions(
+	const obs_service_t *service,
+	struct obs_service_resolution **resolutions, size_t *count);
+EXPORT void obs_service_get_max_fps(const obs_service_t *service, int *fps);
+
+EXPORT void obs_service_get_max_bitrate(const obs_service_t *service,
+					int *video_bitrate, int *audio_bitrate);
+
 /* NOTE: This function is temporary and should be removed/replaced at a later
  * date. */
 EXPORT const char *obs_service_get_output_type(const obs_service_t *service);
-
 //add by agora
-EXPORT signal_handler_t *obs_service_get_signal_handler(const obs_service_t *service);
+EXPORT signal_handler_t *
+obs_service_get_signal_handler(const obs_service_t *service);
 EXPORT bool obs_service_agora_setup_remote_video(const obs_service_t *service,
 						 unsigned int uid, void *view);
 //agora server publish rtmp to cdn
-EXPORT bool obs_service_agora_add_publish_stream_url(const obs_service_t *service,
+EXPORT bool
+obs_service_agora_add_publish_stream_url(const obs_service_t *service,
 					 const char *url, bool transcoding);
-EXPORT bool obs_service_agora_remove_publish_stream_url(const obs_service_t *service,
+EXPORT bool
+obs_service_agora_remove_publish_stream_url(const obs_service_t *service,
 					    const char *url);
 //end
 /* ------------------------------------------------------------------------- */

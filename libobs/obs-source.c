@@ -31,6 +31,8 @@
 #include "obs.h"
 #include "obs-internal.h"
 
+static bool filter_compatible(obs_source_t *source, obs_source_t *filter);
+
 static inline bool data_valid(const struct obs_source *source, const char *f)
 {
 	return obs_source_valid(source, f) && source->context.data;
@@ -182,6 +184,7 @@ static bool obs_source_init(struct obs_source *source)
 	pthread_mutex_init_value(&source->audio_mutex);
 	pthread_mutex_init_value(&source->audio_buf_mutex);
 	pthread_mutex_init_value(&source->audio_cb_mutex);
+	pthread_mutex_init_value(&source->caption_cb_mutex);
 
 	if (pthread_mutexattr_init(&attr) != 0)
 		return false;
@@ -198,6 +201,8 @@ static bool obs_source_init(struct obs_source *source)
 	if (pthread_mutex_init(&source->audio_mutex, NULL) != 0)
 		return false;
 	if (pthread_mutex_init(&source->async_mutex, NULL) != 0)
+		return false;
+	if (pthread_mutex_init(&source->caption_cb_mutex, NULL) != 0)
 		return false;
 
 	if (is_audio_source(source) || is_composite_source(source))
@@ -493,6 +498,32 @@ void obs_source_copy_filters(obs_source_t *dst, obs_source_t *src)
 	duplicate_filters(dst, src, dst->context.private);
 }
 
+static void duplicate_filter(obs_source_t *dst, obs_source_t *filter)
+{
+	if (!filter_compatible(dst, filter))
+		return;
+
+	char *new_name = get_new_filter_name(dst, filter->context.name);
+	bool enabled = obs_source_enabled(filter);
+
+	obs_source_t *dst_filter = obs_source_duplicate(filter, new_name, true);
+	obs_source_set_enabled(dst_filter, enabled);
+
+	bfree(new_name);
+	obs_source_filter_add(dst, dst_filter);
+	obs_source_release(dst_filter);
+}
+
+void obs_source_copy_single_filter(obs_source_t *dst, obs_source_t *filter)
+{
+	if (!obs_source_valid(dst, "obs_source_copy_single_filter"))
+		return;
+	if (!obs_source_valid(filter, "obs_source_copy_single_filter"))
+		return;
+
+	duplicate_filter(dst, filter);
+}
+
 obs_source_t *obs_source_duplicate(obs_source_t *source, const char *new_name,
 				   bool create_private)
 {
@@ -655,6 +686,7 @@ void obs_source_destroy(struct obs_source *source)
 
 	da_free(source->audio_actions);
 	da_free(source->audio_cb_list);
+	da_free(source->caption_cb_list);
 	da_free(source->async_cache);
 	da_free(source->async_frames);
 	da_free(source->filters);
@@ -663,6 +695,7 @@ void obs_source_destroy(struct obs_source *source)
 	pthread_mutex_destroy(&source->audio_buf_mutex);
 	pthread_mutex_destroy(&source->audio_cb_mutex);
 	pthread_mutex_destroy(&source->audio_mutex);
+	pthread_mutex_destroy(&source->caption_cb_mutex);
 	pthread_mutex_destroy(&source->async_mutex);
 	obs_data_release(source->private_settings);
 	obs_context_data_free(&source->context);
@@ -809,6 +842,28 @@ obs_properties_t *obs_get_source_properties(const char *id)
 		return props;
 	}
 	return NULL;
+}
+
+obs_missing_files_t *obs_source_get_missing_files(const obs_source_t *source)
+{
+	if (!obs_source_valid(source, "obs_source_get_missing_files"))
+		return obs_missing_files_create();
+
+	if (source->info.missing_files) {
+		return source->info.missing_files(source->context.data);
+	}
+
+	return obs_missing_files_create();
+}
+
+void obs_source_replace_missing_file(obs_missing_file_cb cb,
+				     obs_source_t *source, const char *new_path,
+				     void *data)
+{
+	if (!obs_source_valid(source, "obs_source_replace_missing_file"))
+		return;
+
+	cb(source->context.data, new_path, data);
 }
 
 bool obs_is_source_configurable(const char *id)
@@ -1979,9 +2034,21 @@ static inline void obs_source_draw_texture(struct obs_source *source,
 		tex = gs_texrender_get_texture(source->async_texrender);
 
 	param = gs_effect_get_param_by_name(effect, "image");
-	gs_effect_set_texture(param, tex);
+
+	const bool linear_srgb = gs_get_linear_srgb();
+
+	const bool previous = gs_framebuffer_srgb_enabled();
+	gs_enable_framebuffer_srgb(linear_srgb);
+
+	if (linear_srgb) {
+		gs_effect_set_texture_srgb(param, tex);
+	} else {
+		gs_effect_set_texture(param, tex);
+	}
 
 	gs_draw_sprite(tex, source->async_flip ? GS_FLIP_V : 0, 0, 0);
+
+	gs_enable_framebuffer_srgb(previous);
 }
 
 static void obs_source_draw_async_texture(struct obs_source *source)
@@ -2870,6 +2937,51 @@ void obs_source_set_async_rotation(obs_source_t *source, long rotation)
 		source->async_rotation = rotation;
 }
 
+void obs_source_output_cea708(obs_source_t *source,
+			      const struct obs_source_cea_708 *captions)
+{
+	if (!captions) {
+		return;
+	}
+
+	pthread_mutex_lock(&source->caption_cb_mutex);
+
+	for (size_t i = source->caption_cb_list.num; i > 0; i--) {
+		struct caption_cb_info info =
+			source->caption_cb_list.array[i - 1];
+		info.callback(info.param, source, captions);
+	}
+
+	pthread_mutex_unlock(&source->caption_cb_mutex);
+}
+
+void obs_source_add_caption_callback(obs_source_t *source,
+				     obs_source_caption_t callback, void *param)
+{
+	struct caption_cb_info info = {callback, param};
+
+	if (!obs_source_valid(source, "obs_source_add_caption_callback"))
+		return;
+
+	pthread_mutex_lock(&source->caption_cb_mutex);
+	da_push_back(source->caption_cb_list, &info);
+	pthread_mutex_unlock(&source->caption_cb_mutex);
+}
+
+void obs_source_remove_caption_callback(obs_source_t *source,
+					obs_source_caption_t callback,
+					void *param)
+{
+	struct caption_cb_info info = {callback, param};
+
+	if (!obs_source_valid(source, "obs_source_remove_caption_callback"))
+		return;
+
+	pthread_mutex_lock(&source->caption_cb_mutex);
+	da_erase_item(source->caption_cb_list, &info);
+	pthread_mutex_unlock(&source->caption_cb_mutex);
+}
+
 static inline bool preload_frame_changed(obs_source_t *source,
 					 const struct obs_source_frame *in)
 {
@@ -3510,7 +3622,15 @@ static inline void render_filter_tex(gs_texture_t *tex, gs_effect_t *effect,
 	gs_eparam_t *image = gs_effect_get_param_by_name(effect, "image");
 	size_t passes, i;
 
-	gs_effect_set_texture(image, tex);
+	const bool linear_srgb = gs_get_linear_srgb();
+
+	const bool previous = gs_framebuffer_srgb_enabled();
+	gs_enable_framebuffer_srgb(linear_srgb);
+
+	if (linear_srgb)
+		gs_effect_set_texture_srgb(image, tex);
+	else
+		gs_effect_set_texture(image, tex);
 
 	passes = gs_technique_begin(tech);
 	for (i = 0; i < passes; i++) {
@@ -3519,6 +3639,8 @@ static inline void render_filter_tex(gs_texture_t *tex, gs_effect_t *effect,
 		gs_technique_end_pass(tech);
 	}
 	gs_technique_end(tech);
+
+	gs_enable_framebuffer_srgb(previous);
 }
 
 static inline bool can_bypass(obs_source_t *target, obs_source_t *parent,
@@ -4086,21 +4208,27 @@ void obs_source_draw_set_color_matrix(const struct matrix4 *color_matrix,
 void obs_source_draw(gs_texture_t *texture, int x, int y, uint32_t cx,
 		     uint32_t cy, bool flip)
 {
-	gs_effect_t *effect = gs_get_effect();
-	bool change_pos = (x != 0 || y != 0);
-	gs_eparam_t *image;
+	if (!obs_ptr_valid(texture, "obs_source_draw"))
+		return;
 
+	gs_effect_t *effect = gs_get_effect();
 	if (!effect) {
 		blog(LOG_WARNING, "obs_source_draw: no active effect!");
 		return;
 	}
 
-	if (!obs_ptr_valid(texture, "obs_source_draw"))
-		return;
+	const bool linear_srgb = gs_get_linear_srgb();
 
-	image = gs_effect_get_param_by_name(effect, "image");
-	gs_effect_set_texture(image, texture);
+	const bool previous = gs_framebuffer_srgb_enabled();
+	gs_enable_framebuffer_srgb(linear_srgb);
 
+	gs_eparam_t *image = gs_effect_get_param_by_name(effect, "image");
+	if (linear_srgb)
+		gs_effect_set_texture_srgb(image, texture);
+	else
+		gs_effect_set_texture(image, texture);
+
+	const bool change_pos = (x != 0 || y != 0);
 	if (change_pos) {
 		gs_matrix_push();
 		gs_matrix_translate3f((float)x, (float)y, 0.0f);
@@ -4110,6 +4238,8 @@ void obs_source_draw(gs_texture_t *texture, int x, int y, uint32_t cx,
 
 	if (change_pos)
 		gs_matrix_pop();
+
+	gs_enable_framebuffer_srgb(previous);
 }
 
 void obs_source_inc_showing(obs_source_t *source)
@@ -4454,7 +4584,7 @@ static inline void apply_audio_action(obs_source_t *source,
 static void apply_audio_actions(obs_source_t *source, size_t channels,
 				size_t sample_rate)
 {
-	float *vol_data = malloc(sizeof(float) * AUDIO_OUTPUT_FRAMES);
+	float vol_data[AUDIO_OUTPUT_FRAMES];
 	float cur_vol = get_source_volume(source, source->audio_ts);
 	size_t frame_num = 0;
 
@@ -4495,8 +4625,6 @@ static void apply_audio_actions(obs_source_t *source, size_t channels,
 		if ((source->audio_mixers & (1 << mix)) != 0)
 			multiply_vol_data(source, mix, channels, vol_data);
 	}
-
-	free(vol_data);
 }
 
 static void apply_audio_volume(obs_source_t *source, uint32_t mixers,

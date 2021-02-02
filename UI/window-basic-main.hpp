@@ -68,6 +68,7 @@ class OBSBasicStats;
 #define PREVIEW_EDGE_SIZE 10
 
 struct BasicOutputHandler;
+
 //add by agora
 #define PREVIEW_EDGE_SIZE 10
 #define REMOTE_VIDEO_COUNT 16
@@ -92,11 +93,12 @@ typedef struct tagAgoraSettings {
 	bool muteAllRemoteAudioVideo = false;
 	int audioProfileScenario = 0;
 	bool bAudioHighQuality = false;
-	
+
 } AgoraSettings, *PAgoraSettings;
 
 struct AgoraOutputHandler;
 //end
+
 enum class QtDataRole {
 	OBSRef = Qt::UserRole,
 	OBSSignals,
@@ -242,7 +244,7 @@ private:
 	QPointer<QDockWidget> statsDock;
 	QPointer<OBSAbout> about;
 
-	OBSLogViewer *logView;
+	OBSLogViewer *logView = nullptr;
 
 	QPointer<QTimer> cpuUsageTimer;
 	QPointer<QTimer> diskFullTimer;
@@ -293,6 +295,7 @@ private:
 	QPointer<QAction> sysTrayStream;
 	QPointer<QAction> sysTrayRecord;
 	QPointer<QAction> sysTrayReplayBuffer;
+	QPointer<QAction> sysTrayVirtualCam;
 	QPointer<QAction> showHide;
 	QPointer<QAction> exit;
 	QPointer<QMenu> trayMenu;
@@ -429,6 +432,9 @@ private:
 
 	void CreateProgramDisplay();
 	void CreateProgramOptions();
+	int TransitionCount();
+	int AddTransitionBeforeSeparator(const QString &name,
+					 obs_source_t *source);
 	void AddQuickTransitionId(int id);
 	void AddQuickTransition();
 	void AddQuickTransitionHotkey(QuickTransition *qt);
@@ -572,6 +578,8 @@ public slots:
 	void DeferSaveBegin();
 	void DeferSaveEnd();
 
+	void DisplayStreamStartError();
+
 	void StartStreaming();
 	void StopStreaming();
 	void ForceStopStreaming();
@@ -596,6 +604,7 @@ public slots:
 
 	void ReplayBufferStart();
 	void ReplayBufferSave();
+	void ReplayBufferSaved();
 	void ReplayBufferStopping();
 	void ReplayBufferStop(int code);
 
@@ -862,6 +871,8 @@ public:
 	QIcon GetGroupIcon() const;
 	QIcon GetSceneIcon() const;
 
+	OBSWeakSource copyFilter = nullptr;
+
 protected:
 	virtual void closeEvent(QCloseEvent *event) override;
 	virtual void changeEvent(QEvent *event) override;
@@ -980,6 +991,7 @@ private slots:
 	// Source Context Buttons
 	void on_sourcePropertiesButton_clicked();
 	void on_sourceFiltersButton_clicked();
+	void on_sourceInteractButton_clicked();
 
 	void on_autoConfigure_triggered();
 	void on_stats_triggered();
@@ -1034,7 +1046,7 @@ private slots:
 	void StackedMixerAreaContextMenuRequested();
 
 	void ResizeOutputSizeOfSource();
-	void on_agoraPKButton_clicked();
+
 public slots:
 	void on_actionResetTransform_triggered();
 
@@ -1043,7 +1055,8 @@ public slots:
 	bool ReplayBufferActive();
 
 	void ClearContextBar();
-	void UpdateContextBar();
+	void UpdateContextBar(bool force = false);
+	void UpdateContextBarDeferred(bool force = false);
 
 public:
 	explicit OBSBasic(QWidget *parent = 0);
@@ -1061,6 +1074,7 @@ public:
 private:
 	std::unique_ptr<Ui::OBSBasic> ui;
 
+	
 public:
 	//agora
 	obs_service_t *GetAgoraService();
@@ -1121,6 +1135,7 @@ private slots:
 	void OnError(int err, const char *msg);
 	void OnInitRtcEngineFailed(long long code);
 	void OnConnectionStateChanged(long long reason);
+	void on_agoraPKButton_clicked();
 	// end agora
 };
 

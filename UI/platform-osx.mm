@@ -87,6 +87,29 @@ bool InitApplicationBundle()
 #endif
 }
 
+void CheckAppWithSameBundleID(bool &already_running)
+{
+	try {
+		NSBundle *bundle = [NSBundle mainBundle];
+		if (!bundle)
+			throw "Could not find main bundle";
+
+		NSString *bundleID = [bundle bundleIdentifier];
+		if (!bundleID)
+			throw "Could not find bundle identifier";
+
+		int app_count =
+			[NSRunningApplication
+				runningApplicationsWithBundleIdentifier:bundleID]
+				.count;
+
+		already_running = app_count > 1;
+
+	} catch (const char *error) {
+		blog(LOG_ERROR, "CheckAppWithSameBundleID: %s", error);
+	}
+}
+
 string GetDefaultVideoSavePath()
 {
 	NSFileManager *fm = [NSFileManager defaultManager];
@@ -142,6 +165,13 @@ vector<string> GetPreferredLocales()
 bool IsAlwaysOnTop(QWidget *window)
 {
 	return (window->windowFlags() & Qt::WindowStaysOnTopHint) != 0;
+}
+
+void disableColorSpaceConversion(QWidget *window)
+{
+	NSView *view =
+		(__bridge NSView *)reinterpret_cast<void *>(window->winId());
+	view.window.colorSpace = NSColorSpace.sRGBColorSpace;
 }
 
 void SetAlwaysOnTop(QWidget *window, bool enable)

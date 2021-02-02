@@ -72,7 +72,7 @@ void AgoraOutput::Update()
 // 		obs_data_set_string(pcmSettings, "rate_control", "CBR");
 // 		obs_data_set_int(pcmSettings, "bitrate", audioBitrate);
 
-	obs_service_t* agoraService = main->GetAgoraService();
+	obs_service_t *agoraService = main->GetAgoraService();
 	obs_service_apply_encoder_settings(agoraService,
 		yuvSettings, pcmSettings);
 

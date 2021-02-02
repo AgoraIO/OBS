@@ -83,9 +83,10 @@ agora-pcm-encoder.cpp和agora-yuv-encoder.cpp分别实现了音频和视频编�
 ### 声网sdk
 
 
-* dll  动态库拷贝obs studio依赖库到dependencies2013\win32\bin
-* lib  lib拷贝到dependencies2013\win32\bin
-* include 在dependencies2013\win32\include下创建agora文件夹存放声网头文件
+* dll  动态库拷贝obs studio依赖库到dependencies
+* \win32\bin
+* lib  lib拷贝到dependencies2017\win32\bin
+* include 在dependencies2017\win32\include下创建agora文件夹存放声网头文件
 
 注意： 注意头文件要包含IAgoraRtcEngine2.h用来自定义输出分辨率的接口
 
@@ -102,7 +103,7 @@ agora-pcm-encoder.cpp和agora-yuv-encoder.cpp分别实现了音频和视频编�
 总结一下，用户如何利用声网提供的demo：
 
 * 将plugins下的整个win-agora拷贝到自己的plugins目录下
-* 将agora dll和lib拷贝到dependencies2013\win32\bin下，agora头文件拷贝到dependencies2013\win32\include
+* 将agora dll和lib拷贝到dependencies2017\win32\bin下，agora头文件拷贝到dependencies2017\win32\include
 * 将FindAgora.cmake拷贝到CMake\Modules下，将CopyMSVCBins.cmake中包含agora的部分拷贝到自己的CopyMSVCBins.cmake文件中
 * 在obs.h、obs.cpp、obs-service.h中搜索agora,并把对应的代码拷贝到自己的obs studio库中。
 

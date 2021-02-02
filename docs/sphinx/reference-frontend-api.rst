@@ -105,6 +105,10 @@ Structures/Enumerations
 
      Triggered when the replay buffer has fully stopped.
 
+   - **OBS_FRONTEND_EVENT_REPLAY_BUFFER_SAVED**
+
+     Triggered when the replay buffer has been saved.
+
    - **OBS_FRONTEND_EVENT_STUDIO_MODE_ENABLED**
 
      Triggered when the user has turned on studio mode.
@@ -124,7 +128,7 @@ Structures/Enumerations
      the program is either about to load a new scene collection, or the
      program is about to exit.
 
-   - **OBS_FRONTEND_FINISHED_LOADING**
+   - **OBS_FRONTEND_EVENT_FINISHED_LOADING**
 
      Triggered when the program has finished loading.
 
@@ -135,6 +139,15 @@ Structures/Enumerations
    - **OBS_FRONTEND_EVENT_RECORDING_UNPAUSED**
 
      Triggered when the recording has been unpaused.
+
+   - **OBS_FRONTEND_EVENT_VIRTUALCAM_STARTED**
+
+     Triggered when the virtual camera is started.
+
+   - **OBS_FRONTEND_EVENT_VIRTUALCAM_STOPPED**
+
+     Triggered when the virtual camera is stopped.
+
 
 .. type:: struct obs_frontend_source_list
 
@@ -450,6 +463,15 @@ Functions
 
 ---------------------------------------
 
+.. function:: void obs_frontend_open_projector(const char *type, int monitor, const char *geometry, const char *name)
+
+   :param type:     "Preview", "Source", "Scene", "StudioProgram", or "Multiview" (case insensitive).
+   :param monitor:  Monitor to open the projector on. If -1, opens a window.
+   :param geometry: If *monitor* is -1, size and position of the projector window. Encoded in Base64 using Qt's geometry encoding.
+   :param name:     If *type* is "Source" or "Scene", name of the source or scene to be displayed.
+
+---------------------------------------
+
 .. function:: void obs_frontend_save(void)
 
    Saves the current scene collection.
@@ -543,3 +565,27 @@ Functions
    Takes a screenshot of the specified source.
 
    :param source: The source to take screenshot of.
+
+---------------------------------------
+
+.. function:: obs_output_t *obs_frontend_get_virtualcam_output(void)
+
+   :return: A new reference to the current virtual camera output.
+
+---------------------------------------
+
+.. function:: void obs_frontend_start_virtualcam(void)
+
+   Starts the virtual camera.
+
+---------------------------------------
+
+.. function:: void obs_frontend_stop_virtualcam(void)
+
+   Stops the virtual camera.
+
+---------------------------------------
+
+.. function:: bool obs_frontend_virtualcam_active(void)
+
+   :return: *true* if virtual camera is active, *false* otherwise.

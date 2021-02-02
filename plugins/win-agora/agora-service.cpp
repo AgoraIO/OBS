@@ -18,7 +18,7 @@ struct agora_data {
 	std::string log_path;
 	bool agora_sdk_capture_mic_audio;
 	bool enableAgoraRawDataTimelog;
-	unsigned int privilegeExpiredTs = 60;
+	unsigned int privilegeExpiredTs = 0;
 	bool bRenewToken = false;
 	bool muteAllRemoteAudioVideo = false;
 	int audioProfile;
@@ -93,7 +93,7 @@ void AgoraService_Update(void *data, obs_data_t *settings)
 
 		service->privilegeExpiredTs =
 			obs_data_get_int(settings, "privilegeExpiredTs");
-		service->privilegeExpiredTs = 60;
+		
 		service->video_bitrate =
 			obs_data_get_int(settings, "agora_video_bitrate");
 		service->enableWebSdkInteroperability = obs_data_get_bool(

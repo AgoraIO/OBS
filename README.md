@@ -90,9 +90,9 @@ Download zip file   [download](https://www.agora.io/en/download/).
 
 Decompress zip file,you'll find dll， include and lib folders in sdk.
 
-* dll  copy agora\_rtc\_sdk.dll and agora\_sig\_sdk.dll to dependencies2013\win32\bin
-* lib  copy agora\_rtc\_sdk.lib to dependencies2013\win32\bin
-* include Create agora folder in dependencies2013\win32\include, then copy agora header files to here.
+* dll  copy agora\_rtc\_sdk.dll and agora\_sig\_sdk.dll to dependencies2017\win32\bin
+* lib  copy agora\_rtc\_sdk.lib to dependencies2017\win32\bin
+* include Create agora folder in dependencies2017\win32\include, then copy agora header files to here.
 
 **Note:If you want to set custom video profile, include IAgoraRtcEngine2.h.**
 
@@ -107,7 +107,7 @@ Decompress zip file,you'll find dll， include and lib folders in sdk.
 how to use obs studio demo that use agora sdk：
 
 * Copy win-agora folder in plugins to you own plugins folder.
-* Copy agora dll and lib folder to dependencies2013\win32\bin. Create agora folder in dependencies2013\win32\include, then copy agora header files here.
+* Copy agora dll and lib folder to dependencies2017\win32\bin. Create agora folder in dependencies2017\win32\include, then copy agora header files here.
 * Copy FindAgora.cmake file to CMake\Modules. Copy text including agora in CopyMSVCBins.cmake to you own file CopyMSVCBins.cmake.
 * In files obs.h、obs.cpp、obs-service.h,search agora, copy the source code to to you own corresponding files.
 
