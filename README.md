@@ -1,5 +1,7 @@
 #Agora RTC Tool (Windows)
 
+*[中文](README.zh.md)*
+
 Agora RTC Tool for OBS Studio.
 
 ##Possible use cases
@@ -29,17 +31,27 @@ You can get details about agora sdk from [agora.io](https://www.agora.io/en)
 
 You can install release setup directly corresponding to OBS Stduio version.
 
-[Agora RTC Tool 26.0.2]()
+[agora-tool-ui](https://github.com/AgoraIO/OBS/releases/download/3.3.0/Agora-Tool-3.0.0-Installer.exe)
 
-[Agora RTC Tool 25.0.8]()
 
 ##Compiling Agora RTC Tool
 
 ###Prerequisites
 
-You'll need [Qt 5.10.1](https://cdn-fastly.obsproject.com/downloads/Qt_5.10.1.7z),
+1 download dependencies
+
+   download[deps](https://github.com/AgoraIO/OBS/releases/download/3.3.0/deps.zip), unzip and copy to the foled "agora-tool-ui下". You can download latest [agora sdk](https://docs.agora.io/cn/All/downloads?platform=All%20Platforms), replace the files under deps/Agora folder. Then you need to adapt the tool for the sdk.
+
+
+
+2 You'll need [Qt 5.10.1](https://cdn-fastly.obsproject.com/downloads/Qt_5.10.1.7z),
 [CMake](https://cmake.org/download/) and a working [OBS Studio development environment](https://obsproject.com/wiki/install-instructions) installed on your
 computer.
+
+**Note**
+
+This version is based on obs studio [26.1.2](https://github.com/obsproject/obs-studio/tree/26.1.2)
+
 
 ###Windows
 

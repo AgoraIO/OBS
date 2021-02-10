@@ -1,8 +1,10 @@
-#声网连麦工具 (Windows)
+# 声网连麦工具 (Windows)
+
+*[English](README.md)*
 
 声网连麦工具可以使 OBS Studio 支持连麦功能。
 
-##使用场景
+## 使用场景
 
 实时视频聊天工具，该插件依赖于声网SDK。
 
@@ -25,22 +27,30 @@
 * 如果连麦工具要使用的摄像头OBS Studio正在使用，会先禁止obs使用，结束连麦以后会再次打开。
 
 
-##下载安装包
+## 下载安装包
 
 可以直接安装OBS Stduio 对应版本的连麦工具
 
-[Agora RTC Tool 26.0.2]()
+[agora-tool-ui](https://github.com/AgoraIO/OBS/releases/download/3.3.0/Agora-Tool-3.0.0-Installer.exe)
 
-[Agora RTC Tool 25.0.8]()
 
-##编译声网连麦工具
+## 编译声网连麦工具
 
-###准备
+### 准备
 
-需要在电脑上安装[Qt 5.10.1](https://cdn-fastly.obsproject.com/downloads/Qt_5.10.1.7z),
+1 下载依赖库
+
+   下载[deps](https://github.com/AgoraIO/OBS/releases/download/3.3.0/deps.zip)，解压后将deps拷贝到agora-tool-ui下。如果要使用最新的SDK，到[agora sdk](https://docs.agora.io/cn/All/downloads?platform=All%20Platforms) 去下载,解压后替换r deps/Agora目录下的对应文件。 并且需要去适配声网SDK（如果版本差异太大，接口不同）
+
+
+2 需要在电脑上安装[Qt 5.14.2](https://github.com/sbd021/Basic-Video-Broadcasting/releases/download/5.14.2/Qt5.14.2.zip),
 [CMake](https://cmake.org/download/) 和一个可以工作的 [OBS Studio development environment](https://obsproject.com/wiki/install-instructions) 
 
-###Windows
+**注意**
+
+这个版本基于 obs studio [26.1.2](https://github.com/obsproject/obs-studio/tree/26.1.2)
+
+### Windows
 
 在 cmake-gui，需要设置下面的变量:
 
