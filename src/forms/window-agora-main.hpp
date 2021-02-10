@@ -84,6 +84,12 @@ private:
 	QString empty_appid_info;
 	QString empty_uid;
 	QString init_failed_info = "";
+
+	QString invalidChannelError = "";
+	QString invalidAppidError = "";
+	QString invalidTokenExpiredError = "";
+	QString invalidTokenlError = "";
+
 	AgoraToolSettings m_agoraToolSettings;
 	//show remote video
 	QVBoxLayout *remoteVideoLayout;
@@ -146,7 +152,7 @@ public slots:
 	void onUserJoined_slot(uid_t uid, int elapsed);
 	void onUserOffline_slot(uid_t uid, int reason);
 	void onFirstRemoteVideoDecoded_slot(uid_t uid, int width, int height, int elapsed);
-
+	void onConnectionStateChanged_slot(int state, int reason);
 public:
 	void ToggleAgoraDialog();
 	AgoraBasic(QMainWindow *parent);

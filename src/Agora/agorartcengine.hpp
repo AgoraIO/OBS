@@ -41,7 +41,7 @@ public:
 	void stopPreview();
 
 	int joinChannel(const std::string &key, const std::string &channel,
-			unsigned uid);
+			unsigned uid, bool muteAudio = true, bool muteVideo = true);
 	int leaveChannel();
 	
 	bool  keepPreRotation(bool bRotate);
@@ -89,6 +89,8 @@ public:
 
 	void SetAudioProfile(int scenario, int channels, bool bHighQuality);
 
+	void MuteAllRemoteVideo(bool bMute);
+	void MuteAllRemoteAudio(bool bMute);
 signals:
 	void onJoinChannelSuccess(const char* channel, unsigned int uid, int elapsed);
 	void onLeaveChannel(const RtcStats &stats);
@@ -97,6 +99,8 @@ signals:
 	void onUserOffline(unsigned int uid, int reason);
 	void onFirstRemoteVideoDecoded(unsigned int uid, int width, int height,
 		int elapsed);
+
+	void onConnectionStateChanged(int state, int reason);
 private:
 	friend class AgoraRtcEngineEvent;
 private:

@@ -54,6 +54,12 @@ AgoraBasic::AgoraBasic(QMainWindow *parent)
 	empty_channel = tr("Agora.General.EmptyChannel");
 	empty_uid = tr("Agora.General.EmptyUID");
 	init_failed_info = tr("Agora.General.Init.Failed");
+	
+	invalidChannelError = tr("Basic.Main.Agora.Invalid.Channel");
+	invalidTokenlError = tr("Basic.Main.Agora.Invalid.Token");
+	invalidAppidError = tr("Basic.Main.Agora.Invalid.Appid");
+	invalidTokenExpiredError = tr("Basic.Main.Agora.Token.Expired");
+	
 	obs_frontend_pop_ui_translation();
 
 	ui->controlsDock->setWindowTitle(control_text);
@@ -65,7 +71,8 @@ AgoraBasic::AgoraBasic(QMainWindow *parent)
 	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onUserJoined, this, &AgoraBasic::onUserJoined_slot);
 	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onUserOffline, this, &AgoraBasic::onUserOffline_slot);
 	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onFirstRemoteVideoDecoded, this, &AgoraBasic::onFirstRemoteVideoDecoded_slot);
-
+	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onConnectionStateChanged, this, &AgoraBasic::onConnectionStateChanged_slot);
+	
 	CreateRemoteVideos();
 	auto addDrawCallback = [this]() {
 		obs_display_add_draw_callback(display,
@@ -165,9 +172,9 @@ void AgoraBasic::on_agoraSteramButton_clicked()
 		}
 
 		StartAgoraOutput();
-
 		AgoraRtcEngine::GetInstance()->joinChannel(m_agoraToolSettings.token.c_str()
-			,  m_agoraToolSettings.channelName.c_str(), m_agoraToolSettings.uid);
+			,  m_agoraToolSettings.channelName.c_str(), m_agoraToolSettings.uid,
+			!m_agoraToolSettings.muteAllRemoteAudioVideo, !m_agoraToolSettings.muteAllRemoteAudioVideo);
 		ui->agoraSteramButton->setText(starting_text);
 	}
 	else {
@@ -177,7 +184,6 @@ void AgoraBasic::on_agoraSteramButton_clicked()
 		AgoraRtcEngine::GetInstance()->leaveChannel();
 		ui->agoraSteramButton->setText(stopping_text);
 		ClearRemoteVideos();
-	
 	}
 }
 
@@ -727,4 +733,26 @@ void AgoraBasic::onFirstRemoteVideoDecoded_slot(uid_t uid, int width, int height
 		uids[i++] = iter;
 	}
 	SetLiveTranscoding();
+}
+
+void AgoraBasic::onConnectionStateChanged_slot(int state, int reason)
+{
+	if (reason == 8) { //CONNECTION_CHANGED_INVALID_TOKEN
+		QMessageBox::critical(NULL, "Error", invalidTokenlError.toStdString().c_str());
+		on_agoraSteramButton_clicked();
+	}
+	else if (reason == 9) { //CONNECTION_CHANGED_TOKEN_EXPIRED
+		QMessageBox::critical(NULL, "Error", invalidTokenExpiredError.toStdString().c_str());
+		on_agoraSteramButton_clicked();
+	}
+	else if (reason == 6) { //CONNECTION_CHANGED_INVALID_APP_ID
+		QMessageBox::critical(NULL, "Error", invalidAppidError.toStdString().c_str());
+		on_agoraSteramButton_clicked();
+
+	}
+	else if (reason == 7) { //CONNECTION_CHANGED_INVALID_CHANNEL_NAME
+
+		QMessageBox::critical(this, "Error", invalidChannelError.toStdString().c_str());
+		on_agoraSteramButton_clicked();
+	}
 }

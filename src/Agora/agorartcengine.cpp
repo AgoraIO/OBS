@@ -47,6 +47,11 @@ public:
 	{
 		emit m_engine.onFirstRemoteVideoDecoded(uid, width, height, elapsed);
 	}
+
+	virtual void onConnectionStateChanged( CONNECTION_STATE_TYPE state,	CONNECTION_CHANGED_REASON_TYPE reason) override
+	{
+		emit m_engine.onConnectionStateChanged((int)state, (int)reason);
+	}
 };
 
 AgoraRtcEngine *AgoraRtcEngine::m_agoraEngine = nullptr;
@@ -294,7 +299,7 @@ std::string AgoraRtcEngine::CalculateToken(std::string appid,
 }
 
 int AgoraRtcEngine::joinChannel(const std::string &key,
-				const std::string &channel, unsigned int uid)
+				const std::string &channel, unsigned int uid, bool muteAudio , bool muteVideo)
 {
 	if (m_bJoinChannel)
 		return 0;
@@ -313,7 +318,11 @@ int AgoraRtcEngine::joinChannel(const std::string &key,
 	}
 	m_rtcEngine->setAudioProfile(profile, (AUDIO_SCENARIO_TYPE)m_scenario);
 
-	int r = m_rtcEngine->joinChannel(key.data(), channel.data(), "", uid);
+	ChannelMediaOptions options;
+	options.autoSubscribeAudio = muteAudio;
+	options.autoSubscribeVideo = muteVideo;
+
+	int r = m_rtcEngine->joinChannel(key.data(), channel.data(), "", uid, options);
 	m_bJoinChannel = true;
 	return r;
 }
@@ -344,6 +353,7 @@ int AgoraRtcEngine::setupRemoteVideo(unsigned int uid, void *view)
 	canvas.view = v;
 	canvas.renderMode = RENDER_MODE_FIT;
 	canvas.uid = uid;
+
 	return m_rtcEngine->setupRemoteVideo(canvas);
 }
 
@@ -584,6 +594,16 @@ void AgoraRtcEngine::SetAudioProfile(int scenario, int channels, bool bHighQuali
 	m_scenario = (AUDIO_SCENARIO_TYPE)scenario;
 	audioChannel = channels;
 	m_bHighQuality = bHighQuality;
+}
+
+void AgoraRtcEngine::MuteAllRemoteVideo(bool bMute)
+{
+	m_rtcEngine->muteAllRemoteVideoStreams(bMute);
+}
+
+void AgoraRtcEngine::MuteAllRemoteAudio(bool bMute)
+{
+	m_rtcEngine->muteAllRemoteAudioStreams(bMute);
 }
 
 void AgoraRtcEngine::PushAudioFrame(struct encoder_frame *frame)
