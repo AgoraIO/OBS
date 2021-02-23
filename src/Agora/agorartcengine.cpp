@@ -52,6 +52,11 @@ public:
 	{
 		emit m_engine.onConnectionStateChanged((int)state, (int)reason);
 	}
+
+	virtual void onRemoteVideoStateChanged(uid_t uid, REMOTE_VIDEO_STATE state, REMOTE_VIDEO_STATE_REASON reason, int elapsed) override
+	{
+		emit m_engine.onRemoteVideoStateChanged(uid, (int)state, (int)reason, elapsed);
+	}
 };
 
 AgoraRtcEngine *AgoraRtcEngine::m_agoraEngine = nullptr;

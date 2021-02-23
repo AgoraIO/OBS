@@ -101,6 +101,8 @@ signals:
 		int elapsed);
 
 	void onConnectionStateChanged(int state, int reason);
+
+	void onRemoteVideoStateChanged(unsigned int uid, int state, int reason, int elapsed);
 private:
 	friend class AgoraRtcEngineEvent;
 private:

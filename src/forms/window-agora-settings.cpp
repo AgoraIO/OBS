@@ -543,7 +543,9 @@ void AgoraSettings::on_buttonBox_clicked(QAbstractButton *button)
 	if (val == QDialogButtonBox::AcceptRole ||
 		val == QDialogButtonBox::RejectRole) {
 		ClearChanged();
-		close();
+		
+		accept();
+		//close();
 	}
 }
 
@@ -640,6 +642,7 @@ void AgoraSettings::showEvent(QShowEvent *event)
 	ui->cmbRecordChannelSetup->setEnabled(bEnabled);
 	ui->cmbScenario->setEnabled(bEnabled);
 }
+
 
 /*typedef void(*obs_source_audio_capture_t)(void *param, obs_source_t *source,
 	const struct audio_data *audio_data,

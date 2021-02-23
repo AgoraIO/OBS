@@ -153,6 +153,7 @@ public slots:
 	void onUserOffline_slot(uid_t uid, int reason);
 	void onFirstRemoteVideoDecoded_slot(uid_t uid, int width, int height, int elapsed);
 	void onConnectionStateChanged_slot(int state, int reason);
+	void onRemoteVideoStateChanged_slot(unsigned int uid, int state, int reason, int elapsed);
 public:
 	void ToggleAgoraDialog();
 	AgoraBasic(QMainWindow *parent);

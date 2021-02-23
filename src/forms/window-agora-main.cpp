@@ -70,8 +70,10 @@ AgoraBasic::AgoraBasic(QMainWindow *parent)
 	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onError, this, &AgoraBasic::onError_slot);
 	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onUserJoined, this, &AgoraBasic::onUserJoined_slot);
 	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onUserOffline, this, &AgoraBasic::onUserOffline_slot);
-	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onFirstRemoteVideoDecoded, this, &AgoraBasic::onFirstRemoteVideoDecoded_slot);
+	//connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onFirstRemoteVideoDecoded, this, &AgoraBasic::onFirstRemoteVideoDecoded_slot);
 	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onConnectionStateChanged, this, &AgoraBasic::onConnectionStateChanged_slot);
+	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onRemoteVideoStateChanged, this, &AgoraBasic::onRemoteVideoStateChanged_slot);
+
 	
 	CreateRemoteVideos();
 	auto addDrawCallback = [this]() {
@@ -222,7 +224,21 @@ void AgoraBasic::on_settingsButton_clicked()
 {
 	AgoraSettings settings(this);
 	settings.setWindowIconText(settings_title);
-	settings.exec();
+	int ret= settings.exec();
+
+	if (ret == QDialog::Accepted) {
+		if (AgoraRtcEngine::GetInstance()->IsJoinChannel()) {
+			AgoraRtcEngine::GetInstance()->MuteAllRemoteAudio(m_agoraToolSettings.muteAllRemoteAudioVideo);
+			AgoraRtcEngine::GetInstance()->MuteAllRemoteVideo(m_agoraToolSettings.muteAllRemoteAudioVideo);
+
+			if (m_lstRemoteVideoUids.size() > 0 && m_agoraToolSettings.muteAllRemoteAudioVideo) {
+				ClearRemoteVideos();
+				m_lstRemoteVideoUids.clear();
+				if (!m_agoraToolSettings.rtmp_url.empty())
+					SetLiveTranscoding();
+			}
+		}
+	}
 }
 
 void AgoraBasic::on_exitButton_clicked()
@@ -754,5 +770,12 @@ void AgoraBasic::onConnectionStateChanged_slot(int state, int reason)
 
 		QMessageBox::critical(this, "Error", invalidChannelError.toStdString().c_str());
 		on_agoraSteramButton_clicked();
+	}
+}
+
+void AgoraBasic::onRemoteVideoStateChanged_slot(unsigned int uid, int state, int reason, int elapsed)
+{
+	if (state == REMOTE_VIDEO_STATE_DECODING) {
+		onFirstRemoteVideoDecoded_slot(uid, 0, 0, elapsed);
 	}
 }
