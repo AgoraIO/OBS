@@ -31,7 +31,14 @@ You can get details about agora sdk from [agora.io](https://www.agora.io/en)
 
 You can install release setup directly corresponding to OBS Stduio version.
 
-[agora-tool-ui](https://github.com/AgoraIO/OBS/releases/download/3.3.0/Agora-Tool-3.0.0-Installer.exe)
+* [agora-tool-ui](https://github.com/AgoraIO/OBS/releases/download/3.3.0/Agora-Tool-3.0.0-Installer.exe) (26.1 and later)
+
+* [agora-tool-ui](https://github.com/AgoraIO/OBS/releases/download/3.3.0/Agora-Tool-3.0.0-26.0.2-Installer.exe) (26.0.2 and below)
+
+**Note：**
+
+26.0.2 and below version，We test several old version obs stuido, including 25.0.8 26.0  26.0.2. We didn't test older version obs studio than 25.0.8. If older version cannot load agora rtc tool, we suggest you update your obs studio and use 26.1 and later version tool.
+
 
 
 ##Compiling Agora RTC Tool
