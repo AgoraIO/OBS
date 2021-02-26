@@ -125,6 +125,8 @@ private:
 	obs_output_t *output;
 	obs_encoder_t *audio_encoder;
 
+	bool joinFailed = false;
+
 	bool started = false;
 
 	virtual void showEvent(QShowEvent *event)override;

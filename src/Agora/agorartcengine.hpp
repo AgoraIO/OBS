@@ -91,6 +91,8 @@ public:
 
 	void MuteAllRemoteVideo(bool bMute);
 	void MuteAllRemoteAudio(bool bMute);
+
+	void release();
 signals:
 	void onJoinChannelSuccess(const char* channel, unsigned int uid, int elapsed);
 	void onLeaveChannel(const RtcStats &stats);

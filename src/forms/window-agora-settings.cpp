@@ -40,6 +40,9 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	ui(new Ui::AgoraSettings)
 {
 	ui->setupUi(this);
+
+	ui->label_45->hide();
+	ui->lineEditExpiredTs->hide();
 	//Apply button disabled until change.
 	EnableApplyButton(false);
 	ui->label_5->hide();
@@ -280,10 +283,15 @@ void AgoraSettings::SaveVideoSettings()
 void AgoraSettings::SaveGeneralSettings()
 {
 	AgoraToolSettings settings;
+	main->GetAgoraSetting(settings);
 	QString strAppid = ui->lineEditAppid->text().toUtf8();
 	strAppid = strAppid.trimmed();
-	if (!strAppid.isEmpty())
+	if (!strAppid.isEmpty()) {
+		if (AgoraRtcEngine::GetInstance()->IsInitialize()
+			&& !settings.appid.empty() && settings.appid.compare(strAppid.toUtf8()) !=0)
+			appid_changed = true;
 		settings.appid = strAppid.toUtf8();
+	}
 	settings.appCerf = ui->lineEditAppCertificate->text().toUtf8();
 	settings.token = ui->lineEditToken->text().toUtf8();
 	settings.channelName = ui->lineEditChannel->text().toUtf8();
@@ -522,6 +530,8 @@ void AgoraSettings::on_buttonAppid_clicked()
 		return;
 	}
 
+	ui->buttonAppid->setEnabled(false);
+
 	AgoraToolSettings setting;
 	main->GetAgoraSetting(setting);
 	setting.appid = appid.toUtf8().toStdString();
@@ -543,7 +553,9 @@ void AgoraSettings::on_buttonBox_clicked(QAbstractButton *button)
 	if (val == QDialogButtonBox::AcceptRole ||
 		val == QDialogButtonBox::RejectRole) {
 		ClearChanged();
-		
+		if (appid_changed && AgoraRtcEngine::GetInstance()->IsInitialize()) {
+			AgoraRtcEngine::GetInstance()->release();
+		}
 		accept();
 		//close();
 	}

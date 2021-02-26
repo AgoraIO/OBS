@@ -28,9 +28,10 @@ private:
 	std::unique_ptr<Ui::AgoraSettings> ui;
 	AgoraBasic * main;
 	bool generalChanged = false;
-	bool audioChanged = false;
-	bool videoChanged = false;
-	bool loading = true;
+	bool audioChanged   = false;
+	bool videoChanged   = false;
+	bool loading        = true;
+	bool appid_changed  = false; 
 	int agora_fps[FPS_NUM];
 	int agora_bitrate[3];
 

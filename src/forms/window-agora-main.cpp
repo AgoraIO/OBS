@@ -131,8 +131,8 @@ void AgoraBasic::on_agoraSteramButton_clicked()
 {
 	QString str = ui->agoraSteramButton->text();
 
-	if (starting_text.compare(str) == 0 ||
-		stopping_text.compare(str) == 0) {
+	if (!joinFailed && (starting_text.compare(str) == 0 ||
+		stopping_text.compare(str) == 0)) {
 		return;
 	}
 
@@ -174,6 +174,13 @@ void AgoraBasic::on_agoraSteramButton_clicked()
 		}
 
 		StartAgoraOutput();
+
+		AgoraRtcEngine::GetInstance()->setVideoProfileEx(
+			m_agoraToolSettings.agora_width,
+			m_agoraToolSettings.agora_height,
+			m_agoraToolSettings.agora_fps,
+			m_agoraToolSettings.agora_bitrate);
+
 		AgoraRtcEngine::GetInstance()->joinChannel(m_agoraToolSettings.token.c_str()
 			,  m_agoraToolSettings.channelName.c_str(), m_agoraToolSettings.uid,
 			!m_agoraToolSettings.muteAllRemoteAudioVideo, !m_agoraToolSettings.muteAllRemoteAudioVideo);
@@ -753,23 +760,32 @@ void AgoraBasic::onFirstRemoteVideoDecoded_slot(uid_t uid, int width, int height
 
 void AgoraBasic::onConnectionStateChanged_slot(int state, int reason)
 {
-	if (reason == 8) { //CONNECTION_CHANGED_INVALID_TOKEN
-		QMessageBox::critical(NULL, "Error", invalidTokenlError.toStdString().c_str());
-		on_agoraSteramButton_clicked();
-	}
-	else if (reason == 9) { //CONNECTION_CHANGED_TOKEN_EXPIRED
-		QMessageBox::critical(NULL, "Error", invalidTokenExpiredError.toStdString().c_str());
-		on_agoraSteramButton_clicked();
-	}
-	else if (reason == 6) { //CONNECTION_CHANGED_INVALID_APP_ID
-		QMessageBox::critical(NULL, "Error", invalidAppidError.toStdString().c_str());
-		on_agoraSteramButton_clicked();
+	if (reason == 8 || reason == 9 ||
+		reason == 6 || reason == 7) {
+		joinFailed = true;
+		std::string info = "";
+		switch (reason)
+		{
+		case 8: //CONNECTION_CHANGED_INVALID_TOKEN
+			info = invalidTokenlError.toStdString();
+			break;
+		case 9: //CONNECTION_CHANGED_TOKEN_EXPIRED
+			info = invalidTokenExpiredError.toStdString();
+			break;
+		case 6: //CONNECTION_CHANGED_INVALID_APP_ID
+			info = invalidAppidError.toStdString();
+			break;
+		case 7: //CONNECTION_CHANGED_INVALID_CHANNEL_NAME
+			info = invalidChannelError.toStdString();
+			break;
+		default:
+			break;
+		}
+		
+		QMessageBox::critical(NULL, "Error", info.c_str());
 
-	}
-	else if (reason == 7) { //CONNECTION_CHANGED_INVALID_CHANNEL_NAME
-
-		QMessageBox::critical(this, "Error", invalidChannelError.toStdString().c_str());
 		on_agoraSteramButton_clicked();
+		joinFailed = false;
 	}
 }
 

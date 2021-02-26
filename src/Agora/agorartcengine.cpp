@@ -99,6 +99,11 @@ AgoraRtcEngine::AgoraRtcEngine()
 
 AgoraRtcEngine::~AgoraRtcEngine()
 {
+	release();
+}
+
+void AgoraRtcEngine::release()
+{
 	if (m_pMediaEngine)
 		m_pMediaEngine->release();
 
@@ -112,7 +117,7 @@ AgoraRtcEngine::~AgoraRtcEngine()
 		m_externalAudioframe.buffer = nullptr;
 	}
 
-	if (m_externalVideoFrame .buffer) {
+	if (m_externalVideoFrame.buffer) {
 		delete[] m_externalVideoFrame.buffer;
 		m_externalVideoFrame.buffer = nullptr;
 	}
@@ -121,7 +126,8 @@ AgoraRtcEngine::~AgoraRtcEngine()
 		m_rtcEngine->release(true);
 		m_rtcEngine = NULL;
 	}
-	
+
+	m_bInitialize = false;
 }
 
 bool AgoraRtcEngine::InitEngine(std::string appid)
@@ -137,6 +143,9 @@ bool AgoraRtcEngine::InitEngine(std::string appid)
 		return false;
 	}
 
+	if (!m_rtcEngine)
+		m_rtcEngine = createAgoraRtcEngine();
+
 	int ret = m_rtcEngine->initialize(context);
 	if (0 != ret) {
 		return false;
@@ -151,11 +160,9 @@ bool AgoraRtcEngine::InitEngine(std::string appid)
 	m_rtcEngine->setChannelProfile(CHANNEL_PROFILE_LIVE_BROADCASTING);
 
 	m_audioDeviceManager = new AAudioDeviceManager(m_rtcEngine);
-	m_bInitialize = true;
-
 	m_pMediaEngine->setExternalVideoSource(true, false);
 	m_rtcEngine->setExternalAudioSource(true, sampleRate, 2);
-
+	m_bInitialize = true;
 	return true;
 }
 
