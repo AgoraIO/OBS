@@ -11,12 +11,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if (WIN32)
 	include(external/FindLibObs.cmake)
-endif()
-
-if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set(AGORA_ARCH "x64")
-else()
-    set(AGORA_ARCH "x86")
+	if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+		set(AGORA_ARCH "x64")
+	else()
+		set(AGORA_ARCH "x86")
+	endif()
 endif()
 
 find_package(LibObs REQUIRED)
@@ -44,22 +43,70 @@ set(agora-tool-ui_HEADERS
 	src/Agora/agorartcengine.hpp)
 
 add_library(agora-tool-ui MODULE
-	${agora-tool-ui_SOURCES}
-	${agora-tool-ui_HEADERS})
+		${Qt5Core_INCLUDES}
+		${Qt5Widgets_INCLUDES}
+		${LIBOBS_INCLUDE_DIR}
+		"${CMAKE_SOURCE_DIR}/deps/libyuv/include"
+		${agora-tool-ui_SOURCES}
+		${agora-tool-ui_HEADERS}
+		)
 
-include_directories(
-    "${LIBOBS_INCLUDE_DIR}/../UI/obs-frontend-api"
-	${Qt5Core_INCLUDES}
-	${Qt5Widgets_INCLUDES}
-	"${CMAKE_SOURCE_DIR}/deps/Agora/include"
-	"${CMAKE_SOURCE_DIR}/deps/libyuv/include")
+if (WIN32)
+	include_directories(
+			"${LIBOBS_INCLUDE_DIR}/../UI/obs-frontend-api"
+			${Qt5Core_INCLUDES}
+			${Qt5Widgets_INCLUDES}
+			"${CMAKE_SOURCE_DIR}/deps/Agora/include"
+			"${CMAKE_SOURCE_DIR}/deps/libyuv/include")
 
-target_link_libraries(agora-tool-ui
-	libobs
-	Qt5::Core
-	Qt5::Widgets
-	"${CMAKE_SOURCE_DIR}/deps/Agora/${AGORA_ARCH}/agora_rtc_sdk.lib"
-	"${CMAKE_SOURCE_DIR}/deps/libyuv/${AGORA_ARCH}/yuv.lib")
+endif ()
+if(APPLE)
+	include_directories(
+			"${LIBOBS_INCLUDE_DIR}/../../UI/obs-frontend-api"
+			${Qt5Core_INCLUDES}
+			${Qt5Widgets_INCLUDES}
+			"${CMAKE_SOURCE_DIR}/deps/libyuv/include")
+
+	find_library(AGORAAIDENOISEEXTENSION AgoraAIDenoiseExtension "${CMAKE_SOURCE_DIR}/deps/mac/libs")
+	find_library(AGORACORE AgoraCore "${CMAKE_SOURCE_DIR}/deps/mac/libs")
+	find_library(AGORAFDKAAC Agorafdkaac "${CMAKE_SOURCE_DIR}/deps/mac/libs")
+	find_library(AGORAFFMPEG Agoraffmpeg "${CMAKE_SOURCE_DIR}/deps/mac/libs")
+	find_library(AGORARTCKIT AgoraRtcKit "${CMAKE_SOURCE_DIR}/deps/mac/libs")
+	find_library(AGORASOUNDTOUCH AgoraSoundTouch "${CMAKE_SOURCE_DIR}/deps/mac/libs")
+	find_library(AV1 av1 "${CMAKE_SOURCE_DIR}/deps/mac/libs")
+	find_library(YUV yuv "${CMAKE_SOURCE_DIR}/deps/mac/libs")
+	find_library(obs-frontend-api obs-frontend-api "${CMAKE_SOURCE_DIR}/deps/mac/libs")
+
+
+
+endif()
+
+if(WIN32)
+	target_link_libraries(agora-tool-ui
+		libobs
+		Qt5::Core
+		Qt5::Widgets
+		"${CMAKE_SOURCE_DIR}/deps/Agora/${AGORA_ARCH}/agora_rtc_sdk.lib"
+		"${CMAKE_SOURCE_DIR}/deps/libyuv/${AGORA_ARCH}/yuv.lib")
+endif()
+
+if(APPLE)
+	target_link_libraries(agora-tool-ui
+			libobs
+			Qt5::Core
+			Qt5::Widgets
+			${AGORAAIDENOISEEXTENSION}
+			${AGORACORE}
+			${AGORAFDKAAC}
+			${AGORAFFMPEG}
+			${AGORARTCKIT}
+			${AGORASOUNDTOUCH}
+			${AV1}
+			${YUV}
+			${obs-frontend-api}
+			)
+endif()
+
 
 if(WIN32)
 	if(NOT DEFINED OBS_FRONTEND_LIB)

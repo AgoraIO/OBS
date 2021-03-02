@@ -2,8 +2,15 @@
 
 #include <QObject>
 #include <memory>
+#ifdef _WIN32
 #include <IAgoraRtcEngine.h>
-#include <IAgoraMediaEngine.h>
+#else
+#include <AgoraRtcKit/IAgoraRtcEngine.h>
+#include <AgoraRtcKit/IAgoraMediaEngine.h>
+typedef const char * LPCSTR;
+#define TRUE true
+#define FALSE false
+#endif
 #include <string>
 #include "obs.h"
 #include <mutex>

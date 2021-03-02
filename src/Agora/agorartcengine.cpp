@@ -1,5 +1,44 @@
 #include "agorartcengine.hpp"
+#if _WIN32
 #include "AgoraBase.h"
+#else
+#include <AgoraRtcKit/AgoraBase.h>
+#include <chrono>
+#define  DEFINE_GET_TIME_NOW(getTickCount64)   \
+         int64_t getTickCount64() \
+        {       \
+          std::chrono::system_clock::duration d = std::chrono::system_clock::now().time_since_epoch();\
+          std::chrono::milliseconds mic = std::chrono::duration_cast<std::chrono::milliseconds>(d);\
+          return mic.count();\
+        }
+
+DEFINE_GET_TIME_NOW(GetTickCount64)
+DEFINE_GET_TIME_NOW(GetTickCount)
+
+#define DEFINE_MEMCPY_S(func)                                     \
+      int func(void *det, size_t detSize, const void * src, size_t srcSize)                                            \
+      {                                                        \
+        uint8_t errorcode = 0;                                 \
+        if (srcSize > detSize || src == NULL || det == NULL)   \
+        {                                                       \
+          if (srcSize > detSize)                                \
+            errorcode = 1;                                       \
+          else if (src == NULL)                                  \
+            errorcode = 2;                                      \
+          else if (det == NULL)                                  \
+            errorcode = 3;                                       \
+          fflush(stdout);                                         \
+          return -1;                                              \
+        }                                                           \
+        else                                                          \
+          memcpy(det, src, srcSize);                                  \
+                                                                        \
+        return 1;                                                      \
+      }
+
+
+DEFINE_MEMCPY_S(memcpy_s)
+#endif
 #include "obs.h"
 #include <libyuv.h>
 
@@ -622,7 +661,7 @@ void AgoraRtcEngine::PushAudioFrame(struct encoder_frame *frame)
 { 
 	if (!m_bInitialize || !m_bJoinChannel)
 		return;
-	
+
 	m_externalAudioframe.renderTimeMs = GetTickCount64();
 	memcpy_s(m_externalAudioframe.buffer, frame->linesize[0],
 		frame->data[0], frame->linesize[0]);

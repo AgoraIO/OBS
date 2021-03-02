@@ -286,7 +286,7 @@ void AgoraSettings::SaveGeneralSettings()
 	main->GetAgoraSetting(settings);
 	QString strAppid = ui->lineEditAppid->text().toUtf8();
 	strAppid = strAppid.trimmed();
-	if (!strAppid.isEmpty()) {
+#if defined(WIN32)
 		if (AgoraRtcEngine::GetInstance()->IsInitialize()
 			&& !settings.appid.empty() && settings.appid.compare(strAppid.toUtf8()) !=0)
 			appid_changed = true;
@@ -295,7 +295,14 @@ void AgoraSettings::SaveGeneralSettings()
 	settings.appCerf = ui->lineEditAppCertificate->text().toUtf8();
 	settings.token = ui->lineEditToken->text().toUtf8();
 	settings.channelName = ui->lineEditChannel->text().toUtf8();
-	QString strUid = ui->lineEditUID->text();
+#else
+  if (!strAppid.isEmpty())
+    settings.appid = strAppid.toStdString();
+  settings.appCerf = ui->lineEditAppCertificate->text().toStdString();
+  settings.token = ui->lineEditToken->text().toStdString();
+  settings.channelName = ui->lineEditChannel->text().toStdString();
+#endif
+  QString strUid = ui->lineEditUID->text();
 	if (strUid.length() > 0)
 		settings.uid = strtoul(strUid.toUtf8().data(), NULL, 10);
 	else
@@ -309,7 +316,11 @@ void AgoraSettings::SaveGeneralSettings()
 	settings.expiredTimeTs = settings.expiredTime * 60 * 60;
 	settings.savePersist = ui->chkPersistSaving->isChecked();
 	settings.muteAllRemoteAudioVideo = ui->chkMuteAllRemoteAV->isChecked();
+#if defined(WIN32)
 	settings.rtmp_url = ui->lineEditAgoraRTmp->text().toUtf8();
+#else
+  settings.rtmp_url = ui->lineEditAgoraRTmp->text().toStdString();
+#endif
 	settings.rtmp_fps = ui->lineEditAgoraRtmpFPS->text().toInt();
 	settings.rtmp_bitrate = ui->lineEditAgoraRtmpBitrate->text().toInt();
 	settings.rtmp_width = ui->lineEditAgoraRtmpWidth->text().toInt();

@@ -422,7 +422,7 @@ void AgoraBasic::CreateDisplay()
 #ifdef _WIN32
 	info.window.hwnd = (HWND)ui->preview->winId();
 #elif __APPLE__
-	info.window.view = (id)windowId;
+	info.window.view = (id)ui->preview->winId();
 #else
 	info.window.id = windowId;
 	info.window.display = QX11Info::display();
