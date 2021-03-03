@@ -291,7 +291,7 @@ void AgoraSettings::SaveGeneralSettings()
 			&& !settings.appid.empty() && settings.appid.compare(strAppid.toUtf8()) !=0)
 			appid_changed = true;
 		settings.appid = strAppid.toUtf8();
-	}
+
 	settings.appCerf = ui->lineEditAppCertificate->text().toUtf8();
 	settings.token = ui->lineEditToken->text().toUtf8();
 	settings.channelName = ui->lineEditChannel->text().toUtf8();
