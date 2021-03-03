@@ -73,6 +73,25 @@
 
 cmake点击configure之后，会得到一个变量LibObs_DIR, 确保它的值是obs-studio/build64/libobs。
 
+### Mac
+在编译Mac版本的插件之前，一定要先编译OBS的源码，参考官网文档跑下CI/full-build-macos.sh的脚本
+
+在 cmake-gui，需要设置下面的变量:
+
+* QTDIR （路径）： 编译器对应的QT版本。比如：/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5
+* LIBOBS_INCLUDE_DIR （路径） :OBS Studio源码路径下的子路径libobs。
+* LIBOBS_LIB (路径) : libobs项目所在路径
+* OBS_FRONTEND_LIB (路径) : obs-frontend-api项目所在路径 例如:obs-studio/UI/obs-frontend-api
+
+举个例子, obs源码路径是obs-studio，build路径是obs-studio/build64。
+
+* LIBOBS\_INCLUDE\_DIR 的值是 obs-studio/build/libobs
+* LIBOBS\_LIB 的值是 obs-studio/build/libobs, 
+* OBS\_FRONTEND\_LIB 的值是 obs-studio/build/UI/obs-frontend-api. 
+
+cmake点击configure之后，会得到一个变量LibObs_DIR, 确保它的值是obs-studio/build/libobs。
+
+
 
 
 
