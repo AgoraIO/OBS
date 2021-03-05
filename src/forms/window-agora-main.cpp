@@ -394,8 +394,19 @@ void AgoraBasic::resizeEvent(QResizeEvent *event)
 	CreateDisplay();
 
 	if (isVisible() && display) {
+#if _WIN32
 		QSize size = this->size();
 		obs_display_resize(display, size.width(), size.height());
+#else
+    QSize size = this->size() *  ui->preview->devicePixelRatioF();
+    if (m_lstRemoteVideoUids.size() >= 1) {
+        
+        obs_display_resize(display, size.width()/ (m_lstRemoteVideoUids.size() + 1), size.height() / (m_lstRemoteVideoUids.size()));
+    }else
+    {
+        obs_display_resize(display, size.width(), size.height());
+    }
+#endif
 	}
 
 }
@@ -410,9 +421,11 @@ void AgoraBasic::CreateDisplay()
 	QWindow* window = ui->preview->windowHandle();
 	if (display)
 		return;
-
+#if _WIN32
 	QSize size = this->size();
-
+#else
+  QSize size = this->size() *  ui->preview->devicePixelRatioF();
+#endif
 	gs_init_data info = {};
 	info.cx = size.width();
 	info.cy = size.height();
