@@ -29,6 +29,8 @@ You can get details about agora sdk from [agora.io](https://www.agora.io/en)
 
 ##Download Release Setup
 
+**Windows**
+
 You can install release setup directly corresponding to OBS Stduio version.
 
 * [agora-tool-ui](https://github.com/AgoraIO/OBS/releases/download/3.3.0/Agora-Tool-3.0.0-Installer.exe) (26.1 and later)
@@ -39,6 +41,10 @@ You can install release setup directly corresponding to OBS Stduio version.
 
 26.0.2 and below version，We test several old version obs stuido, including 25.0.8 26.0  26.0.2. We didn't test older version obs studio than 25.0.8. If older version cannot load agora rtc tool, we suggest you update your obs studio and use 26.1 and later version tool.
 
+**Mac**
+
+You can install release setup directly corresponding to OBS Stduio version.
+* [agora-tool-ui](https://github.com/AgoraIO/OBS/releases/download/3.3.1/Agora-Tool-3.3.1-Installer.dmg) (26.1 and later)
 
 
 ##Compiling Agora RTC Tool
@@ -76,6 +82,24 @@ For example, if the build directory is located in obs-studio src directory, name
 * OBS\_FRONTEND\_LIB is obs-studio/build64/UI/obs-frontend-api. 
 
 After configure camke, you get an variable LibObs_DIR, make sure its value is obs-studio/build64/libobs.
+
+
+###Mac 
+
+In cmake-gui, you'll have to set the following variables :
+
+* QTDIR (path) : location of the Qt environment suited for your compiler and architecture
+* LIBOBS_INCLUDE_DIR (path) : location of the libobs subfolder in the source code of OBS Studio
+* LIBOBS_LIB (filepath) : location of the libobs project
+* OBS_FRONTEND_LIB (filepath) : location of the obs-frontend-api project 
+
+For example, if the build directory is located in obs-studio src directory, named build64.
+
+* LIBOBS\_INCLUDE\_DIR is obs-studio/build/libobs
+* LIBOBS\_LIB is  obs-studio/build/libobs, 
+* OBS\_FRONTEND\_LIB is obs-studio/build/UI/obs-frontend-api. 
+
+After configure camke, you get an variable LibObs_DIR, make sure its value is obs-studio/build/libobs。
 
 
 

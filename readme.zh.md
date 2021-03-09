@@ -29,6 +29,8 @@
 
 ## 下载安装包
 
+**Windows**
+
 可以直接安装OBS Stduio 对应版本的连麦工具
 
 * [agora-tool-ui](https://github.com/AgoraIO/OBS/releases/download/3.3.0/Agora-Tool-3.0.0-Installer.exe) (26.1 and later)
@@ -38,6 +40,12 @@
 **注解：**
 
 26.0.2及以下版本，测试了obs studio 以下几个版本25.0.8 26.0  26.0.2。更老的版本未测试，如果无法加载，建议升级到最新使用26.1及以上的版本。
+
+**Mac**
+
+可以直接安装OBS Stduio 对应版本的连麦工具
+
+* [agora-tool-ui](https://github.com/AgoraIO/OBS/releases/download/3.3.1/Agora-Tool-3.3.1-Installer.dmg)(26.1 and later)
 
 
 ## 编译声网连麦工具
