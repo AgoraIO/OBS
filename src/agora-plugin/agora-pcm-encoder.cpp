@@ -1,7 +1,9 @@
 #include <obs-module.h>
 #include <obs-encoder.h>
 #include "../Agora/agorartcengine.hpp"
-uint8_t* audio_buffer = nullptr;
+
+int count = 0;
+
 static const char *AgoraGetAudioEncoderName(void*)
 {
 	return obs_module_text("AgoraAudioEnc");
@@ -20,6 +22,11 @@ static void AgoraPCM_Destroy(void* data)
 static bool AgoraPCM_Encode(void* data, struct encoder_frame* frame,
 struct encoder_packet* packet, bool *receive_packet)
 {
+	if (count % 200 == 0) {
+		blog(LOG_ERROR, "PushAudioFrame");
+		count = count % 200;
+	}
+	count++;
 	AgoraRtcEngine* engine = (AgoraRtcEngine*)data;
 	engine->PushAudioFrame(frame);
 	return true;

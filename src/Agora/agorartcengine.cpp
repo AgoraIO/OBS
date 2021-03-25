@@ -63,6 +63,7 @@ public:
 
 	virtual void onLeaveChannel(const RtcStats &stats) override
 	{
+		Sleep(200);
 		emit m_engine.onLeaveChannel(stats);
 	}
 
@@ -87,6 +88,11 @@ public:
 		emit m_engine.onFirstRemoteVideoDecoded(uid, width, height, elapsed);
 	}
 
+	virtual void onFirstRemoteVideoFrame(uid_t uid, int width, int height, int elapsed) override
+	{
+		emit m_engine.onFirstRemoteVideoFrame(uid, width, height, elapsed);
+	}
+
 	virtual void onConnectionStateChanged( CONNECTION_STATE_TYPE state,	CONNECTION_CHANGED_REASON_TYPE reason) override
 	{
 		emit m_engine.onConnectionStateChanged((int)state, (int)reason);
@@ -95,6 +101,16 @@ public:
 	virtual void onRemoteVideoStateChanged(uid_t uid, REMOTE_VIDEO_STATE state, REMOTE_VIDEO_STATE_REASON reason, int elapsed) override
 	{
 		emit m_engine.onRemoteVideoStateChanged(uid, (int)state, (int)reason, elapsed);
+	}
+
+	virtual void onRtmpStreamingStateChanged(const char *url, RTMP_STREAM_PUBLISH_STATE state, RTMP_STREAM_PUBLISH_ERROR errCode) override
+	{
+		emit m_engine.onRtmpStreamingStateChanged(url,  state, errCode);
+	}
+
+	virtual void onClientRoleChanged(CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole) override
+	{
+		emit m_engine.onClientRoleChanged(oldRole, newRole);
 	}
 };
 
@@ -195,8 +211,10 @@ bool AgoraRtcEngine::InitEngine(std::string appid)
 
 	SetExternalVideoFrame();
 
-	m_rtcEngine->enableVideo();
+	
 	m_rtcEngine->setChannelProfile(CHANNEL_PROFILE_LIVE_BROADCASTING);
+	m_rtcEngine->enableVideo();
+	AgoraRtcEngine::GetInstance()->setClientRole(CLIENT_ROLE_BROADCASTER);
 
 	m_audioDeviceManager = new AAudioDeviceManager(m_rtcEngine);
 	m_pMediaEngine->setExternalVideoSource(true, false);
@@ -402,7 +420,7 @@ int AgoraRtcEngine::setupRemoteVideo(unsigned int uid, void *view)
 	view_t v = reinterpret_cast<view_t>(view);
 	VideoCanvas canvas; // (v, RENDER_MODE_FIT, uid);
 	canvas.view = v;
-	canvas.renderMode = RENDER_MODE_FIT;
+	canvas.renderMode = RENDER_MODE_HIDDEN;
 	canvas.uid = uid;
 
 	return m_rtcEngine->setupRemoteVideo(canvas);
@@ -426,7 +444,7 @@ bool AgoraRtcEngine::setVideoProfileEx(int nWidth, int nHeight, int nFrameRate,
 				       int nBitRate)
 {
 	AParameter apm(m_rtcEngine);
-	apm->setParameters("{\"che.video.freestyle_customer\": true}");
+	//apm->setParameters("{\"che.video.freestyle_customer\": true}");
 	VideoEncoderConfiguration config;
 	config.dimensions.width = nWidth;
 	config.dimensions.height = nHeight;

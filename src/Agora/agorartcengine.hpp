@@ -112,6 +112,9 @@ signals:
 	void onConnectionStateChanged(int state, int reason);
 
 	void onRemoteVideoStateChanged(unsigned int uid, int state, int reason, int elapsed);
+	void onFirstRemoteVideoFrame(unsigned uid, int width, int height, int elapsed);
+	void onRtmpStreamingStateChanged(const char *url, int state, int errCode);
+	void onClientRoleChanged(int oldRole, int newRole);
 private:
 	friend class AgoraRtcEngineEvent;
 private:

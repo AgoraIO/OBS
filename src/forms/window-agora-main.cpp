@@ -54,6 +54,8 @@ AgoraBasic::AgoraBasic(QMainWindow *parent)
 	empty_channel = tr("Agora.General.EmptyChannel");
 	empty_uid = tr("Agora.General.EmptyUID");
 	init_failed_info = tr("Agora.General.Init.Failed");
+
+	exit_info = tr("Agora.Main.Exit.Info");
 	
 	invalidChannelError = tr("Basic.Main.Agora.Invalid.Channel");
 	invalidTokenlError = tr("Basic.Main.Agora.Invalid.Token");
@@ -70,9 +72,13 @@ AgoraBasic::AgoraBasic(QMainWindow *parent)
 	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onError, this, &AgoraBasic::onError_slot);
 	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onUserJoined, this, &AgoraBasic::onUserJoined_slot);
 	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onUserOffline, this, &AgoraBasic::onUserOffline_slot);
-	//connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onFirstRemoteVideoDecoded, this, &AgoraBasic::onFirstRemoteVideoDecoded_slot);
+	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onFirstRemoteVideoDecoded, this, &AgoraBasic::onFirstRemoteVideoDecoded_slot);
 	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onConnectionStateChanged, this, &AgoraBasic::onConnectionStateChanged_slot);
 	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onRemoteVideoStateChanged, this, &AgoraBasic::onRemoteVideoStateChanged_slot);
+	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onFirstRemoteVideoFrame, this, &AgoraBasic::onFirstRemoteVideoFrame_slot);
+	connect(&transcodingTimer, &QTimer::timeout, this, &AgoraBasic::transcoding_slot);
+	connect(&showRemoteTimer, &QTimer::timeout, this, &AgoraBasic::showRemote_slot);
+	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onClientRoleChanged, this, &AgoraBasic::onClientRoleChanged_slot);
 
 	
 	CreateRemoteVideos();
@@ -112,6 +118,8 @@ AgoraBasic::AgoraBasic(QMainWindow *parent)
 	};
 	connect(&aCloseEventHandler, &ACloseEvent::AgoraClose, closeEvent_slot);
 	mainWindow->installEventFilter(&aCloseEventHandler);
+
+	stopSignal = CreateEvent(nullptr, true, false, nullptr);
 }
 
 AgoraBasic::~AgoraBasic()
@@ -152,14 +160,17 @@ void AgoraBasic::on_agoraSteramButton_clicked()
 			QMessageBox::information(NULL, QString(""), empty_uid);
 			return;
 		}
-		if (!AgoraRtcEngine::GetInstance()->IsInitialize()
-			&& !AgoraRtcEngine::GetInstance()->InitEngine(m_agoraToolSettings.appid)) {
-			QMessageBox::information(NULL, QString(""), init_failed_info);
-			return;
+		if (!AgoraRtcEngine::GetInstance()->IsInitialize()){
+			if (!AgoraRtcEngine::GetInstance()->InitEngine(m_agoraToolSettings.appid)) {
+				QMessageBox::information(NULL, QString(""), init_failed_info);
+				return;
+			}
+		}
+		else {
+			AgoraRtcEngine::GetInstance()->setClientRole(CLIENT_ROLE_BROADCASTER);
+			Sleep(1000);
 		}
 		
-		AgoraRtcEngine::GetInstance()->setClientRole(CLIENT_ROLE_BROADCASTER);
-
 		std::string token = m_agoraToolSettings.token;
 
 		if (current_source) {
@@ -185,14 +196,22 @@ void AgoraBasic::on_agoraSteramButton_clicked()
 			,  m_agoraToolSettings.channelName.c_str(), m_agoraToolSettings.uid,
 			!m_agoraToolSettings.muteAllRemoteAudioVideo, !m_agoraToolSettings.muteAllRemoteAudioVideo);
 		ui->agoraSteramButton->setText(starting_text);
+		
 	}
 	else {
 		obs_remove_raw_video_callback(RawVideoCallback, this);
 		StopAgoraOutput();
 		AgoraRtcEngine::GetInstance()->stopPreview();
+
+		ResetEvent(stopSignal);
 		AgoraRtcEngine::GetInstance()->leaveChannel();
+		SetEvent(stopSignal);
+		if (!m_agoraToolSettings.agora_url.empty())
+			AgoraRtcEngine::GetInstance()->RemovePublishStreamUrl(m_agoraToolSettings.agora_url.c_str());
 		ui->agoraSteramButton->setText(stopping_text);
 		ClearRemoteVideos();
+		m_lstRemoteVideoUids.clear();
+		m_lstUids.clear();
 	}
 }
 
@@ -211,10 +230,14 @@ void AgoraBasic::hideEvent(QHideEvent *event)
 void AgoraBasic::closeEvent(QCloseEvent *event)
 {
 	QString str = ui->agoraSteramButton->text();
-	if (start_text.compare(str) == 0) {
+	if (stop_text.compare(str) == 0) {
+		/*obs_remove_raw_video_callback(RawVideoCallback, this);
+		ResetEvent(stopSignal);
 		AgoraRtcEngine::GetInstance()->leaveChannel();
-		obs_remove_raw_video_callback(RawVideoCallback, this);
-		StopAgoraOutput();
+		SetEvent(stopSignal);
+		StopAgoraOutput();*/
+		on_agoraSteramButton_clicked();
+		
 	}
 	
 	QMainWindow::closeEvent(event);
@@ -251,18 +274,39 @@ void AgoraBasic::on_settingsButton_clicked()
 void AgoraBasic::on_exitButton_clicked()
 {
 	QString str = ui->agoraSteramButton->text();
-	if (start_text.compare(str) != 0) {
+	if (stop_text.compare(str) != 0) {
 		return;
 	}
 }
 
 void AgoraBasic::SetLiveTranscoding()
 {
-	int count = m_lstUids.size() + 1;
+	if (m_agoraToolSettings.rtmp_url.empty())
+		return;
+	int count = m_lstRemoteVideoUids.size();
+	count = count > REMOTE_VIDEO_COUNT ? REMOTE_VIDEO_COUNT : count;
+
+	LiveTranscoding config;
+	config.audioSampleRate = AUDIO_SAMPLE_RATE_48000;
+	config.audioChannels = 2;
+	config.width = m_agoraToolSettings.rtmp_width;   //;
+	config.height = m_agoraToolSettings.rtmp_height; //;
+	config.videoFramerate = m_agoraToolSettings.rtmp_fps;
+	config.videoBitrate = m_agoraToolSettings.rtmp_height;
+	config.videoGop = config.videoFramerate;
+	config.userCount = count + 1;
+	config.watermark = nullptr;
+	config.videoCodecProfile = VIDEO_CODEC_PROFILE_MAIN;
+	config.transcodingUsers = new TranscodingUser[config.userCount];
+	config.lowLatency = true;
+
 	int row = 1;
 	int col = 1;
+
+	
 	if (count == 2) {
-		col = 2;
+		row = 2;
+		col = 1;
 	}
 	else if (count > 2 && count <= 4) {
 		row = col = 2;
@@ -280,43 +324,69 @@ void AgoraBasic::SetLiveTranscoding()
 		col = 4;
 	}
 	else if (count > 12 && count <= 16) {
-		row = 3;
+		row = 4;
 		col = 4;
 	}
 
-	int w = m_agoraToolSettings.rtmp_width / col;
-	int h = m_agoraToolSettings.rtmp_height / row;
+	if (count == 0) {
+		config.transcodingUsers[0].x = 0;
+		config.transcodingUsers[0].y = 0;
+		config.transcodingUsers[0].width = m_agoraToolSettings.rtmp_width;
+		config.transcodingUsers[0].height = m_agoraToolSettings.rtmp_height;
+		config.transcodingUsers[0].zOrder = 1;
+		config.transcodingUsers[0].uid = local_uid;
+		
+	}
+	else {
+		int width = m_agoraToolSettings.rtmp_width / 2;
+		int height = m_agoraToolSettings.rtmp_height;
 
-	LiveTranscoding config;
-	config.audioSampleRate = AUDIO_SAMPLE_RATE_48000;
-	config.audioChannels = 2;
-	config.width = m_agoraToolSettings.rtmp_width;   //;
-	config.height = m_agoraToolSettings.rtmp_height; //;
-	config.videoFramerate = m_agoraToolSettings.rtmp_fps;
-	config.videoBitrate = m_agoraToolSettings.rtmp_height;
-	config.videoGop = config.videoFramerate;
-	config.userCount = count;
-	config.watermark = nullptr;
-	config.videoCodecProfile = VIDEO_CODEC_PROFILE_MAIN;
-	config.transcodingUsers = new TranscodingUser[config.userCount];
-	config.lowLatency = true;
-	
-	//config.backgroundColor = 0x262626;
+		config.transcodingUsers[0].x = 0;
+		config.transcodingUsers[0].y = 0;
+		config.transcodingUsers[0].width = width;
+		config.transcodingUsers[0].height = height;
+		config.transcodingUsers[0].zOrder = 1;
+		config.transcodingUsers[0].uid = local_uid;
+		
+		int w = width / col;
+		int h = height / row;
 
-	int index = 0;
-	for (int i = 0; i < row; ++i) {
-		for (int j = 0; j < col; ++j) {
-			index = i * col + j;
-			config.transcodingUsers[index].x = j * w;
-			config.transcodingUsers[index].y = i * h;
+		int index = 0;
+		for (int i = 0; i < row - 1; ++i) {
+			for (int j = 0; j < col; ++j) {
+				index = i * col + j + 1;
+				if (index > count)
+					break;
+				config.transcodingUsers[index].x = width + j * w;
+				config.transcodingUsers[index].y = i * h;
+				config.transcodingUsers[index].width = w;
+				config.transcodingUsers[index].height = h;
+				config.transcodingUsers[index].zOrder = 1;
+				config.transcodingUsers[index].uid = uids[index];
+		
+			}
+		}
+
+		int rest = count - (row - 1)*col;
+		w = width / rest;
+		for (int j = 0; j < rest; ++j) {
+			index = (row - 1) * col + j + 1;
+			if (index > count)
+				break;
+			config.transcodingUsers[index].x = width + j * w;
+			config.transcodingUsers[index].y = (row - 1) * h;
 			config.transcodingUsers[index].width = w;
 			config.transcodingUsers[index].height = h;
 			config.transcodingUsers[index].zOrder = 1;
 			config.transcodingUsers[index].uid = uids[index];
-			config.transcodingUsers[index].audioChannel = 2;
 		}
 	}
 
+	blog(LOG_INFO, "SetLiveTranscoding begin count:%d", config.userCount);
+	for (int i = 0; i < config.userCount; ++i) {
+		blog(LOG_INFO, "uid:%u, index:%d, x:%d, y:%d, w:%d, h:%d", config.transcodingUsers[i].uid, i, config.transcodingUsers[i].x, config.transcodingUsers[i].y, config.transcodingUsers[i].width, config.transcodingUsers[i].height);
+	}
+	blog(LOG_INFO, "SetLiveTranscoding end");
 	AgoraRtcEngine::GetInstance()->SetLiveTranscoding(config);
 
 	delete[] config.transcodingUsers;
@@ -332,7 +402,7 @@ void AgoraBasic::CreateRemoteVideos()
 			QSizePolicy::Expanding, QSizePolicy::Expanding);
 		remoteVideoInfos[i].uid = 0;
 		remoteVideoInfos[i].iRemoteVideoHLayout = -1;
-		remoteVideoInfos[i].remoteVideo->setUpdatesEnabled(false);
+		remoteVideoInfos[i].remoteVideo->setUpdatesEnabled(true);
 	}
 
 	remoteVideoLayout = new QVBoxLayout();
@@ -367,24 +437,32 @@ void AgoraBasic::DestroyRemoteVideos()
 
 void AgoraBasic::ClearRemoteVideos()
 {
+	blog(LOG_INFO, "ClearRemoteVideos");
 	for (int i = 0; i < REMOTE_VIDEO_COUNT; ++i) {
 		int index = remoteVideoInfos[i].iRemoteVideoHLayout;
 		if (index >= 0 && remoteVideoInfos[i].uid > 0) {
 			ResetRemoteVideoWidget(i);
 		}
 	}
+
+
+	blog(LOG_INFO, "remote widget info:");
+	for (int i = 0; i < m_lstRemoteVideoUids.size(); ++i) {
+		int index = remoteVideoInfos[i].iRemoteVideoHLayout;
+	}
 }
 
 void AgoraBasic::ResetRemoteVideoWidget(int index)
 {
-	remoteVideoHLayout[remoteVideoInfos[index].iRemoteVideoHLayout]
-		->removeWidget(remoteVideoInfos[index].remoteVideo);
+	remoteVideoHLayout[remoteVideoInfos[index].iRemoteVideoHLayout]->removeWidget(remoteVideoInfos[index].remoteVideo);
+	AgoraRtcEngine::GetInstance()->setupRemoteVideo(remoteVideoInfos[index].uid, nullptr);
 	delete remoteVideoInfos[index].remoteVideo;
 	remoteVideoInfos[index].remoteVideo = new QWidget;
 	remoteVideoInfos[index].remoteVideo->setSizePolicy(
 		QSizePolicy::Expanding, QSizePolicy::Expanding);
 	remoteVideoInfos[index].iRemoteVideoHLayout = -1;
 	remoteVideoInfos[index].uid = 0;
+	remoteVideoInfos[index].remoteVideo->setUpdatesEnabled(true);
 }
 
 void AgoraBasic::resizeEvent(QResizeEvent *event)
@@ -395,7 +473,7 @@ void AgoraBasic::resizeEvent(QResizeEvent *event)
 
 	if (isVisible() && display) {
 #if _WIN32
-		QSize size = this->size();
+		QSize size = ui->preview->size();
 		obs_display_resize(display, size.width(), size.height());
 #else
     QSize size = this->size() *  ui->preview->devicePixelRatioF();
@@ -501,8 +579,9 @@ void AgoraBasic::DrawPreview(void *data, uint32_t cx, uint32_t cy)
 void AgoraBasic::RawVideoCallback (void *param, struct video_data *frame)
 {
 	struct obs_video_info ovi;
-	
-	if (obs_get_video_info(&ovi)) {
+	AgoraBasic* basic = (AgoraBasic*)param;
+	bool time_out = WaitForSingleObject(basic->stopSignal, 10);
+	if (obs_get_video_info(&ovi) && !time_out) {
 		
 		AgoraRtcEngine::GetInstance()->PushVideoFrame(frame);
 	}
@@ -562,10 +641,11 @@ void AgoraBasic::StopAgoraOutput()
 void AgoraBasic::onJoinChannelSuccess_slot(const char* channel, unsigned int uid, int elapsed)
 {
 	uids[0] = uid;
+	local_uid = uid;
 	ui->agoraSteramButton->setText(stop_text);
 	ui->exitButton->setEnabled(false);
 
-
+	m_agoraToolSettings.uid = uid;
 	if (!m_agoraToolSettings.rtmp_url.empty()) {
 		if (m_agoraToolSettings.rtmp_width == 0
 			|| m_agoraToolSettings.rtmp_height == 0
@@ -576,12 +656,14 @@ void AgoraBasic::onJoinChannelSuccess_slot(const char* channel, unsigned int uid
 		SetLiveTranscoding();
 		AgoraRtcEngine::GetInstance()->AddPublishStreamUrl(m_agoraToolSettings.rtmp_url.c_str(), true);
 	}
+	SetEvent(stopSignal);
 }
 
 void AgoraBasic::onLeaveChannel_slot(const RtcStats &stats)
 {
 	ui->agoraSteramButton->setText(start_text);
 	ui->exitButton->setEnabled(true);
+	blog(LOG_INFO, "onLeaveChannel");
 }
 
 void AgoraBasic::onError_slot(int err, const char *msg)
@@ -592,6 +674,15 @@ void AgoraBasic::onError_slot(int err, const char *msg)
 void AgoraBasic::onUserJoined_slot(uid_t uid, int elapsed)
 {
 	m_lstUids.push_back(uid);
+
+	if (m_lstUids.size() > 16) {
+		blog(LOG_INFO, "userjoined begin: count=%d", m_lstUids.size());
+		for (auto iter : m_lstUids) {
+
+			blog(LOG_INFO, "uid:%u", iter);
+		}
+		blog(LOG_INFO, "userjoined end");
+	}
 }
 
 void AgoraBasic::onUserOffline_slot(uid_t uid, int reason)
@@ -617,7 +708,7 @@ void AgoraBasic::onUserOffline_slot(uid_t uid, int reason)
 
 	if (m_lstRemoteVideoUids.size() < 16) {
 		int i = 0;
-		uids[i++] = loacal_uid;
+		uids[i++] = local_uid;
 		for (auto iter : m_lstRemoteVideoUids) {
 			uids[i++] = iter;
 		}
@@ -642,8 +733,12 @@ void AgoraBasic::onUserOffline_slot(uid_t uid, int reason)
 
 	int row = 1;
 	int col = 1;
-	if (count == 2) {
-		col = 2;
+	if (count == 1) {
+		ui->preview->setUpdatesEnabled(true);
+	}
+	else if (count == 2) {
+		row = 2;
+		col = 1;
 	}
 	else if (count == 3 || count == 4) {
 		row = 2;
@@ -666,43 +761,22 @@ void AgoraBasic::onUserOffline_slot(uid_t uid, int reason)
 		col = 4;
 	}
 
-	if (count == 4 || count == 9) {
-		ClearRemoteVideos();
-		auto iter = m_lstRemoteVideoUids.begin();
-		for (int i = 0; i < row; i++) {
-			for (int j = 0; j < col; j++) {
-				int index = i * col + j;
-				remoteVideoInfos[index].iRemoteVideoHLayout = i;
-				remoteVideoInfos[index].uid = *iter;
-				AgoraRtcEngine::GetInstance()->setupRemoteVideo(*iter,
-					(view_t)remoteVideoInfos[i].remoteVideo->winId());
+	ClearRemoteVideos();
+	auto iter = m_lstRemoteVideoUids.begin();
+	for (int i = 0; i < row; i++) {
+		for (int j = 0; j < col; j++) {
+			int index = i * col + j;
+			if (index >= count)
+				break;
 
-				remoteVideoHLayout[i]->addWidget(
-					remoteVideoInfos[index].remoteVideo);
-				++iter;
-			}
-		}
-	}
-	else {
-		for (int i = idx; i < count; i++) {
-			remoteVideoInfos[i].uid = remoteVideoInfos[i + 1].uid;
-			AgoraRtcEngine::GetInstance()->setupRemoteVideo(remoteVideoInfos[i].uid, (view_t)remoteVideoInfos[i].remoteVideo->winId());
-		}
+			remoteVideoInfos[index].iRemoteVideoHLayout = i;
+			remoteVideoInfos[index].uid = *iter;
+			AgoraRtcEngine::GetInstance()->setupRemoteVideo(*iter,
+				(view_t)remoteVideoInfos[index].remoteVideo->winId());
 
-		ResetRemoteVideoWidget(count);
-		if (m_lstRemoteVideoUids.size() >= REMOTE_VIDEO_COUNT) {
-			auto iter = m_lstRemoteVideoUids.begin();
-			for (int i = 0; i < REMOTE_VIDEO_COUNT; i++) {
-				++iter;
-			}
-
-			remoteVideoInfos[REMOTE_VIDEO_COUNT - 1].uid = *iter;
-			remoteVideoInfos[REMOTE_VIDEO_COUNT - 1].iRemoteVideoHLayout = row - 1;
-			remoteVideoInfos[REMOTE_VIDEO_COUNT - 1].remoteVideo->setUpdatesEnabled(false);
-			AgoraRtcEngine::GetInstance()->setupRemoteVideo(remoteVideoInfos[REMOTE_VIDEO_COUNT - 1].uid, (view_t)remoteVideoInfos[REMOTE_VIDEO_COUNT - 1].remoteVideo->winId());
-
-			remoteVideoHLayout[row - 1]->addWidget(
-				remoteVideoInfos[REMOTE_VIDEO_COUNT - 1].remoteVideo);
+			remoteVideoHLayout[i]->addWidget(
+				remoteVideoInfos[index].remoteVideo);
+			++iter;
 		}
 	}
 }
@@ -711,64 +785,19 @@ void AgoraBasic::onFirstRemoteVideoDecoded_slot(uid_t uid, int width, int height
 {
 	m_lstRemoteVideoUids.push_back(uid);
 	int count = m_lstRemoteVideoUids.size();
+	count = count > REMOTE_VIDEO_COUNT ? REMOTE_VIDEO_COUNT : count;
+
+	for (int i = 0; i < count; ++i) {
+		if (remoteVideoInfos[i].uid == uid)
+			return;
+	}
+
 	if (count > REMOTE_VIDEO_COUNT)
 		return;
 
-	if (count == 5 || count == 10) {
-		ClearRemoteVideos();
-		int row = 2;
-		int col = 3;
-		if (count == 5) {
-			row = 2;
-			col = 3;
-		}
-		else if (count == 10) {
-			row = 3;
-			col = 4;
-		}
-
-		auto iter = m_lstRemoteVideoUids.begin();
-		for (int i = 0; i < row; i++) {
-			for (int j = 0; j < col; j++) {
-				int index = i * col + j;
-				if (index >= m_lstRemoteVideoUids.size())
-					break;
-				remoteVideoInfos[index].iRemoteVideoHLayout = i;
-				remoteVideoInfos[index].uid = *iter;
-
-				AgoraRtcEngine::GetInstance()->setupRemoteVideo(uid, (view_t)remoteVideoInfos[index].remoteVideo->winId());
-				remoteVideoHLayout[i]->addWidget(
-					remoteVideoInfos[index].remoteVideo);
-				++iter;
-			}
-		}
-	}
-	else {
-		int row = 1;
-		if (count > 2 && count <= 6) {
-			row = 2;
-		}
-		else if (count > 6 && count <= 12)
-			row = 3;
-		else if (count > 12)
-			row = 4;
-
-		remoteVideoHLayout[row - 1]->addWidget(
-			remoteVideoInfos[count - 1].remoteVideo);
-		remoteVideoInfos[count - 1].iRemoteVideoHLayout = row - 1;
-		remoteVideoInfos[count - 1].uid = uid;
-		AgoraRtcEngine::GetInstance()->setupRemoteVideo(uid, (view_t)remoteVideoInfos[count - 1].remoteVideo->winId());
-	}
-
-	//set live transcoding
-	if (m_lstRemoteVideoUids.size() > 15)
-		return;
-	int i = 0;
-	uids[i++] = loacal_uid;
-	for (auto iter : m_lstRemoteVideoUids) {
-		uids[i++] = iter;
-	}
-	SetLiveTranscoding();
+	showRemoteTimer.stop();
+	showRemoteTimer.start(1000);
+	
 }
 
 void AgoraBasic::onConnectionStateChanged_slot(int state, int reason)
@@ -804,7 +833,106 @@ void AgoraBasic::onConnectionStateChanged_slot(int state, int reason)
 
 void AgoraBasic::onRemoteVideoStateChanged_slot(unsigned int uid, int state, int reason, int elapsed)
 {
-	if (state == REMOTE_VIDEO_STATE_DECODING) {
+	if (state == REMOTE_VIDEO_STATE_DECODING 
+		&& reason == REMOTE_VIDEO_STATE_REASON_REMOTE_UNMUTED) {
 		onFirstRemoteVideoDecoded_slot(uid, 0, 0, elapsed);
 	}
+	else if (state == REMOTE_VIDEO_STATE_STOPPED
+		&& reason == REMOTE_VIDEO_STATE_REASON_REMOTE_MUTED) {
+		onUserOffline_slot(uid, 0);
+	}
+}
+
+void AgoraBasic::onFirstRemoteVideoFrame_slot(unsigned uid, int width, int height, int elapsed)
+{
+	if (m_lstRemoteVideoUids.size() == 1) {
+		ui->preview->setUpdatesEnabled(false);
+	}
+
+	int count = m_lstRemoteVideoUids.size() > REMOTE_VIDEO_COUNT ? REMOTE_VIDEO_COUNT : m_lstRemoteVideoUids.size();
+	for (int i = 0; i < count; ++i) {
+		remoteVideoInfos[i].remoteVideo->show();
+		//remoteVideoInfos[i].remoteVideo->setUpdatesEnabled(false);
+	}
+}
+
+void AgoraBasic::showRemote_slot()
+{
+	int count = m_lstRemoteVideoUids.size();
+	count = count > REMOTE_VIDEO_COUNT ? REMOTE_VIDEO_COUNT : count;
+
+
+	int row = 1;
+	int col = 1;
+	if (count == 1) {
+		ui->preview->setUpdatesEnabled(true);
+	}
+	else if (count == 2) {
+		row = 2;
+		col = 1;
+	}
+	else if (count == 3 || count == 4) {
+		row = 2;
+		col = 2;
+	}
+	else if (count == 5 || count == 6) {
+		row = 2;
+		col = 3;
+	}
+	else if (count > 6 && count <= 9) {
+		row = 3;
+		col = 3;
+	}
+	else if (count > 9 && count <= 12) {
+		row = 3;
+		col = 4;
+	}
+	else if (count > 12) {
+		row = 4;
+		col = 4;
+	}
+
+	ClearRemoteVideos();
+
+	auto iter = m_lstRemoteVideoUids.begin();
+	for (int i = 0; i < row; i++) {
+		for (int j = 0; j < col; j++) {
+			int index = i * col + j;
+			if (index == count)
+				break;
+			remoteVideoInfos[index].iRemoteVideoHLayout = i;
+			remoteVideoInfos[index].uid = *iter;
+			remoteVideoInfos[index].remoteVideo->hide();
+			AgoraRtcEngine::GetInstance()->setupRemoteVideo(*iter, (view_t)remoteVideoInfos[index].remoteVideo->winId());
+			remoteVideoHLayout[i]->addWidget(remoteVideoInfos[index].remoteVideo);
+			++iter;
+
+
+		}
+	}
+
+	//set live transcoding
+	if (m_lstRemoteVideoUids.size() > REMOTE_VIDEO_COUNT)
+		return;
+	int i = 0;
+	uids[i++] = local_uid;
+	for (auto iter : m_lstRemoteVideoUids) {
+		uids[i++] = iter;
+	}
+
+
+	showRemoteTimer.stop();
+	transcodingTimer.stop();
+	transcodingTimer.start(1000);
+}
+
+void AgoraBasic::transcoding_slot()
+{
+	SetLiveTranscoding();
+	transcodingTimer.stop();
+}
+
+void AgoraBasic::onClientRoleChanged_slot(int oldRole, int newRole)
+{
+	blog(LOG_INFO, "oldRole:%d, newRole:%d", oldRole, newRole);
 }

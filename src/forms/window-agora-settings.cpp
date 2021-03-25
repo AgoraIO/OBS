@@ -31,9 +31,10 @@
 #define DSCROLL_CHANGED SIGNAL(valueChanged(double))
 
 #define TOGGLE_CHANGED  SIGNAL(toggled(bool))
-#define GENERAL_CHANGED   SLOT(GeneralChanged())
+#define GENERAL_CHANGED SLOT(GeneralChanged())
 #define AUDIO_CHANGED   SLOT(AudioChanged())
 #define VIDEO_CHANGED   SLOT(VideoChanged())
+#define RTMP_CHANGED     SLOT(RtmpChanged())
 AgoraSettings::AgoraSettings(QWidget *parent)
 	: QDialog(parent),
 	main(qobject_cast<AgoraBasic *>(parent)),
@@ -124,6 +125,9 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	ui->labelRtmpBitrate->setText(tr("Agora.Settings.Rtmp.Bitrate"));
 	ui->labelRtmpWidth->setText(tr("Agora.Settings.Rtmp.Width"));
 	ui->labelRtmpHeight->setText(tr("Agora.Settings.Rtmp.Height"));
+
+	ui->lineEditExpiredTs->hide();
+	ui->label_45->hide();
 	//information
 	empty_appid_info = tr("Agora.General.EmptyAppid");
 	init_failed_info = tr("Agora.General.Init.Failed");
@@ -172,12 +176,14 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	LoadGeneralSettings();
 	LoadAudioSettings();
 	LoadVideoSettings();
+	LoadRtmpSettings();
 	//
 	HookWidget(ui->lineEditAppid, EDIT_CHANGED, GENERAL_CHANGED);
 	HookWidget(ui->lineEditToken, EDIT_CHANGED, GENERAL_CHANGED);
 	HookWidget(ui->lineEditAppCertificate, EDIT_CHANGED, GENERAL_CHANGED);
 	HookWidget(ui->lineEditExpiredTs, EDIT_CHANGED, GENERAL_CHANGED);
 	HookWidget(ui->lineEditChannel, EDIT_CHANGED, GENERAL_CHANGED);
+	HookWidget(ui->lineEditUID, EDIT_CHANGED, GENERAL_CHANGED);
 
 	HookWidget(ui->chkPersistSaving, CHECK_CHANGED, GENERAL_CHANGED);
 	HookWidget(ui->chkMuteAllRemoteAV, CHECK_CHANGED, GENERAL_CHANGED);
@@ -193,7 +199,12 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	HookWidget(ui->agoraResolution, COMBO_CHANGED, VIDEO_CHANGED);
 	HookWidget(ui->cmbAgoraVideoDevice, COMBO_CHANGED, VIDEO_CHANGED);
 
-	
+
+	HookWidget(ui->lineEditAgoraRTmp, EDIT_CHANGED, RTMP_CHANGED);
+	HookWidget(ui->lineEditAgoraRtmpFPS, EDIT_CHANGED, RTMP_CHANGED);
+	HookWidget(ui->lineEditAgoraRtmpWidth, EDIT_CHANGED, RTMP_CHANGED);
+	HookWidget(ui->lineEditAgoraRtmpHeight, EDIT_CHANGED, RTMP_CHANGED);
+	HookWidget(ui->lineEditAgoraRtmpBitrate, EDIT_CHANGED, RTMP_CHANGED);
 }
 
 
@@ -237,11 +248,21 @@ void AgoraSettings::AudioChanged()
 	}
 }
 
+void AgoraSettings::RtmpChanged()
+{
+	if (!loading) {
+		rtmpChanged = true;
+		sender()->setProperty("changed", QVariant(true));
+		EnableApplyButton(true);
+	}
+}
+
 void AgoraSettings::ClearChanged()
 {
 	generalChanged = false;
 	audioChanged = false;
 	videoChanged = false;
+	rtmpChanged = false;
 }
 
 void AgoraSettings::SaveAudioSettings()
@@ -274,7 +295,7 @@ void AgoraSettings::SaveVideoSettings()
 	main->GetAgoraSetting(settings);
 
 	settings.agora_fps = agora_fps[ui->cmbAgoraFPS->currentIndex()];
-	settings.agora_bitrate = agora_fps[ui->cmbAgoraBitrate->currentIndex()];
+	settings.agora_bitrate = agora_bitrate[ui->cmbAgoraBitrate->currentIndex()];
 	settings.agora_width = m_vecResolution[ui->agoraResolution->currentIndex()].width;
 	settings.agora_height = m_vecResolution[ui->agoraResolution->currentIndex()].height;
 	main->SetAgoraSetting(settings);
@@ -316,15 +337,7 @@ void AgoraSettings::SaveGeneralSettings()
 	settings.expiredTimeTs = settings.expiredTime * 60 * 60;
 	settings.savePersist = ui->chkPersistSaving->isChecked();
 	settings.muteAllRemoteAudioVideo = ui->chkMuteAllRemoteAV->isChecked();
-#if defined(WIN32)
-	settings.rtmp_url = ui->lineEditAgoraRTmp->text().toUtf8();
-#else
-  settings.rtmp_url = ui->lineEditAgoraRTmp->text().toStdString();
-#endif
-	settings.rtmp_fps = ui->lineEditAgoraRtmpFPS->text().toInt();
-	settings.rtmp_bitrate = ui->lineEditAgoraRtmpBitrate->text().toInt();
-	settings.rtmp_width = ui->lineEditAgoraRtmpWidth->text().toInt();
-	settings.rtmp_height = ui->lineEditAgoraRtmpHeight->text().toInt();
+
 
 	main->SetAgoraSetting(settings);
 
@@ -366,6 +379,20 @@ void AgoraSettings::SaveGeneralSettings()
 }
 
 
+void AgoraSettings::SaveRtmpSetting()
+{
+	AgoraToolSettings settings;
+	main->GetAgoraSetting(settings);
+	settings.rtmp_fps = ui->lineEditAgoraRtmpFPS->text().toInt();
+	settings.rtmp_bitrate = ui->lineEditAgoraRtmpBitrate->text().toInt();
+	settings.rtmp_width = ui->lineEditAgoraRtmpWidth->text().toInt();
+	settings.rtmp_height = ui->lineEditAgoraRtmpHeight->text().toInt();
+
+	settings.rtmp_url = ui->lineEditAgoraRTmp->text().toStdString();
+
+	main->SetAgoraSetting(settings);
+}
+
 void AgoraSettings::SaveCheckBox(QAbstractButton *widget,
 	const char *section, const char *value,
 	bool invert)
@@ -378,6 +405,7 @@ void AgoraSettings::SaveCheckBox(QAbstractButton *widget,
 		//config_set_bool(main->Config(), section, value, checked);
 	}
 }
+
 
 void AgoraSettings::SaveEdit(QLineEdit *widget, const char *section,
 	const char *value)
@@ -491,6 +519,22 @@ void AgoraSettings::LoadVideoSettings()
 	loading = false;
 }
 
+
+void AgoraSettings::LoadRtmpSettings()
+{
+	return;
+	loading = true;
+	AgoraToolSettings settings;
+	//main->GetAgoraSettings(settings);
+
+	ui->lineEditAgoraRTmp->setText(QString::fromUtf8(settings.rtmp_url.data()));
+	ui->lineEditAgoraRtmpBitrate->setText(QString("%1").arg(settings.rtmp_bitrate));
+	ui->lineEditAgoraRtmpFPS->setText(QString("%1").arg(settings.rtmp_fps));
+	ui->lineEditAgoraRtmpWidth->setText(QString("%1").arg(settings.rtmp_width));
+	ui->lineEditAgoraRtmpHeight->setText(QString("%1").arg(settings.rtmp_height));
+	loading = false;
+}
+
 void AgoraSettings::LoadAgoraSettings()
 {
 	loading = true;
@@ -523,6 +567,9 @@ void AgoraSettings::SaveSettings()
 
 	if (generalChanged)
 		SaveGeneralSettings();
+
+	if (rtmpChanged)
+		SaveRtmpSetting();
 }
 
 void AgoraSettings::on_buttonAppid_clicked()
@@ -591,7 +638,7 @@ void AgoraSettings::on_loadConfigButton_clicked()
 		if (!str.isEmpty())
 			ui->lineEditAppid->setText(str);
 
-		str = spConfig->value("/BaseInfo/AppCertificate").toString();
+		str = spConfig->value("/BaseInfo/AppToken").toString();
 		if (!str.isEmpty())
 			ui->lineEditToken->setText(str);
 		str = spConfig->value("/BaseInfo/ChannelName").toString();
@@ -606,6 +653,9 @@ void AgoraSettings::on_loadConfigButton_clicked()
 		if (!str.isEmpty())
 			ui->lineEditExpiredTs->setText(str);
 
+		str = spConfig->value("/BaseInfo/RtmpUrl").toString();
+		if (!str.isEmpty())
+			ui->lineEditAgoraRTmp->setText(str);
 
 		auto addRes = [this](int cx, int cy) {
 			QString res = ResString(cx, cy).c_str();

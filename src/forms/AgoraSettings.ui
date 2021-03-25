@@ -76,7 +76,7 @@
      <item>
       <widget class="QStackedWidget" name="settingsPages">
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="agoraPage">
         <layout class="QVBoxLayout" name="verticalLayout_16">
@@ -108,8 +108,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>534</width>
-              <height>314</height>
+              <width>698</width>
+              <height>403</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_23">

@@ -30,6 +30,7 @@ private:
 	bool generalChanged = false;
 	bool audioChanged   = false;
 	bool videoChanged   = false;
+	bool rtmpChanged    = false;
 	bool loading        = true;
 	bool appid_changed  = false; 
 	int agora_fps[FPS_NUM];
@@ -61,11 +62,12 @@ private:
 	void SaveAudioSettings();
 	void SaveVideoSettings();
 	void SaveGeneralSettings();
+	void SaveRtmpSetting();
 
 	void LoadGeneralSettings();
 	void LoadAudioSettings();
 	void LoadVideoSettings();
-	
+	void LoadRtmpSettings();
 	void LoadAudioDevice();
 
 	virtual void showEvent(QShowEvent *event)override;
@@ -79,6 +81,7 @@ private slots:
 	void VideoChanged();
 	void AudioChanged();
 	void GeneralChanged();
+	void RtmpChanged();
 	void on_buttonAppid_clicked();
 	void on_buttonBox_clicked(QAbstractButton *button);
 	void on_loadConfigButton_clicked();

@@ -7,7 +7,7 @@
 #include "ui_AgoraBasic.h"
 #include "../Agora/agorartcengine.hpp"
 #include <util/config-file.h>
-
+#include <QTimer>
 #include "obs.hpp"
 
 
@@ -37,13 +37,13 @@ typedef struct tagAgoraToolSettings {
 	std::string agora_url = "";
 	int  agora_fps = 15;
 	int  agora_bitrate = 1000;
-	int  agora_width = 1920;
-	int  agora_height = 1080;
+	int  agora_width = 1280;
+	int  agora_height = 720;
 	std::string rtmp_url = "";
 	int rtmp_fps = 15;
 	int rtmp_bitrate = 1000;
-	int rtmp_width = 1920;
-	int rtmp_height = 1080;
+	int rtmp_width = 1280;
+	int rtmp_height = 720;
 
 	int audioChannel = 2;
 	int scenario = 0;
@@ -75,6 +75,7 @@ class AgoraBasic : public QMainWindow {
 private:
 	std::unique_ptr<Ui::AgoraBasic> ui;
 	QString control_text;
+	QString exit_info;
 	QString start_text;
 	QString starting_text;
 	QString stop_text;
@@ -97,7 +98,7 @@ private:
 	std::list<uint32_t> m_lstUids;
 	std::list<uint32_t> m_lstRemoteVideoUids;
 	uint32_t remote_uid = 0;
-	uint32_t loacal_uid = 0;
+	uint32_t local_uid = 0;
 	unsigned int uids[17];
 	RemoteVideoInfo remoteVideoInfos[REMOTE_VIDEO_COUNT];
 	//
@@ -125,9 +126,13 @@ private:
 	obs_output_t *output;
 	obs_encoder_t *audio_encoder;
 
-	bool joinFailed = false;
+	QTimer transcodingTimer;
+	QTimer showRemoteTimer;
 
+	bool joinFailed = false;
 	bool started = false;
+
+	HANDLE stopSignal = NULL;
 
 	virtual void showEvent(QShowEvent *event)override;
 	virtual void hideEvent(QHideEvent *event)override;
@@ -156,6 +161,10 @@ public slots:
 	void onFirstRemoteVideoDecoded_slot(uid_t uid, int width, int height, int elapsed);
 	void onConnectionStateChanged_slot(int state, int reason);
 	void onRemoteVideoStateChanged_slot(unsigned int uid, int state, int reason, int elapsed);
+	void onFirstRemoteVideoFrame_slot(unsigned uid, int width, int height, int elapsed);
+	void transcoding_slot();
+	void showRemote_slot();
+	void onClientRoleChanged_slot(int oldRole, int newRole);
 public:
 	void ToggleAgoraDialog();
 	AgoraBasic(QMainWindow *parent);
