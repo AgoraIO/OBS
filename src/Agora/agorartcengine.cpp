@@ -392,7 +392,6 @@ int AgoraRtcEngine::joinChannel(const std::string &key,
 	options.autoSubscribeVideo = muteVideo;
 
 	int r = m_rtcEngine->joinChannel(key.data(), channel.data(), "", uid, options);
-	m_bJoinChannel = true;
 	return r;
 }
 
@@ -400,10 +399,6 @@ int AgoraRtcEngine::leaveChannel()
 {
 	if (!m_bInitialize || !m_bJoinChannel)
 		return -1;
-	/*if (fp) {
-		fclose(fp);
-		fp = nullptr;
-	}*/
 	m_bJoinChannel = false;
 	int r = m_rtcEngine->leaveChannel();
 	return r;

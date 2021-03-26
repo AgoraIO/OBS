@@ -119,7 +119,7 @@ AgoraBasic::AgoraBasic(QMainWindow *parent)
 	connect(&aCloseEventHandler, &ACloseEvent::AgoraClose, closeEvent_slot);
 	mainWindow->installEventFilter(&aCloseEventHandler);
 
-	stopSignal = CreateEvent(nullptr, true, false, nullptr);
+	//stopSignal = CreateEvent(nullptr, true, false, nullptr);
 }
 
 AgoraBasic::~AgoraBasic()
@@ -203,9 +203,10 @@ void AgoraBasic::on_agoraSteramButton_clicked()
 		StopAgoraOutput();
 		AgoraRtcEngine::GetInstance()->stopPreview();
 
-		ResetEvent(stopSignal);
+		//ResetEvent(stopSignal);
 		AgoraRtcEngine::GetInstance()->leaveChannel();
-		SetEvent(stopSignal);
+		//SetEvent(stopSignal);
+		
 		if (!m_agoraToolSettings.agora_url.empty())
 			AgoraRtcEngine::GetInstance()->RemovePublishStreamUrl(m_agoraToolSettings.agora_url.c_str());
 		ui->agoraSteramButton->setText(stopping_text);
@@ -231,11 +232,6 @@ void AgoraBasic::closeEvent(QCloseEvent *event)
 {
 	QString str = ui->agoraSteramButton->text();
 	if (stop_text.compare(str) == 0) {
-		/*obs_remove_raw_video_callback(RawVideoCallback, this);
-		ResetEvent(stopSignal);
-		AgoraRtcEngine::GetInstance()->leaveChannel();
-		SetEvent(stopSignal);
-		StopAgoraOutput();*/
 		on_agoraSteramButton_clicked();
 		
 	}
@@ -580,8 +576,8 @@ void AgoraBasic::RawVideoCallback (void *param, struct video_data *frame)
 {
 	struct obs_video_info ovi;
 	AgoraBasic* basic = (AgoraBasic*)param;
-	bool time_out = WaitForSingleObject(basic->stopSignal, 10);
-	if (obs_get_video_info(&ovi) && !time_out) {
+	//bool time_out = WaitForSingleObject(basic->stopSignal, 10);
+	if (obs_get_video_info(&ovi) ) {
 		
 		AgoraRtcEngine::GetInstance()->PushVideoFrame(frame);
 	}
@@ -644,8 +640,8 @@ void AgoraBasic::onJoinChannelSuccess_slot(const char* channel, unsigned int uid
 	local_uid = uid;
 	ui->agoraSteramButton->setText(stop_text);
 	ui->exitButton->setEnabled(false);
-
 	m_agoraToolSettings.uid = uid;
+	AgoraRtcEngine::GetInstance()->SetJoinChannel(true);
 	if (!m_agoraToolSettings.rtmp_url.empty()) {
 		if (m_agoraToolSettings.rtmp_width == 0
 			|| m_agoraToolSettings.rtmp_height == 0
@@ -656,7 +652,7 @@ void AgoraBasic::onJoinChannelSuccess_slot(const char* channel, unsigned int uid
 		SetLiveTranscoding();
 		AgoraRtcEngine::GetInstance()->AddPublishStreamUrl(m_agoraToolSettings.rtmp_url.c_str(), true);
 	}
-	SetEvent(stopSignal);
+	
 }
 
 void AgoraBasic::onLeaveChannel_slot(const RtcStats &stats)

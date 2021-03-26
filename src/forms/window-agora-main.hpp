@@ -132,7 +132,9 @@ private:
 	bool joinFailed = false;
 	bool started = false;
 
-	HANDLE stopSignal = NULL;
+	//HANDLE stopSignal = NULL;
+
+	
 
 	virtual void showEvent(QShowEvent *event)override;
 	virtual void hideEvent(QHideEvent *event)override;

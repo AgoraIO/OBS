@@ -100,6 +100,7 @@ public:
 	void MuteAllRemoteAudio(bool bMute);
 
 	void release();
+	void SetJoinChannel(bool bJoin) { m_bJoinChannel = bJoin; }
 signals:
 	void onJoinChannelSuccess(const char* channel, unsigned int uid, int elapsed);
 	void onLeaveChannel(const RtcStats &stats);
