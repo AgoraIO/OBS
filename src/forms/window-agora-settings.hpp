@@ -87,4 +87,5 @@ private slots:
 	void on_loadConfigButton_clicked();
 	void on_recordVolumeSld_valueChanged(int value);
 	void on_playoutVolumeSld_valueChanged(int value);
+	void on_cmbVideoEncoder_currentIndexChanged(int index);
 };

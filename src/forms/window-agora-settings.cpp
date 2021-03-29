@@ -41,9 +41,17 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	ui(new Ui::AgoraSettings)
 {
 	ui->setupUi(this);
-
+	//hide 
 	ui->label_45->hide();
 	ui->lineEditExpiredTs->hide();
+	ui->label_8->hide();
+	ui->label_10->hide();
+	ui->label_5->hide();
+
+	ui->agoraResolution->hide();
+	ui->cmbAgoraFPS->hide();
+	ui->cmbAgoraVideoDevice->hide();
+	//hide end
 	//Apply button disabled until change.
 	EnableApplyButton(false);
 	ui->label_5->hide();
@@ -133,6 +141,13 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	init_failed_info = tr("Agora.General.Init.Failed");
 
 	ui->baseAspect->setText(tr(""));
+
+	//video encoder
+	ui->labelVideoEncoder->setText(tr("Agora.Settings.Video.Encoder"));
+	ui->labelFPSResolution->setText(tr("Agora.Settings.Video.FPS.Resolution"));
+	ui->cmbVideoEncoder->setItemText(0, tr("Agora.Settings.Video.Agora.Bitrate"));
+	ui->cmbVideoEncoder->setItemText(1, tr("Agora.Settings.Video.OBS.Bitrate"));
+	ui->cmbVideoEncoder->setCurrentIndex(0);
 	obs_frontend_pop_ui_translation();
 	
 	ui->cmbAgoraFPS->setCurrentIndex(3);
@@ -172,6 +187,7 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	dimmision.width = 1920;
 	dimmision.height = 1080;
 	m_vecResolution.push_back(dimmision);
+	
 
 	LoadGeneralSettings();
 	LoadAudioSettings();
@@ -198,6 +214,7 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	HookWidget(ui->cmbAgoraBitrate, COMBO_CHANGED, VIDEO_CHANGED);
 	HookWidget(ui->agoraResolution, COMBO_CHANGED, VIDEO_CHANGED);
 	HookWidget(ui->cmbAgoraVideoDevice, COMBO_CHANGED, VIDEO_CHANGED);
+	HookWidget(ui->cmbVideoEncoder, COMBO_CHANGED, VIDEO_CHANGED);
 
 
 	HookWidget(ui->lineEditAgoraRTmp, EDIT_CHANGED, RTMP_CHANGED);
@@ -298,6 +315,7 @@ void AgoraSettings::SaveVideoSettings()
 	settings.agora_bitrate = agora_bitrate[ui->cmbAgoraBitrate->currentIndex()];
 	settings.agora_width = m_vecResolution[ui->agoraResolution->currentIndex()].width;
 	settings.agora_height = m_vecResolution[ui->agoraResolution->currentIndex()].height;
+	settings.videoEncoder = ui->cmbVideoEncoder->currentIndex();
 	main->SetAgoraSetting(settings);
 }
 
@@ -508,6 +526,8 @@ void AgoraSettings::LoadVideoSettings()
 			break;
 		}
 	}
+
+	ui->cmbVideoEncoder->setCurrentIndex(setting.videoEncoder);
 	
 	for (int i = 0; i < m_vecResolution.size(); i++) {
 		addRes(m_vecResolution[i].width, m_vecResolution[i].height);
@@ -697,6 +717,18 @@ void AgoraSettings::on_recordVolumeSld_valueChanged(int value)
 	//AgoraRtcEngine::GetInstance()->setRecordingDeviceVolume(value);
 }
 
+void AgoraSettings::on_cmbVideoEncoder_currentIndexChanged(int index)
+{
+	if (index == 0) {//Agora bitrate
+		ui->label_4->show();
+		ui->cmbAgoraBitrate->show();
+	}
+	else {
+		ui->label_4->hide();
+		ui->cmbAgoraBitrate->hide();
+	}
+}
+
 void AgoraSettings::on_playoutVolumeSld_valueChanged(int value)
 {
 	AgoraRtcEngine::GetInstance()->setPalyoutDeviceVolume(value);
@@ -714,6 +746,9 @@ void AgoraSettings::showEvent(QShowEvent *event)
 	ui->chkAudioHighQuality->setEnabled(bEnabled);
 	ui->cmbRecordChannelSetup->setEnabled(bEnabled);
 	ui->cmbScenario->setEnabled(bEnabled);
+
+	ui->cmbAgoraBitrate->setEnabled(bEnabled);
+	ui->cmbVideoEncoder->setEnabled(bEnabled);
 }
 
 

@@ -439,7 +439,7 @@ bool AgoraRtcEngine::setVideoProfileEx(int nWidth, int nHeight, int nFrameRate,
 				       int nBitRate)
 {
 	AParameter apm(m_rtcEngine);
-	//apm->setParameters("{\"che.video.freestyle_customer\": true}");
+	apm->setParameters("{\"che.video.freestyle_customer\": true}");
 	VideoEncoderConfiguration config;
 	config.dimensions.width = nWidth;
 	config.dimensions.height = nHeight;

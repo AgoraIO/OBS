@@ -7,6 +7,8 @@
 #include "../agora-ui-main.h"
 #include "obs-module.h"
 #include "window-agora-settings.hpp"
+#include <util/platform.h>
+#include <util/dstr.h>
 using namespace std;
 
 bool DisplayResizeEvent::eventFilter(QObject *obj, QEvent *event)
@@ -119,7 +121,75 @@ AgoraBasic::AgoraBasic(QMainWindow *parent)
 	connect(&aCloseEventHandler, &ACloseEvent::AgoraClose, closeEvent_slot);
 	mainWindow->installEventFilter(&aCloseEventHandler);
 
-	//stopSignal = CreateEvent(nullptr, true, false, nullptr);
+	InitGlobalConfig();
+	InitBasicConfig();
+}
+
+void AgoraBasic::InitGlobalConfig()
+{
+	char path[512];
+
+	int len = os_get_config_path(path, sizeof(path), "obs-studio/global.ini");
+	if (len <= 0)
+		return;
+	int errorcode = globalConfig.Open(path, CONFIG_OPEN_ALWAYS);
+	if (errorcode != CONFIG_SUCCESS) {
+		blog(LOG_ERROR, "Agora Plugin Failed to open global.ini: %d", errorcode);
+		return ;
+	}
+}
+
+int AgoraBasic::GetProfilePath(char *path, size_t size, const char *file)
+{
+	char profiles_path[512];
+	const char *profile =
+		config_get_string(globalConfig, "Basic", "ProfileDir");
+	int ret;
+
+	if (!profile)
+		return -1;
+	if (!path)
+		return -1;
+	if (!file)
+		file = "";
+
+	ret = os_get_config_path(profiles_path, 512, "obs-studio/basic/profiles");
+	if (ret <= 0)
+		return ret;
+
+	if (!*file)
+		return snprintf(path, size, "%s/%s", profiles_path, profile);
+
+	return snprintf(path, size, "%s/%s/%s", profiles_path, profile, file);
+}
+
+
+void AgoraBasic::InitBasicConfig()
+{
+	char configPath[512];
+
+	int ret = GetProfilePath(configPath, sizeof(configPath), "");
+	if (ret <= 0) {
+		blog(LOG_INFO, "Failed to get profile path");
+		return ;
+	}
+
+	ret = GetProfilePath(configPath, sizeof(configPath), "basic.ini");
+	if (ret <= 0) {
+		blog(LOG_INFO, "Failed to get basic.ini path");
+		return ;
+	}
+
+	int code = basicConfig.Open(configPath, CONFIG_OPEN_ALWAYS);
+	if (code != CONFIG_SUCCESS) {
+		blog(LOG_INFO, "Failed to open basic.ini: %d", code);
+		return;
+	}
+
+	if (config_get_string(basicConfig, "General", "Name") == nullptr) {
+		const char *curName = config_get_string(globalConfig,
+			"Basic", "Profile");
+	}
 }
 
 AgoraBasic::~AgoraBasic()
@@ -135,6 +205,23 @@ AgoraBasic::~AgoraBasic()
 
 	AgoraRtcEngine::GetInstance()->ReleaseInstance();
 }
+
+int AgoraBasic::GetOBSBitrate()
+{
+	const char *mode = config_get_string(basicConfig, "Output", "Mode");
+	bool advOut = astrcmpi(mode, "Advanced") == 0;
+
+	int bitrate = 2500;
+	if (advOut) {
+		bitrate = config_get_int(basicConfig, "AdvOut", "VBitrate");
+	}
+	else {
+		bitrate = config_get_int(basicConfig, "SimpleOutput", "VBitrate");
+	}
+
+	return bitrate == 0 ? 2500 : bitrate;
+}
+
 void AgoraBasic::on_agoraSteramButton_clicked()
 {
 	QString str = ui->agoraSteramButton->text();
@@ -186,11 +273,32 @@ void AgoraBasic::on_agoraSteramButton_clicked()
 
 		StartAgoraOutput();
 
-		AgoraRtcEngine::GetInstance()->setVideoProfileEx(
-			m_agoraToolSettings.agora_width,
-			m_agoraToolSettings.agora_height,
-			m_agoraToolSettings.agora_fps,
-			m_agoraToolSettings.agora_bitrate);
+		int output_width = ovi.output_width;
+		int output_height = ovi.output_height;
+
+		if (output_width*output_height > 1920 * 1080) {
+			float rate = sqrtf((float)(output_width*output_height) / (1920 * 1080.0f));
+			float width = (float)output_width / rate;
+			float height = (float)output_height / rate;
+			output_width = width;
+			output_height = height;
+		}
+
+		if (m_agoraToolSettings.videoEncoder == 0) {//Agora ÂëÂÊ
+			AgoraRtcEngine::GetInstance()->setVideoProfileEx(
+				output_width,
+				output_height,
+				(float)ovi.fps_num/(float)ovi.fps_den,
+				m_agoraToolSettings.agora_bitrate);
+		}
+		else {//obs ÂëÂÊ
+			m_agoraToolSettings.obs_bitrate = GetOBSBitrate();
+			AgoraRtcEngine::GetInstance()->setVideoProfileEx(
+				output_width,
+				output_height,
+				(float)ovi.fps_num / (float)ovi.fps_den,
+				m_agoraToolSettings.obs_bitrate);
+		}
 
 		AgoraRtcEngine::GetInstance()->joinChannel(m_agoraToolSettings.token.c_str()
 			,  m_agoraToolSettings.channelName.c_str(), m_agoraToolSettings.uid,
@@ -209,7 +317,10 @@ void AgoraBasic::on_agoraSteramButton_clicked()
 		
 		if (!m_agoraToolSettings.agora_url.empty())
 			AgoraRtcEngine::GetInstance()->RemovePublishStreamUrl(m_agoraToolSettings.agora_url.c_str());
-		ui->agoraSteramButton->setText(stopping_text);
+		if (starting_text.compare(str) == 0)
+			ui->agoraSteramButton->setText(start_text);
+		else
+			ui->agoraSteramButton->setText(stopping_text);
 		ClearRemoteVideos();
 		m_lstRemoteVideoUids.clear();
 		m_lstUids.clear();
@@ -220,6 +331,7 @@ void AgoraBasic::showEvent(QShowEvent *event)
 {
 	if (!current_source)
 		current_source = obs_frontend_get_current_scene();
+
 	QMainWindow::showEvent(event);
 }
 

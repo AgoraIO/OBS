@@ -6,7 +6,7 @@
 #include <memory>
 #include "ui_AgoraBasic.h"
 #include "../Agora/agorartcengine.hpp"
-#include <util/config-file.h>
+#include <util/util.hpp>
 #include <QTimer>
 #include "obs.hpp"
 
@@ -36,7 +36,7 @@ typedef struct tagAgoraToolSettings {
 	bool muteAllRemoteAudioVideo = false;
 	std::string agora_url = "";
 	int  agora_fps = 15;
-	int  agora_bitrate = 1000;
+	int  agora_bitrate = 0;
 	int  agora_width = 1280;
 	int  agora_height = 720;
 	std::string rtmp_url = "";
@@ -48,6 +48,9 @@ typedef struct tagAgoraToolSettings {
 	int audioChannel = 2;
 	int scenario = 0;
 	bool bHighQuality = false;
+	int obs_bitrate = 2500;
+
+	int videoEncoder = 0;//Ä¬ÈÏAgora²ÎÊý
 } AgoraToolSettings, *PAgoraToolSettings;
 
 class DisplayResizeEvent : public QObject
@@ -132,10 +135,13 @@ private:
 	bool joinFailed = false;
 	bool started = false;
 
+	ConfigFile globalConfig;
+	ConfigFile basicConfig;
+	void InitGlobalConfig();
+	void InitBasicConfig();
+	int GetOBSBitrate();
+	int GetProfilePath(char *path, size_t size, const char *file);
 	//HANDLE stopSignal = NULL;
-
-	
-
 	virtual void showEvent(QShowEvent *event)override;
 	virtual void hideEvent(QHideEvent *event)override;
 	virtual void closeEvent(QCloseEvent *event)override;
