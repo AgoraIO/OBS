@@ -63,7 +63,7 @@ AgoraBasic::AgoraBasic(QMainWindow *parent)
 	invalidTokenlError = tr("Basic.Main.Agora.Invalid.Token");
 	invalidAppidError = tr("Basic.Main.Agora.Invalid.Appid");
 	invalidTokenExpiredError = tr("Basic.Main.Agora.Token.Expired");
-	
+
 	obs_frontend_pop_ui_translation();
 
 	ui->controlsDock->setWindowTitle(control_text);
@@ -137,6 +137,18 @@ void AgoraBasic::InitGlobalConfig()
 		blog(LOG_ERROR, "Agora Plugin Failed to open global.ini: %d", errorcode);
 		return ;
 	}
+
+	char pathAgora[512];
+
+	int lenAgora = os_get_config_path(pathAgora, sizeof(pathAgora), "obs-studio/globalAgora.ini");
+	if (lenAgora <= 0)
+		return;
+	errorcode = globalAgoraConfig.Open(pathAgora, CONFIG_OPEN_ALWAYS);
+	if (errorcode != CONFIG_SUCCESS) {
+		blog(LOG_ERROR, "Agora Plugin Failed to open globalAgora.ini: %d", errorcode);
+		return;
+	}
+	
 }
 
 int AgoraBasic::GetProfilePath(char *path, size_t size, const char *file)
@@ -190,6 +202,39 @@ void AgoraBasic::InitBasicConfig()
 		const char *curName = config_get_string(globalConfig,
 			"Basic", "Profile");
 	}
+
+	m_agoraToolSettings.savePersist = config_get_bool(globalAgoraConfig, "AgoraTool", "savePersist");
+
+	if (m_agoraToolSettings.savePersist) {
+
+		m_agoraToolSettings.appid = config_get_string(globalAgoraConfig, "AgoraTool", "appid");
+		m_agoraToolSettings.token = config_get_string(globalAgoraConfig, "AgoraTool", "token");
+		m_agoraToolSettings.rtmp_url = config_get_string(globalAgoraConfig, "AgoraTool", "rtmp_url");
+		m_agoraToolSettings.channelName = config_get_string(globalAgoraConfig, "AgoraTool", "channelName");
+		m_agoraToolSettings.uid = config_get_uint(globalAgoraConfig, "AgoraTool", "uid");
+
+		m_agoraToolSettings.agora_fps = config_get_int(globalAgoraConfig, "AgoraTool", "agora_fps");
+		m_agoraToolSettings.agora_bitrate = config_get_int(globalAgoraConfig, "AgoraTool", "agora_bitrate");
+		m_agoraToolSettings.agora_width = config_get_int(globalAgoraConfig, "AgoraTool", "agora_width");
+		m_agoraToolSettings.agora_height = config_get_int(globalAgoraConfig, "AgoraTool", "agora_height");
+
+
+		m_agoraToolSettings.rtmp_fps = config_get_int(globalAgoraConfig, "AgoraTool", "rtmp_fps");
+		m_agoraToolSettings.rtmp_bitrate = config_get_int(globalAgoraConfig, "AgoraTool", "rtmp_bitrate");
+		m_agoraToolSettings.rtmp_width = config_get_int(globalAgoraConfig, "AgoraTool", "rtmp_width");
+		m_agoraToolSettings.rtmp_height = config_get_int(globalAgoraConfig, "AgoraTool", "rtmp_height");
+
+		m_agoraToolSettings.audioChannel = config_get_int(globalAgoraConfig, "AgoraTool", "audioChannel");
+		m_agoraToolSettings.scenario = config_get_int(globalAgoraConfig, "AgoraTool", "scenario");
+		m_agoraToolSettings.obs_bitrate = config_get_int(globalAgoraConfig, "AgoraTool", "obs_bitrate");
+		m_agoraToolSettings.videoEncoder = config_get_int(globalAgoraConfig, "AgoraTool", "videoEncoder");
+
+
+		m_agoraToolSettings.muteAllRemoteAudioVideo = config_get_bool(globalAgoraConfig, "AgoraTool", "muteAllRemoteAudioVideo");
+		m_agoraToolSettings.bHighQuality = config_get_bool(globalAgoraConfig, "AgoraTool", "bHighQuality");
+	}
+
+	m_agoraToolSettings.savePersistAppid = config_get_bool(globalAgoraConfig, "AgoraTool", "savePersistAppid");
 }
 
 AgoraBasic::~AgoraBasic()
@@ -204,6 +249,69 @@ AgoraBasic::~AgoraBasic()
 		obs_encoder_release(audio_encoder);
 
 	AgoraRtcEngine::GetInstance()->ReleaseInstance();
+
+	if (m_agoraToolSettings.savePersist) {
+
+		config_set_string(globalAgoraConfig, "AgoraTool", "appid", m_agoraToolSettings.appid.c_str());
+		config_set_string(globalAgoraConfig, "AgoraTool", "token", m_agoraToolSettings.token.c_str());
+		config_set_string(globalAgoraConfig, "AgoraTool", "rtmp_url", m_agoraToolSettings.rtmp_url.c_str());
+		config_set_string(globalAgoraConfig, "AgoraTool", "channelName", m_agoraToolSettings.channelName.c_str());
+		config_set_uint(globalAgoraConfig, "AgoraTool", "uid", m_agoraToolSettings.uid);
+
+		config_set_int(globalAgoraConfig, "AgoraTool", "agora_fps", m_agoraToolSettings.agora_fps);
+		config_set_int(globalAgoraConfig, "AgoraTool", "agora_bitrate", m_agoraToolSettings.agora_bitrate);
+		config_set_int(globalAgoraConfig, "AgoraTool", "agora_width", m_agoraToolSettings.agora_width);
+		config_set_int(globalAgoraConfig, "AgoraTool", "agora_height", m_agoraToolSettings.agora_height);
+
+		config_set_int(globalAgoraConfig, "AgoraTool", "rtmp_fps", m_agoraToolSettings.rtmp_fps);
+		config_set_int(globalAgoraConfig, "AgoraTool", "rtmp_bitrate", m_agoraToolSettings.rtmp_bitrate);
+		config_set_int(globalAgoraConfig, "AgoraTool", "rtmp_width", m_agoraToolSettings.rtmp_width);
+		config_set_int(globalAgoraConfig, "AgoraTool", "rtmp_height", m_agoraToolSettings.rtmp_height);
+
+		config_set_int(globalAgoraConfig, "AgoraTool", "audioChannel", m_agoraToolSettings.audioChannel);
+		config_set_int(globalAgoraConfig, "AgoraTool", "scenario", m_agoraToolSettings.scenario);
+		config_set_int(globalAgoraConfig, "AgoraTool", "obs_bitrate", m_agoraToolSettings.obs_bitrate);
+		config_set_int(globalAgoraConfig, "AgoraTool", "videoEncoder", m_agoraToolSettings.videoEncoder);
+
+		config_set_bool(globalAgoraConfig, "AgoraTool", "muteAllRemoteAudioVideo", m_agoraToolSettings.muteAllRemoteAudioVideo);
+		config_set_bool(globalAgoraConfig, "AgoraTool", "bHighQuality", m_agoraToolSettings.bHighQuality);
+		config_set_bool(globalAgoraConfig, "AgoraTool", "savePersist", m_agoraToolSettings.savePersist);
+	}
+	else {
+		config_set_string(globalAgoraConfig, "AgoraTool", "appid", "");
+		config_set_string(globalAgoraConfig, "AgoraTool", "token", "");
+		config_set_string(globalAgoraConfig, "AgoraTool", "rtmp_url", "");
+		config_set_string(globalAgoraConfig, "AgoraTool", "channelName", "");
+		config_set_uint(globalAgoraConfig, "AgoraTool", "uid", 0);
+
+		config_set_int(globalAgoraConfig, "AgoraTool", "agora_fps", 0);
+		config_set_int(globalAgoraConfig, "AgoraTool", "agora_bitrate", 0);
+		config_set_int(globalAgoraConfig, "AgoraTool", "agora_width", 0);
+		config_set_int(globalAgoraConfig, "AgoraTool", "agora_height", 0);
+
+		config_set_int(globalAgoraConfig, "AgoraTool", "rtmp_fps", 0);
+		config_set_int(globalAgoraConfig, "AgoraTool", "rtmp_bitrate", 0);
+		config_set_int(globalAgoraConfig, "AgoraTool", "rtmp_width", 0);
+		config_set_int(globalAgoraConfig, "AgoraTool", "rtmp_height", 0);
+
+		config_set_int(globalAgoraConfig, "AgoraTool", "audioChannel", 0);
+		config_set_int(globalAgoraConfig, "AgoraTool", "scenario", 0);
+		config_set_int(globalAgoraConfig, "AgoraTool", "obs_bitrate", 0);
+		config_set_int(globalAgoraConfig, "AgoraTool", "videoEncoder", 0);
+
+
+		config_set_bool(globalAgoraConfig, "AgoraTool", "muteAllRemoteAudioVideo", false);
+		config_set_bool(globalAgoraConfig, "AgoraTool", "bHighQuality", false);
+		config_set_bool(globalAgoraConfig, "AgoraTool", "savePersist", false);
+	}
+
+	if(m_agoraToolSettings.savePersistAppid)
+		config_set_string(globalAgoraConfig, "AgoraTool", "appid", m_agoraToolSettings.appid.c_str());
+	else
+		config_set_string(globalAgoraConfig, "AgoraTool", "appid", "");
+	config_set_bool(globalAgoraConfig, "AgoraTool", "savePersistAppid", m_agoraToolSettings.savePersistAppid);
+
+	globalAgoraConfig.Save();
 }
 
 int AgoraBasic::GetOBSBitrate()
@@ -688,9 +796,8 @@ void AgoraBasic::RawVideoCallback (void *param, struct video_data *frame)
 {
 	struct obs_video_info ovi;
 	AgoraBasic* basic = (AgoraBasic*)param;
-	//bool time_out = WaitForSingleObject(basic->stopSignal, 10);
+	
 	if (obs_get_video_info(&ovi) ) {
-		
 		AgoraRtcEngine::GetInstance()->PushVideoFrame(frame);
 	}
 }

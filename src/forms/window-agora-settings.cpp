@@ -139,15 +139,18 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	//information
 	empty_appid_info = tr("Agora.General.EmptyAppid");
 	init_failed_info = tr("Agora.General.Init.Failed");
-
+	persistSaveAppid = tr("Basic.Settings.Agora.PersistSaveAppid");
+	persistSaveAppidInfo = tr("Basic.Settings.Agora.PersistSaveAppidInfo");
 	ui->baseAspect->setText(tr(""));
 
+	ui->chkPersistSaveAppid->setText(persistSaveAppid);
 	//video encoder
 	ui->labelVideoEncoder->setText(tr("Agora.Settings.Video.Encoder"));
 	ui->labelFPSResolution->setText(tr("Agora.Settings.Video.FPS.Resolution"));
 	ui->cmbVideoEncoder->setItemText(0, tr("Agora.Settings.Video.Agora.Bitrate"));
 	ui->cmbVideoEncoder->setItemText(1, tr("Agora.Settings.Video.OBS.Bitrate"));
 	ui->cmbVideoEncoder->setCurrentIndex(0);
+
 	obs_frontend_pop_ui_translation();
 	
 	ui->cmbAgoraFPS->setCurrentIndex(3);
@@ -164,7 +167,6 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	agora_bitrate[2] = STANDARD_BITRATE;
 	
 	ui->chkAutoLoadConfig->setVisible(false);
-	ui->chkPersistSaving->setVisible(false);
 	ui->lineEditAppCertificate->setVisible(false);
 	ui->labelAppCertificate->setVisible(false);
 	
@@ -200,7 +202,7 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	HookWidget(ui->lineEditExpiredTs, EDIT_CHANGED, GENERAL_CHANGED);
 	HookWidget(ui->lineEditChannel, EDIT_CHANGED, GENERAL_CHANGED);
 	HookWidget(ui->lineEditUID, EDIT_CHANGED, GENERAL_CHANGED);
-
+	
 	HookWidget(ui->chkPersistSaving, CHECK_CHANGED, GENERAL_CHANGED);
 	HookWidget(ui->chkMuteAllRemoteAV, CHECK_CHANGED, GENERAL_CHANGED);
 
@@ -222,6 +224,9 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	HookWidget(ui->lineEditAgoraRtmpWidth, EDIT_CHANGED, RTMP_CHANGED);
 	HookWidget(ui->lineEditAgoraRtmpHeight, EDIT_CHANGED, RTMP_CHANGED);
 	HookWidget(ui->lineEditAgoraRtmpBitrate, EDIT_CHANGED, RTMP_CHANGED);
+
+	HookWidget(ui->chkPersistSaving, CHECK_CHANGED, GENERAL_CHANGED);
+	connect(ui->chkPersistSaveAppid, &QCheckBox::toggled, this, &AgoraSettings::onChkSaveAppidSettings);
 }
 
 
@@ -355,14 +360,15 @@ void AgoraSettings::SaveGeneralSettings()
 	settings.expiredTimeTs = settings.expiredTime * 60 * 60;
 	settings.savePersist = ui->chkPersistSaving->isChecked();
 	settings.muteAllRemoteAudioVideo = ui->chkMuteAllRemoteAV->isChecked();
-
-
+	settings.savePersistAppid = ui->chkPersistSaveAppid->isChecked();
+	
 	main->SetAgoraSetting(settings);
 
 	SaveCheckBox(ui->chkPersistSaving, "AgoraSettings", "PersistSave");
+	if(settings.savePersistAppid && !strAppid.isEmpty())
+		SaveEdit(ui->lineEditAppid, "AgoraSettings", "AppId");
+
 	if (settings.savePersist) {
-		if (!strAppid.isEmpty())
-			SaveEdit(ui->lineEditAppid, "AgoraSettings", "AppId");
 		if (!strUid.isEmpty())
 			SaveEdit(ui->lineEditUID, "AgoraSettings", "UID");
 		if (!strExpired.isEmpty())
@@ -450,6 +456,7 @@ void AgoraSettings::LoadGeneralSettings()
 		ui->lineEditUID->setText(strUid);
 	}
 	ui->chkPersistSaving->setChecked(settings.savePersist);
+	ui->chkPersistSaveAppid->setChecked(settings.savePersistAppid);
 	ui->chkMuteAllRemoteAV->setChecked(settings.muteAllRemoteAudioVideo);
 	QString strExpired = QString("%1").arg(settings.expiredTime);
 	ui->lineEditExpiredTs->setText(strExpired);
@@ -571,6 +578,7 @@ void AgoraSettings::LoadAgoraSettings()
 		ui->lineEditUID->setText(strUid);
 	}
 	ui->chkPersistSaving->setChecked(settings.savePersist);
+	ui->chkPersistSaveAppid->setChecked(settings.savePersistAppid);
 	ui->chkMuteAllRemoteAV->setChecked(settings.muteAllRemoteAudioVideo);
 	QString strExpired = QString("%1").arg(settings.expiredTime);
 	ui->lineEditExpiredTs->setText(strExpired);
@@ -758,3 +766,17 @@ void AgoraSettings::showEvent(QShowEvent *event)
 
 EXPORT void obs_source_add_audio_capture_callback(
 	obs_source_t *source, obs_source_audio_capture_t callback, void *param);*/
+
+
+void AgoraSettings::onChkSaveAppidSettings(bool bCheck)
+{
+	if (bCheck)
+		ui->agoraMsg2->setText(persistSaveAppidInfo);
+	else
+		ui->agoraMsg2->setText("");
+	AgoraToolSettings settings;
+	main->GetAgoraSetting(settings);
+	if (settings.savePersistAppid != bCheck) {
+		generalChanged = true;
+	}
+}

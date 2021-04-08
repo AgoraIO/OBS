@@ -35,7 +35,8 @@ private:
 	bool appid_changed  = false; 
 	int agora_fps[FPS_NUM];
 	int agora_bitrate[3];
-
+	QString persistSaveAppid = "";
+	QString persistSaveAppidInfo = "";
 	QString title = "";
 	QString empty_appid_info = "";
 	QString init_failed_info = "";
@@ -88,4 +89,6 @@ private slots:
 	void on_recordVolumeSld_valueChanged(int value);
 	void on_playoutVolumeSld_valueChanged(int value);
 	void on_cmbVideoEncoder_currentIndexChanged(int index);
+	
+	void onChkSaveAppidSettings(bool bCheck);
 };

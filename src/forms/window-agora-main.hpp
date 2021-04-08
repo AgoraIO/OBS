@@ -51,6 +51,8 @@ typedef struct tagAgoraToolSettings {
 	int obs_bitrate = 2500;
 
 	int videoEncoder = 0;//Ä¬ÈÏAgora²ÎÊý
+
+	bool savePersistAppid = false;
 } AgoraToolSettings, *PAgoraToolSettings;
 
 class DisplayResizeEvent : public QObject
@@ -93,7 +95,6 @@ private:
 	QString invalidAppidError = "";
 	QString invalidTokenExpiredError = "";
 	QString invalidTokenlError = "";
-
 	AgoraToolSettings m_agoraToolSettings;
 	//show remote video
 	QVBoxLayout *remoteVideoLayout;
@@ -137,6 +138,7 @@ private:
 
 	ConfigFile globalConfig;
 	ConfigFile basicConfig;
+	ConfigFile globalAgoraConfig;
 	void InitGlobalConfig();
 	void InitBasicConfig();
 	int GetOBSBitrate();
@@ -173,6 +175,7 @@ public slots:
 	void transcoding_slot();
 	void showRemote_slot();
 	void onClientRoleChanged_slot(int oldRole, int newRole);
+	
 public:
 	void ToggleAgoraDialog();
 	AgoraBasic(QMainWindow *parent);
