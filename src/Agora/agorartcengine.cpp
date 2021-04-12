@@ -3,6 +3,7 @@
 #include "AgoraBase.h"
 #else
 #include <AgoraRtcKit/AgoraBase.h>
+#include <thread>
 #include <chrono>
 #define  DEFINE_GET_TIME_NOW(getTickCount64)   \
          int64_t getTickCount64() \
@@ -14,6 +15,9 @@
 
 DEFINE_GET_TIME_NOW(GetTickCount64)
 DEFINE_GET_TIME_NOW(GetTickCount)
+
+#define Sleep(x)          \
+    std::this_thread::sleep_for(std::chrono::milliseconds(x))
 
 #define DEFINE_MEMCPY_S(func)                                     \
       int func(void *det, size_t detSize, const void * src, size_t srcSize)                                            \

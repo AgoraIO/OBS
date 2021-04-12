@@ -1,5 +1,6 @@
 #include <QMessageBox>
 #include <QWindow>
+#include <QDebug>
 #include <stdio.h>
 #include <obs-frontend-api.h>
 #include <obs-properties.h>
@@ -9,6 +10,15 @@
 #include "window-agora-settings.hpp"
 #include <util/platform.h>
 #include <util/dstr.h>
+
+#if _WIN32
+#else
+#include <dispatch/dispatch.h>
+#include <thread>
+#define Sleep(x)          \
+    std::this_thread::sleep_for(std::chrono::milliseconds(x))
+
+#endif
 using namespace std;
 
 bool DisplayResizeEvent::eventFilter(QObject *obj, QEvent *event)
@@ -333,12 +343,13 @@ int AgoraBasic::GetOBSBitrate()
 void AgoraBasic::on_agoraSteramButton_clicked()
 {
 	QString str = ui->agoraSteramButton->text();
-
+  qDebug() << "ui->agoraSteramButton->text";
+  qDebug() << str;
+  
 	if (!joinFailed && (starting_text.compare(str) == 0 ||
 		stopping_text.compare(str) == 0)) {
 		return;
 	}
-
 	if (start_text.compare(str) == 0) {
 
 		if (m_agoraToolSettings.appid.empty()) {
@@ -392,14 +403,14 @@ void AgoraBasic::on_agoraSteramButton_clicked()
 			output_height = height;
 		}
 
-		if (m_agoraToolSettings.videoEncoder == 0) {//Agora ÂëÂÊ
+		if (m_agoraToolSettings.videoEncoder == 0) {//Agora 
 			AgoraRtcEngine::GetInstance()->setVideoProfileEx(
 				output_width,
 				output_height,
 				(float)ovi.fps_num/(float)ovi.fps_den,
 				m_agoraToolSettings.agora_bitrate);
 		}
-		else {//obs ÂëÂÊ
+		else {//obs 
 			m_agoraToolSettings.obs_bitrate = GetOBSBitrate();
 			AgoraRtcEngine::GetInstance()->setVideoProfileEx(
 				output_width,
@@ -407,7 +418,7 @@ void AgoraBasic::on_agoraSteramButton_clicked()
 				(float)ovi.fps_num / (float)ovi.fps_den,
 				m_agoraToolSettings.obs_bitrate);
 		}
-
+    qDebug() << "joinChannel";
 		AgoraRtcEngine::GetInstance()->joinChannel(m_agoraToolSettings.token.c_str()
 			,  m_agoraToolSettings.channelName.c_str(), m_agoraToolSettings.uid,
 			!m_agoraToolSettings.muteAllRemoteAudioVideo, !m_agoraToolSettings.muteAllRemoteAudioVideo);
@@ -684,23 +695,19 @@ void AgoraBasic::ResetRemoteVideoWidget(int index)
 void AgoraBasic::resizeEvent(QResizeEvent *event)
 {
 	QWidget::resizeEvent(event);
-	
-	CreateDisplay();
 
 	if (isVisible() && display) {
 #if _WIN32
+    CreateDisplay();
 		QSize size = ui->preview->size();
-		obs_display_resize(display, size.width(), size.height());
 #else
-    QSize size = this->size() *  ui->preview->devicePixelRatioF();
-    if (m_lstRemoteVideoUids.size() >= 1) {
-        
-        obs_display_resize(display, size.width()/ (m_lstRemoteVideoUids.size() + 1), size.height() / (m_lstRemoteVideoUids.size()));
-    }else
-    {
-        obs_display_resize(display, size.width(), size.height());
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+      CreateDisplay();
+    });
+    QSize size = ui->preview->size() *  ui->preview->devicePixelRatioF();
 #endif
+    obs_display_resize(display, size.width(), size.height());
+
 	}
 
 }
@@ -872,6 +879,7 @@ void AgoraBasic::onJoinChannelSuccess_slot(const char* channel, unsigned int uid
 		AgoraRtcEngine::GetInstance()->AddPublishStreamUrl(m_agoraToolSettings.rtmp_url.c_str(), true);
 	}
 	
+
 }
 
 void AgoraBasic::onLeaveChannel_slot(const RtcStats &stats)
@@ -1048,8 +1056,13 @@ void AgoraBasic::onConnectionStateChanged_slot(int state, int reason)
 
 void AgoraBasic::onRemoteVideoStateChanged_slot(unsigned int uid, int state, int reason, int elapsed)
 {
-	if (state == REMOTE_VIDEO_STATE_DECODING 
-		&& reason == REMOTE_VIDEO_STATE_REASON_REMOTE_UNMUTED) {
+  
+  qDebug()<<" state === "<<state;
+  qDebug()<<" reason === "<<reason;
+  
+	if (state == REMOTE_VIDEO_STATE_DECODING
+		&&( reason == REMOTE_VIDEO_STATE_REASON_REMOTE_UNMUTED || reason == REMOTE_VIDEO_STATE_REASON_LOCAL_UNMUTED)) {
+    qDebug()<<"#### heheda #### "<<state;
 		onFirstRemoteVideoDecoded_slot(uid, 0, 0, elapsed);
 	}
 	else if (state == REMOTE_VIDEO_STATE_STOPPED

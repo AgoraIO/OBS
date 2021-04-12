@@ -62,9 +62,11 @@ if (WIN32)
 endif ()
 if(APPLE)
 	include_directories(
-			"${LIBOBS_INCLUDE_DIR}/../../UI/obs-frontend-api"
-			${Qt5Core_INCLUDES}
-			${Qt5Widgets_INCLUDES}
+			"${CMAKE_SOURCE_DIR}/../UI/obs-frontend-api"
+			"${CMAKE_SOURCE_DIR}/deps/mac/include"
+			"${CMAKE_SOURCE_DIR}/deps/mac/include/QtCore"
+			"${CMAKE_SOURCE_DIR}/deps/mac/include/QtGui"
+			"${CMAKE_SOURCE_DIR}/deps/mac/include/QtWidgets"
 			"${CMAKE_SOURCE_DIR}/deps/libyuv/include")
 
 	find_library(AGORAAIDENOISEEXTENSION AgoraAIDenoiseExtension "${CMAKE_SOURCE_DIR}/deps/mac/libs")
@@ -76,6 +78,10 @@ if(APPLE)
 	find_library(AV1 av1 "${CMAKE_SOURCE_DIR}/deps/mac/libs")
 	find_library(YUV yuv "${CMAKE_SOURCE_DIR}/deps/mac/libs")
 	find_library(obs-frontend-api obs-frontend-api "${CMAKE_SOURCE_DIR}/deps/mac/libs")
+
+	find_library(QT5CORE QtCore "${CMAKE_SOURCE_DIR}/deps/mac/lib")
+	find_library(QT5GUI QtGui "${CMAKE_SOURCE_DIR}/deps/mac/lib")
+	find_library(QT5WIDGETS QtWidgets "${CMAKE_SOURCE_DIR}/deps/mac/lib")
 
 
 
@@ -93,8 +99,6 @@ endif()
 if(APPLE)
 	target_link_libraries(agora-tool-ui
 			libobs
-			Qt5::Core
-			Qt5::Widgets
 			${AGORAAIDENOISEEXTENSION}
 			${AGORACORE}
 			${AGORAFDKAAC}
@@ -104,6 +108,9 @@ if(APPLE)
 			${AV1}
 			${YUV}
 			${obs-frontend-api}
+			${QT5CORE}
+			${QT5GUI}
+			${QT5WIDGETS}
 			)
 endif()
 
