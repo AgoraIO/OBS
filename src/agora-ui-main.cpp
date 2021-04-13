@@ -41,6 +41,13 @@ void initQT()
     agoraDialog->ToggleAgoraDialog();
   });
 }
+
+#if _WIN32
+void obs_module_unload() {
+	blog(LOG_INFO, "unoad agora tool!");
+}
+#else
 __attribute__((visibility("default"))) void obs_module_unload() {
 	blog(LOG_INFO, "unoad agora tool!");
 }
+#endif

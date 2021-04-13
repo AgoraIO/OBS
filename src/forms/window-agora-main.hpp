@@ -95,6 +95,7 @@ private:
 	QString invalidAppidError = "";
 	QString invalidTokenExpiredError = "";
 	QString invalidTokenlError = "";
+	QString joinFailedInfo = "";
 	AgoraToolSettings m_agoraToolSettings;
 	//show remote video
 	QVBoxLayout *remoteVideoLayout;
@@ -132,6 +133,7 @@ private:
 
 	QTimer transcodingTimer;
 	QTimer showRemoteTimer;
+	QTimer joinFailedTimer;//token invalid ,exapired, joinChannel second time. no callback OnConnectionStateChanged for these reasons.
 
 	bool joinFailed = false;
 	bool started = false;
@@ -175,7 +177,7 @@ public slots:
 	void transcoding_slot();
 	void showRemote_slot();
 	void onClientRoleChanged_slot(int oldRole, int newRole);
-	
+	void joinFailed_slot();
 public:
 	void ToggleAgoraDialog();
 	AgoraBasic(QMainWindow *parent);

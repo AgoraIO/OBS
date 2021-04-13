@@ -49,7 +49,7 @@ AgoraBasic::AgoraBasic(QMainWindow *parent)
 	, audio_encoder(nullptr)
 {
 	ui->setupUi(this);
-	ui->previewDisabledWidget->setVisible(false);
+	//ui->previewDisabledWidget->setVisible(false);
 	ui->menubar->setVisible(false);
 
 	setWindowTitle(QString("Agora RTC Tool"));
@@ -73,6 +73,7 @@ AgoraBasic::AgoraBasic(QMainWindow *parent)
 	invalidTokenlError = tr("Basic.Main.Agora.Invalid.Token");
 	invalidAppidError = tr("Basic.Main.Agora.Invalid.Appid");
 	invalidTokenExpiredError = tr("Basic.Main.Agora.Token.Expired");
+	joinFailedInfo = tr("Agora.JoinChannelFailed.Token");
 
 	obs_frontend_pop_ui_translation();
 
@@ -91,7 +92,7 @@ AgoraBasic::AgoraBasic(QMainWindow *parent)
 	connect(&transcodingTimer, &QTimer::timeout, this, &AgoraBasic::transcoding_slot);
 	connect(&showRemoteTimer, &QTimer::timeout, this, &AgoraBasic::showRemote_slot);
 	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onClientRoleChanged, this, &AgoraBasic::onClientRoleChanged_slot);
-
+	connect(&joinFailedTimer, &QTimer::timeout, this, &AgoraBasic::joinFailed_slot);
 	
 	CreateRemoteVideos();
 	auto addDrawCallback = [this]() {
@@ -119,6 +120,10 @@ AgoraBasic::AgoraBasic(QMainWindow *parent)
 	ui->preview->setAttribute(Qt::WA_NativeWindow);
 	ui->preview->setUpdatesEnabled(false);
 	ui->preview->installEventFilter(&resizeEventHandler);
+
+#if _WIN32
+	CreateDisplay();
+#endif
 
 	InitializeAgoraOutput();
 	
@@ -418,7 +423,9 @@ void AgoraBasic::on_agoraSteramButton_clicked()
 				(float)ovi.fps_num / (float)ovi.fps_den,
 				m_agoraToolSettings.obs_bitrate);
 		}
-    qDebug() << "joinChannel";
+        qDebug() << "joinChannel";
+	    joinFailedTimer.stop();
+	    joinFailedTimer.start(6000);
 		AgoraRtcEngine::GetInstance()->joinChannel(m_agoraToolSettings.token.c_str()
 			,  m_agoraToolSettings.channelName.c_str(), m_agoraToolSettings.uid,
 			!m_agoraToolSettings.muteAllRemoteAudioVideo, !m_agoraToolSettings.muteAllRemoteAudioVideo);
@@ -698,8 +705,7 @@ void AgoraBasic::resizeEvent(QResizeEvent *event)
 
 	if (isVisible() && display) {
 #if _WIN32
-    CreateDisplay();
-		QSize size = ui->preview->size();
+	QSize size = ui->preview->size();
 #else
     dispatch_async(dispatch_get_main_queue(), ^{
       CreateDisplay();
@@ -862,6 +868,7 @@ void AgoraBasic::StopAgoraOutput()
 
 void AgoraBasic::onJoinChannelSuccess_slot(const char* channel, unsigned int uid, int elapsed)
 {
+	joinFailedTimer.stop();
 	uids[0] = uid;
 	local_uid = uid;
 	ui->agoraSteramButton->setText(stop_text);
@@ -1046,7 +1053,8 @@ void AgoraBasic::onConnectionStateChanged_slot(int state, int reason)
 		default:
 			break;
 		}
-		
+		joinFailedTimer.stop();
+
 		QMessageBox::critical(NULL, "Error", info.c_str());
 
 		on_agoraSteramButton_clicked();
@@ -1158,6 +1166,15 @@ void AgoraBasic::transcoding_slot()
 {
 	SetLiveTranscoding();
 	transcodingTimer.stop();
+}
+
+void AgoraBasic::joinFailed_slot()
+{
+	joinFailed = true;
+	QMessageBox::critical(NULL, "Error", joinFailedInfo.toStdString().c_str());
+	joinFailedTimer.stop();
+	on_agoraSteramButton_clicked();
+	joinFailed = false;
 }
 
 void AgoraBasic::onClientRoleChanged_slot(int oldRole, int newRole)

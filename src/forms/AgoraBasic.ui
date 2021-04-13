@@ -57,17 +57,6 @@
          <number>2</number>
         </property>
         <item>
-         <widget class="QWidget" name="previewDisabledWidget" native="true">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_7"/>
-         </widget>
-        </item>
-        <item>
          <layout class="QVBoxLayout" name="previewTextLayout">
           <property name="spacing">
            <number>0</number>
