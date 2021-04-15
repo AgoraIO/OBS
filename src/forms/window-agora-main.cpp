@@ -423,15 +423,17 @@ void AgoraBasic::on_agoraSteramButton_clicked()
 		AgoraRtcEngine::GetInstance()->stopPreview();
 
 		//ResetEvent(stopSignal);
+		if (joinFailed)
+			AgoraRtcEngine::GetInstance()->SetJoinChannel(true);
 		AgoraRtcEngine::GetInstance()->leaveChannel();
 		//SetEvent(stopSignal);
 		
 		if (!m_agoraToolSettings.agora_url.empty())
 			AgoraRtcEngine::GetInstance()->RemovePublishStreamUrl(m_agoraToolSettings.agora_url.c_str());
-		if (starting_text.compare(str) == 0)
-			ui->agoraSteramButton->setText(start_text);
-		else
+		if (starting_text.compare(str) != 0) {
 			ui->agoraSteramButton->setText(stopping_text);
+		}
+		
 		ClearRemoteVideos();
 		m_lstRemoteVideoUids.clear();
 		m_lstUids.clear();
@@ -883,7 +885,7 @@ void AgoraBasic::onLeaveChannel_slot(const RtcStats &stats)
 
 void AgoraBasic::onError_slot(int err, const char *msg)
 {
-
+	blog(LOG_ERROR, "agora error code: %d", err);
 }
 
 void AgoraBasic::onUserJoined_slot(uid_t uid, int elapsed)
@@ -1171,6 +1173,7 @@ void AgoraBasic::OBSEvent(enum obs_frontend_event event, void * data)
 {
 	if (event == OBS_FRONTEND_EVENT_EXIT) {
 		AgoraBasic* basic = (AgoraBasic*)data;
+		obs_display_remove_draw_callback(basic->display, DrawPreview, basic);
 		QString str = basic->ui->agoraSteramButton->text();
 		if (basic->stop_text.compare(str) == 0) {
 			basic->on_agoraSteramButton_clicked();

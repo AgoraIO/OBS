@@ -1,5 +1,7 @@
 # Agora RTC Tool (Windows)
 
+*[中文](README.zh.md)*
+
 Agora RTC Tool for OBS Studio.
 
 ## Possible use cases
