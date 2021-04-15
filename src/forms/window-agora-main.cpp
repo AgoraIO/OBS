@@ -31,16 +31,6 @@ bool DisplayResizeEvent::eventFilter(QObject *obj, QEvent *event)
 	return QObject::eventFilter(obj, event);
 }
 
-bool ACloseEvent::eventFilter(QObject *obj, QEvent *event)
-{
-	if (event->type() == QEvent::Close) {
-		emit AgoraClose();
-		return true;
-	}
-
-	return QObject::eventFilter(obj, event);
-}
-
 AgoraBasic::AgoraBasic(QMainWindow *parent)
 	: QMainWindow(parent, Qt::Dialog)
 	, ui(new Ui::AgoraBasic)
@@ -128,16 +118,11 @@ AgoraBasic::AgoraBasic(QMainWindow *parent)
 	InitializeAgoraOutput();
 	
 	QMainWindow* mainWindow = (QMainWindow*)obs_frontend_get_main_window();
-	auto closeEvent_slot = [this, mainWindow]() {
-		this->close();
-		mainWindow->removeEventFilter(&this->aCloseEventHandler);
-		mainWindow->close();
-	};
-	connect(&aCloseEventHandler, &ACloseEvent::AgoraClose, closeEvent_slot);
-	mainWindow->installEventFilter(&aCloseEventHandler);
 
 	InitGlobalConfig();
 	InitBasicConfig();
+
+	obs_frontend_add_event_callback(AgoraBasic::OBSEvent, this);
 }
 
 void AgoraBasic::InitGlobalConfig()
@@ -1180,4 +1165,17 @@ void AgoraBasic::joinFailed_slot()
 void AgoraBasic::onClientRoleChanged_slot(int oldRole, int newRole)
 {
 	blog(LOG_INFO, "oldRole:%d, newRole:%d", oldRole, newRole);
+}
+
+void AgoraBasic::OBSEvent(enum obs_frontend_event event, void * data)
+{
+	if (event == OBS_FRONTEND_EVENT_EXIT) {
+		AgoraBasic* basic = (AgoraBasic*)data;
+		QString str = basic->ui->agoraSteramButton->text();
+		if (basic->stop_text.compare(str) == 0) {
+			basic->on_agoraSteramButton_clicked();
+		}
+		obs_frontend_save();
+
+	}
 }

@@ -65,16 +65,6 @@ signals:
 	void DisplayResized();
 };
 
-class ACloseEvent : public QObject
-{
-	Q_OBJECT
-
-protected:
-	bool eventFilter(QObject *obj, QEvent *event);
-signals:
-	void AgoraClose();
-};
-
 class AgoraBasic : public QMainWindow {
 	Q_OBJECT
 private:
@@ -126,7 +116,6 @@ private:
 	uint32_t backgroundColor = GREY_COLOR_BACKGROUND;
 
 	DisplayResizeEvent resizeEventHandler;
-	ACloseEvent aCloseEventHandler;
 
 	obs_output_t *output;
 	obs_encoder_t *audio_encoder;
@@ -159,6 +148,7 @@ private:
 	bool StartAgoraOutput();
 	void StopAgoraOutput();
 
+	static void OBSEvent(enum obs_frontend_event event, void *);
 public slots:
 	void on_agoraSteramButton_clicked();
 	void on_settingsButton_clicked();
