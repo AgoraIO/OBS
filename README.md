@@ -31,10 +31,6 @@ You can get details about agora sdk from [agora.io](https://www.agora.io/en)
 
 You can install release setup directly corresponding to OBS Stduio version.
 
-[Agora RTC Tool 26.0.2]()
-
-[Agora RTC Tool 25.0.8]()
-
 ## Compiling Agora RTC Tool
 
 ### Prerequisites
@@ -59,6 +55,25 @@ For example, if the build directory is located in obs-studio src directory, name
 * OBS\_FRONTEND\_LIB is obs-studio/build64/UI/obs-frontend-api. 
 
 After configure camke, you get an variable LibObs_DIR, make sure its value is obs-studio/build64/libobs.
+
+## Run RTC Tool
+
+1 Startup obs
+
+2 Select "Agora Rtc Tool" in Tool menu.Then pop up a dialog.
+
+3 Click settings, then setup basic information
+
+4 You can also download and fill a configure file, then load the configure file.
+[AgoraObs.zip](https://github.com/AgoraIO/OBS/releases/download/3.3.0/AgoraObs.zip)
+
+5 Configure file include:
+
+* appid
+* token
+* channel name
+* uid
+* rtmp url
 
 
 

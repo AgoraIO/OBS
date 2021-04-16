@@ -100,6 +100,24 @@ cmake点击configure之后，会得到一个变量LibObs_DIR, 确保它的值是
 cmake点击configure之后，会得到一个变量LibObs_DIR, 确保它的值是obs-studio/build/libobs。
 
 
+## 运行声网连麦工具
+
+1 启动obs
+
+2 在菜单栏工具中选择“声网连麦工具”，弹出一个对话框。
+
+3 点击设置，填上基本信息。
+
+4 也可以下载配置文件，填上信息主要配置信息。
+[AgoraObs.zip](https://github.com/AgoraIO/OBS/releases/download/3.3.0/AgoraObs.zip)
+
+5 配置文件主要包括：
+
+* appid
+* token
+* channel name
+* uid
+* rtmp url
 
 
 
