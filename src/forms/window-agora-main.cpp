@@ -2,7 +2,6 @@
 #include <QWindow>
 #include <QDebug>
 #include <stdio.h>
-#include <obs-frontend-api.h>
 #include <obs-properties.h>
 #include "window-agora-main.hpp"
 #include "../agora-ui-main.h"
@@ -689,14 +688,17 @@ void AgoraBasic::ResetRemoteVideoWidget(int index)
 void AgoraBasic::resizeEvent(QResizeEvent *event)
 {
 	QWidget::resizeEvent(event);
-
+#if _WIN32
+  CreateDisplay();
+#else
+  dispatch_async(dispatch_get_main_queue(), ^{
+    CreateDisplay();
+  });
+#endif
 	if (isVisible() && display) {
 #if _WIN32
-	QSize size = ui->preview->size();
+		QSize size = ui->preview->size();
 #else
-    dispatch_async(dispatch_get_main_queue(), ^{
-      CreateDisplay();
-    });
     QSize size = ui->preview->size() *  ui->preview->devicePixelRatioF();
 #endif
     obs_display_resize(display, size.width(), size.height());

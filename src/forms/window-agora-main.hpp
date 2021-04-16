@@ -9,6 +9,8 @@
 #include <util/util.hpp>
 #include <QTimer>
 #include "obs.hpp"
+#include <obs-frontend-api.h>
+
 
 
 //class OBSBasic;
