@@ -56,6 +56,27 @@ For example, if the build directory is located in obs-studio src directory, name
 
 After configure camke, you get an variable LibObs_DIR, make sure its value is obs-studio/build64/libobs.
 
+
+### Mac
+Compile obs studio first, before you compile agora tool ui plugin. Reference obs studio compile document.
+
+Use cmake-gui, set variable first:
+
+* QTDIR ： Use the right version qt corresponding to conpiler, sucha as /usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5
+* 
+* LIBOBS_INCLUDE_DIR : the path libobs in obs studio source code path.
+* LIBOBS_LIB: libobs path
+* OBS_FRONTEND_LIB : obs-frontend-api path, such as:obs-studio/UI/obs-frontend-api
+
+For example, obs source code path is obs-studio, build path is obs-studio/build64.
+
+* LIBOBS\_INCLUDE\_DIR value is obs-studio/build/libobs
+* LIBOBS\_LIB value is  obs-studio/build/libobs, 
+* OBS\_FRONTEND\_LIB value is  obs-studio/build/UI/obs-frontend-api. 
+
+Click configure on cmake-gui, then you get a variable LibObs_DIR. Make sure the value is obs-studio/build/libobs.
+
+
 ## Run RTC Tool
 
 1 Startup obs
