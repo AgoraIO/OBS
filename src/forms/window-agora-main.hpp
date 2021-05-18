@@ -9,9 +9,9 @@
 #include <util/util.hpp>
 #include <QTimer>
 #include "obs.hpp"
-#include <obs-frontend-api.h>
-
-
+#if WIN32
+#include "curl.h"
+#endif
 
 //class OBSBasic;
 #define PREVIEW_EDGE_SIZE 10
@@ -52,9 +52,12 @@ typedef struct tagAgoraToolSettings {
 	bool bHighQuality = false;
 	int obs_bitrate = 2500;
 
-	int videoEncoder = 0;//Ä¬ÈÏAgora²ÎÊý
+	int videoEncoder = 0;//default agora bitrate
 
 	bool savePersistAppid = false;
+
+	std::string information_url = "";
+	int info_mode = 0;//0:manually 1:http get
 } AgoraToolSettings, *PAgoraToolSettings;
 
 class DisplayResizeEvent : public QObject
@@ -88,6 +91,7 @@ private:
 	QString invalidTokenExpiredError = "";
 	QString invalidTokenlError = "";
 	QString joinFailedInfo = "";
+	QString requertTokenError = "";
 	AgoraToolSettings m_agoraToolSettings;
 	//show remote video
 	QVBoxLayout *remoteVideoLayout;
@@ -128,6 +132,10 @@ private:
 
 	bool joinFailed = false;
 	bool started = false;
+	//token url
+#if WIN32
+	CURL *curl = nullptr;
+#endif
 
 	ConfigFile globalConfig;
 	ConfigFile basicConfig;
@@ -149,7 +157,7 @@ private:
 	bool InitializeAgoraOutput();
 	bool StartAgoraOutput();
 	void StopAgoraOutput();
-
+	void joinChannel(std::string token);
 	static void OBSEvent(enum obs_frontend_event event, void *);
 public slots:
 	void on_agoraSteramButton_clicked();
@@ -170,6 +178,7 @@ public slots:
 	void showRemote_slot();
 	void onClientRoleChanged_slot(int oldRole, int newRole);
 	void joinFailed_slot();
+	void reuquestToken_slot(QString json, int err);
 public:
 	void ToggleAgoraDialog();
 	AgoraBasic(QMainWindow *parent);
@@ -187,5 +196,5 @@ public:
 	
 signals:
 	void DisplayCreated(AgoraBasic* agora);
-	
+	void requestTokenSignal(QString, int err);
 };

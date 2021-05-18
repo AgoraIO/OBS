@@ -376,6 +376,7 @@ int AgoraRtcEngine::joinChannel(const std::string &key,
 {
 	if (m_bJoinChannel)
 		return 0;
+
 	AUDIO_PROFILE_TYPE profile = AUDIO_PROFILE_MUSIC_STANDARD;
 	if (audioChannel == 1 && !m_bHighQuality) {
 		profile = AUDIO_PROFILE_MUSIC_STANDARD;
@@ -391,11 +392,14 @@ int AgoraRtcEngine::joinChannel(const std::string &key,
 	}
 	m_rtcEngine->setAudioProfile(profile, (AUDIO_SCENARIO_TYPE)m_scenario);
 
+	AParameter apm(m_rtcEngine);
+	apm->setParameters("{\"che.audio.specify.codec\": \"OPUSFB\"}");
+
 	ChannelMediaOptions options;
 	options.autoSubscribeAudio = muteAudio;
 	options.autoSubscribeVideo = muteVideo;
 
-	int r = m_rtcEngine->joinChannel(key.data(), channel.data(), "", uid, options);
+	int r =  m_rtcEngine->joinChannel(key.data(), channel.data(), "", uid, options);//
 	return r;
 }
 
@@ -440,10 +444,12 @@ bool AgoraRtcEngine::keepPreRotation(bool bRotate)
 }
 
 bool AgoraRtcEngine::setVideoProfileEx(int nWidth, int nHeight, int nFrameRate,
-				       int nBitRate)
+				       int nBitRate, bool Agora)
 {
-	AParameter apm(m_rtcEngine);
-	apm->setParameters("{\"che.video.freestyle_customer\": true}");
+	if (!Agora) {
+		AParameter apm(m_rtcEngine);
+		apm->setParameters("{\"che.video.freestyle_customer\": true}");
+	}
 	VideoEncoderConfiguration config;
 	config.dimensions.width = nWidth;
 	config.dimensions.height = nHeight;

@@ -108,8 +108,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>698</width>
-              <height>403</height>
+              <width>684</width>
+              <height>441</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_23">
@@ -174,14 +174,14 @@
                      </item>
                     </layout>
                    </item>
-                   <item row="4" column="0">
+                   <item row="6" column="0">
                     <widget class="QLabel" name="label_appid">
                      <property name="text">
                       <string>Basic.Settings.Agora.APPID</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="4" column="1">
+                   <item row="6" column="1">
                     <layout class="QHBoxLayout" name="horizontalLayout_2">
                      <item>
                       <widget class="QLineEdit" name="lineEditAppid"/>
@@ -195,7 +195,7 @@
                      </item>
                     </layout>
                    </item>
-                   <item row="5" column="0">
+                   <item row="7" column="0">
                     <spacer name="horizontalSpacer_13">
                      <property name="orientation">
                       <enum>Qt::Horizontal</enum>
@@ -208,44 +208,44 @@
                      </property>
                     </spacer>
                    </item>
-                   <item row="7" column="0">
+                   <item row="9" column="0">
                     <widget class="QLabel" name="labelToken">
                      <property name="text">
                       <string>Basic.Settings.Agora.APPTOKEN</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="7" column="1">
+                   <item row="9" column="1">
                     <widget class="QLineEdit" name="lineEditToken"/>
                    </item>
-                   <item row="8" column="0">
+                   <item row="11" column="0">
                     <widget class="QLabel" name="labelAppCertificate">
                      <property name="text">
                       <string>Basic.Settings.Agora.APPCERTIFICATE</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="8" column="1">
+                   <item row="11" column="1">
                     <widget class="QLineEdit" name="lineEditAppCertificate"/>
                    </item>
-                   <item row="9" column="0">
+                   <item row="12" column="0">
                     <widget class="QLabel" name="label_45">
                      <property name="text">
                       <string>Basic.Settings.Agora.Token.Expired</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="9" column="1">
+                   <item row="12" column="1">
                     <widget class="QLineEdit" name="lineEditExpiredTs"/>
                    </item>
-                   <item row="10" column="0">
+                   <item row="13" column="0">
                     <widget class="QLabel" name="labelChannelName">
                      <property name="text">
                       <string>Basic.Settings.Agora.ChannelName</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="10" column="1">
+                   <item row="13" column="1">
                     <layout class="QHBoxLayout" name="horizontalLayout_27">
                      <item>
                       <widget class="QLineEdit" name="lineEditChannel"/>
@@ -262,35 +262,76 @@
                      </item>
                     </layout>
                    </item>
-                   <item row="13" column="1">
+                   <item row="16" column="1">
                     <widget class="QCheckBox" name="chkAutoLoadConfig">
                      <property name="text">
                       <string>Basic.Agora.AutoLoadConfig</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="11" column="1">
+                   <item row="14" column="1">
                     <widget class="QCheckBox" name="chkPersistSaving">
                      <property name="text">
                       <string>Basic.Settings.Agora.PersistSave</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="11" column="0">
+                   <item row="14" column="0">
                     <widget class="QCheckBox" name="chkMuteAllRemoteAV">
                      <property name="text">
                       <string>Basic.Settings.Agora.MutAllRemoteAudioVideo</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="12" column="1">
+                   <item row="15" column="1">
                     <widget class="QCheckBox" name="chkPersistSaveAppid">
                      <property name="text">
                       <string>Basic.Settings.Agora.PersistSaveAppid</string>
                      </property>
                     </widget>
                    </item>
+                   <item row="5" column="0">
+                    <widget class="QLabel" name="labUrl">
+                     <property name="text">
+                      <string>Agora.Settings.Agora.APPTOKEN.URL</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="5" column="1">
+                    <widget class="QLineEdit" name="lineEditUrl"/>
+                   </item>
+                   <item row="3" column="0">
+                    <widget class="QLabel" name="labelGetInfoMode">
+                     <property name="text">
+                      <string>Agora.Settings.GetInfo.Mode</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="3" column="1">
+                    <widget class="QComboBox" name="cmbGetMode">
+                     <item>
+                      <property name="text">
+                       <string>Agora.Settings.GetInfo.Mode.Manaul</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>Agora.Settings.GetInfo.Mode.Http.Get</string>
+                      </property>
+                     </item>
+                    </widget>
+                   </item>
                   </layout>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="labelGetInfoMode_2">
+                  <property name="styleSheet">
+                   <string notr="true">color: rgb(255, 0, 0);</string>
+                  </property>
+                  <property name="text">
+                   <string>Agora.Settings.GetInfo.Mode.Information</string>
+                  </property>
                  </widget>
                 </item>
                 <item>
@@ -1014,8 +1055,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>650</width>
-              <height>219</height>
+              <width>659</width>
+              <height>251</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_50">

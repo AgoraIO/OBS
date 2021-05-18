@@ -40,6 +40,7 @@ private:
 	QString title = "";
 	QString empty_appid_info = "";
 	QString init_failed_info = "";
+	QString tokenUrlText = "";
 
 	std::vector<RESOLUTION> m_vecResolution;
 	inline void EnableApplyButton(bool en)
@@ -91,4 +92,5 @@ private slots:
 	void on_cmbVideoEncoder_currentIndexChanged(int index);
 	
 	void onChkSaveAppidSettings(bool bCheck);
+	void on_cmbGetMode_currentIndexChanged(int index);
 };

@@ -33,9 +33,9 @@
 
 可以直接安装OBS Stduio 对应版本的连麦工具
 
-* [agora-tool-ui](https://github.com/AgoraIO/OBS/releases/download/3.3.0/Agora-Tool-3.0.0-Installer.exe) (26.1 and later)
+* [agora-tool-ui for windows](https://github.com/AgoraIO/OBS/releases/download/3.3.0/Agora-Tool-3.3.0-Installer.exe) (26.1 and later)
 
-* [agora-tool-ui](https://github.com/AgoraIO/OBS/releases/download/3.3.0/Agora-Tool-3.0.0-26.0.2-Installer.exe) (26.0.2 and below)
+
 
 **注解：**
 

@@ -31,6 +31,8 @@ You can get details about agora sdk from [agora.io](https://www.agora.io/en)
 
 You can install release setup directly corresponding to OBS Stduio version.
 
+
+* [agora-tool-ui for windows](https://github.com/AgoraIO/OBS/releases/download/3.3.0/Agora-Tool-3.3.0-Installer.exe) (26.1 and later)
 ## Compiling Agora RTC Tool
 
 ### Prerequisites

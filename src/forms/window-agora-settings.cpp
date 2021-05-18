@@ -60,6 +60,11 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	obs_frontend_push_ui_translation(obs_module_get_string);
 	
 	//general
+	ui->labelGetInfoMode->setText(tr("Agora.Settings.GetInfo.Mode"));
+	ui->cmbGetMode->setItemText(0, tr("Agora.Settings.GetInfo.Mode.Manaul"));
+	ui->cmbGetMode->setItemText(1, tr("Agora.Settings.GetInfo.Mode.Http.Get"));
+	ui->cmbGetMode->setCurrentIndex(0);
+	ui->labelGetInfoMode_2->setText(tr("Agora.Settings.GetInfo.Mode.Information"));
 	ui->generalGroupBox->setTitle(tr("Agora.Settings.General"));
 	ui->loadConfigFileLabel->setText(tr("Basic.Settigs.Agora.LoadConfig"));
 	ui->label_appid->setText(tr("Basic.Settings.Agora.APPID"));
@@ -72,6 +77,12 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	ui->chkMuteAllRemoteAV->setText(tr("Basic.Settings.Agora.MutAllRemoteAudioVideo"));
 	ui->loadConfigButton->setText(tr("Basic.Settigs.Agora.LoadConfigButton"));
 	ui->buttonAppid->setText(tr("Agora.General.Appid.Set"));
+#if WIN32
+	ui->labUrl->setText(tr("Agora.Settings.Agora.APPTOKEN.URL"));
+#else
+	ui->labUrl->hide();
+	ui->lineEditUrl->hide();
+#endif
 	//Audio
 	ui->audioRecordingDevicesGroupBox->setTitle(tr("Agora.Settings.Recording"));
 	ui->label_2->setText(tr("Agora.Record.Devices"));
@@ -105,7 +116,7 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 
 	ui->label_3->setText(tr("Basic.Settings.Audio.Channels"));
 	ui->label_6->setText(tr("Basic.Settings.Agora.AudioProfile.Scenario"));
-	
+
 	ui->label_8->setText(tr("Agora.Settings.Video.BaseResolution"));
 	ui->label_10->setText(tr("Agora.Settings.Video.FPS"));
 	ui->label_4->setText(tr("Agora.Settings.Video.Birate"));
@@ -196,13 +207,15 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	LoadVideoSettings();
 	LoadRtmpSettings();
 	//
+	HookWidget(ui->lineEditUrl, EDIT_CHANGED, GENERAL_CHANGED);
 	HookWidget(ui->lineEditAppid, EDIT_CHANGED, GENERAL_CHANGED);
 	HookWidget(ui->lineEditToken, EDIT_CHANGED, GENERAL_CHANGED);
 	HookWidget(ui->lineEditAppCertificate, EDIT_CHANGED, GENERAL_CHANGED);
 	HookWidget(ui->lineEditExpiredTs, EDIT_CHANGED, GENERAL_CHANGED);
 	HookWidget(ui->lineEditChannel, EDIT_CHANGED, GENERAL_CHANGED);
 	HookWidget(ui->lineEditUID, EDIT_CHANGED, GENERAL_CHANGED);
-	
+	HookWidget(ui->cmbGetMode, COMBO_CHANGED, GENERAL_CHANGED);
+
 	HookWidget(ui->chkPersistSaving, CHECK_CHANGED, GENERAL_CHANGED);
 	HookWidget(ui->chkMuteAllRemoteAV, CHECK_CHANGED, GENERAL_CHANGED);
 
@@ -339,6 +352,8 @@ void AgoraSettings::SaveGeneralSettings()
 	settings.appCerf = ui->lineEditAppCertificate->text().toUtf8();
 	settings.token = ui->lineEditToken->text().toUtf8();
 	settings.channelName = ui->lineEditChannel->text().toUtf8();
+	settings.information_url = ui->lineEditUrl->text().toUtf8();
+	settings.info_mode = ui->cmbGetMode->currentIndex();
 #else
   if (!strAppid.isEmpty())
     settings.appid = strAppid.toStdString();
@@ -369,6 +384,8 @@ void AgoraSettings::SaveGeneralSettings()
 		SaveEdit(ui->lineEditAppid, "AgoraSettings", "AppId");
 
 	if (settings.savePersist) {
+		SaveEdit(ui->lineEditUrl, "AgoraSettings", "InformationUrl");
+		
 		if (!strUid.isEmpty())
 			SaveEdit(ui->lineEditUID, "AgoraSettings", "UID");
 		if (!strExpired.isEmpty())
@@ -448,6 +465,7 @@ void AgoraSettings::LoadGeneralSettings()
 
 	ui->lineEditAppid->setText(QString::fromUtf8(settings.appid.data()));
 	ui->lineEditToken->setText(QString::fromUtf8(settings.token.data()));
+	ui->lineEditUrl->setText(QString::fromUtf8(settings.information_url.data()));
 	ui->lineEditAppCertificate->setText(QString::fromUtf8(settings.appCerf.data()));
 	ui->lineEditChannel->setText(
 		QString::fromUtf8(settings.channelName.data()));
@@ -455,6 +473,13 @@ void AgoraSettings::LoadGeneralSettings()
 		QString strUid = QString("%1").arg(settings.uid);
 		ui->lineEditUID->setText(strUid);
 	}
+	ui->cmbGetMode->setCurrentIndex(settings.info_mode);
+	if (settings.info_mode == 0) {
+		ui->labelGetInfoMode_2->hide();
+		ui->labUrl->hide();
+		ui->lineEditUrl->hide();
+	}
+
 	ui->chkPersistSaving->setChecked(settings.savePersist);
 	ui->chkPersistSaveAppid->setChecked(settings.savePersistAppid);
 	ui->chkMuteAllRemoteAV->setChecked(settings.muteAllRemoteAudioVideo);
@@ -734,6 +759,20 @@ void AgoraSettings::on_cmbVideoEncoder_currentIndexChanged(int index)
 	else {
 		ui->label_4->hide();
 		ui->cmbAgoraBitrate->hide();
+	}
+}
+
+void AgoraSettings::on_cmbGetMode_currentIndexChanged(int index)
+{
+	if (index == 0) {
+		ui->labelGetInfoMode_2->hide();
+		ui->labUrl->hide();
+		ui->lineEditUrl->hide();
+	}
+	else {
+		ui->labelGetInfoMode_2->show();
+		ui->labUrl->show();
+		ui->lineEditUrl->show();
 	}
 }
 

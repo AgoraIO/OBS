@@ -52,7 +52,7 @@ public:
 	int leaveChannel();
 	
 	bool  keepPreRotation(bool bRotate);
-	bool  setVideoProfileEx(int nWidth, int nHeight, int nFrameRate, int nBitRate);
+	bool  setVideoProfileEx(int nWidth, int nHeight, int nFrameRate, int nBitRate, bool Agora = false);
 	bool  enableLocalCameara(bool bEnable);
 
 	bool enableExtendPlayDevice(bool bEnable);
