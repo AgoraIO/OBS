@@ -82,6 +82,8 @@ if(APPLE)
 	find_library(QT5CORE QtCore "${CMAKE_SOURCE_DIR}/deps/mac/lib")
 	find_library(QT5GUI QtGui "${CMAKE_SOURCE_DIR}/deps/mac/lib")
 	find_library(QT5WIDGETS QtWidgets "${CMAKE_SOURCE_DIR}/deps/mac/lib")
+  find_library(CURL curl "${CMAKE_SOURCE_DIR}/deps/mac/libs")
+
 
 
 
@@ -111,6 +113,7 @@ if(APPLE)
 			${QT5CORE}
 			${QT5GUI}
 			${QT5WIDGETS}
+      ${CURL}
 			)
 endif()
 

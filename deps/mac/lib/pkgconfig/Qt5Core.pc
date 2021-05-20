@@ -1,0 +1,15 @@
+prefix=/Users/zhanxiaochao/Qt/5.15.2
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+host_bins=${prefix}/bin
+qt_config=release c++11 c++14 concurrent dbus no-pkg-config reduce_exports static stl properties animation textcodec big_codecs codecs itemmodel proxymodel concatenatetablesproxymodel textdate datestring doubleconversion filesystemiterator filesystemwatcher gestures identityproxymodel library mimetype process statemachine regularexpression settings sharedmemory sortfilterproxymodel stringlistmodel systemsemaphore temporaryfile translation transposeproxymodel xmlstream xmlstreamreader xmlstreamwriter
+
+Name: Qt5 Core
+Description: Qt Core module
+Version: 5.15.2
+Libs: -L${libdir} -lQt5Core 
+Libs.private: -framework DiskArbitration -framework IOKit -lm -framework AppKit -framework Security -framework ApplicationServices -framework CoreServices -framework CoreFoundation -framework Foundation /Users/zhanxiaochao/Qt/5.15.2/lib/libqtpcre2.a   
+Cflags: -DQT_CORE_LIB -I${includedir}/QtCore -I${includedir}
+

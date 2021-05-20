@@ -3,7 +3,6 @@
 #include <QJsondocument>
 #include <QJsonObject>
 #include <stdio.h>
-#include <obs-frontend-api.h>
 #include <obs-properties.h>
 #include "window-agora-main.hpp"
 #include "../agora-ui-main.h"
@@ -45,9 +44,7 @@ AgoraBasic::AgoraBasic(QMainWindow *parent)
 
 	setWindowTitle(QString("Agora RTC Tool"));
 	setAttribute(Qt::WA_QuitOnClose, false);
-#if _WIN32
 	curl = curl_easy_init();
-#endif
 	obs_frontend_push_ui_translation(obs_module_get_string);
 	control_text  = tr("Agora.Main.Controls");
 	start_text    = tr("Agora.Main.Start");
@@ -371,7 +368,6 @@ void AgoraBasic::on_agoraSteramButton_clicked()
 
 	if (start_text.compare(str) == 0) {		
 		//http url
-#if WIN32
 		if (m_agoraToolSettings.info_mode == 1) {
 			ui->agoraSteramButton->setText(starting_text);
 			std::thread th([this](){
@@ -424,7 +420,6 @@ void AgoraBasic::on_agoraSteramButton_clicked()
 			th.join();
 		}
 		else 
-#endif
 		{
 			joinChannel(m_agoraToolSettings.token);
 		}		
@@ -542,10 +537,16 @@ void AgoraBasic::reuquestToken_slot(QString json, int err)
 			ui->agoraSteramButton->setText(start_text);
 			return;
 		}
+#if _WIN32
+    m_agoraToolSettings.appid = jsData["appID"].toString().toUtf8();
+    m_agoraToolSettings.channelName = jsData["channelName"].toString().toUtf8();
+    m_agoraToolSettings.token = jsData["token"].toString().toUtf8();
+#else
+    m_agoraToolSettings.appid = jsData["appID"].toString().toStdString();
+    m_agoraToolSettings.channelName = jsData["channelName"].toString().toStdString();
+    m_agoraToolSettings.token = jsData["token"].toString().toStdString();
+#endif
 
-		m_agoraToolSettings.appid = jsData["appID"].toString().toUtf8();
-		m_agoraToolSettings.channelName = jsData["channelName"].toString().toUtf8();
-		m_agoraToolSettings.token = jsData["token"].toString().toUtf8();
 		m_agoraToolSettings.uid = strtoul(jsData["uid"].toString().toUtf8().data(), nullptr, 10);
 		joinChannel(m_agoraToolSettings.token);
 
@@ -808,20 +809,21 @@ void AgoraBasic::ResetRemoteVideoWidget(int index)
 void AgoraBasic::resizeEvent(QResizeEvent *event)
 {
 	QWidget::resizeEvent(event);
-
-	if (isVisible() && display) {
 #if _WIN32
-	QSize size = ui->preview->size();
 #else
-    dispatch_async(dispatch_get_main_queue(), ^{
-      CreateDisplay();
-    });
+  dispatch_async(dispatch_get_main_queue(), ^{
+    CreateDisplay();
+  });
+#endif
+  if (isVisible() && display) {
+#if _WIN32
+    QSize size = ui->preview->size();
+#else
     QSize size = ui->preview->size() *  ui->preview->devicePixelRatioF();
 #endif
     obs_display_resize(display, size.width(), size.height());
 
-	}
-
+  }
 }
 
 void AgoraBasic::paintEvent(QPaintEvent *event)

@@ -77,8 +77,8 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	ui->chkMuteAllRemoteAV->setText(tr("Basic.Settings.Agora.MutAllRemoteAudioVideo"));
 	ui->loadConfigButton->setText(tr("Basic.Settigs.Agora.LoadConfigButton"));
 	ui->buttonAppid->setText(tr("Agora.General.Appid.Set"));
+  ui->labUrl->setText(tr("Agora.Settings.Agora.APPTOKEN.URL"));
 #if WIN32
-	ui->labUrl->setText(tr("Agora.Settings.Agora.APPTOKEN.URL"));
 #else
 	ui->labUrl->hide();
 	ui->lineEditUrl->hide();
@@ -343,24 +343,21 @@ void AgoraSettings::SaveGeneralSettings()
 	main->GetAgoraSetting(settings);
 	QString strAppid = ui->lineEditAppid->text().toUtf8();
 	strAppid = strAppid.trimmed();
-#if defined(WIN32)
-		if (AgoraRtcEngine::GetInstance()->IsInitialize()
+  if (AgoraRtcEngine::GetInstance()->IsInitialize()
 			&& !settings.appid.empty() && settings.appid.compare(strAppid.toUtf8()) !=0)
 			appid_changed = true;
-		settings.appid = strAppid.toUtf8();
+		settings.appid = strAppid.toStdString();
 
-	settings.appCerf = ui->lineEditAppCertificate->text().toUtf8();
-	settings.token = ui->lineEditToken->text().toUtf8();
-	settings.channelName = ui->lineEditChannel->text().toUtf8();
-	settings.information_url = ui->lineEditUrl->text().toUtf8();
+	settings.appCerf = ui->lineEditAppCertificate->text().toStdString();
+	settings.token = ui->lineEditToken->text().toStdString();
+	settings.channelName = ui->lineEditChannel->text().toStdString();
+	settings.information_url = ui->lineEditUrl->text().toStdString();
 	settings.info_mode = ui->cmbGetMode->currentIndex();
-#else
   if (!strAppid.isEmpty())
     settings.appid = strAppid.toStdString();
   settings.appCerf = ui->lineEditAppCertificate->text().toStdString();
   settings.token = ui->lineEditToken->text().toStdString();
   settings.channelName = ui->lineEditChannel->text().toStdString();
-#endif
   QString strUid = ui->lineEditUID->text();
 	if (strUid.length() > 0)
 		settings.uid = strtoul(strUid.toUtf8().data(), NULL, 10);

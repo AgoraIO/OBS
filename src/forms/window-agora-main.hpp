@@ -6,11 +6,14 @@
 #include <memory>
 #include "ui_AgoraBasic.h"
 #include "../Agora/agorartcengine.hpp"
+#include <obs-frontend-api.h>
 #include <util/util.hpp>
 #include <QTimer>
 #include "obs.hpp"
 #if WIN32
 #include "curl.h"
+#else
+#include <curl/curl.h>
 #endif
 
 //class OBSBasic;
@@ -133,9 +136,7 @@ private:
 	bool joinFailed = false;
 	bool started = false;
 	//token url
-#if WIN32
 	CURL *curl = nullptr;
-#endif
 
 	ConfigFile globalConfig;
 	ConfigFile basicConfig;
@@ -158,7 +159,7 @@ private:
 	bool StartAgoraOutput();
 	void StopAgoraOutput();
 	void joinChannel(std::string token);
-	static void OBSEvent(enum obs_frontend_event event, void *);
+	static void OBSEvent(obs_frontend_event event, void *);
 public slots:
 	void on_agoraSteramButton_clicked();
 	void on_settingsButton_clicked();

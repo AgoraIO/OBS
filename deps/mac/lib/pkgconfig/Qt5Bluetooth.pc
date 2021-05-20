@@ -1,0 +1,14 @@
+prefix=/Users/zhanxiaochao/Qt/5.15.2
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+
+Name: Qt5 Bluetooth
+Description: Qt Bluetooth module
+Version: 5.15.2
+Libs: -L${libdir} -lQt5Bluetooth 
+Libs.private: /Users/zhanxiaochao/Qt/5.15.2/lib/libQt5Core.a -framework DiskArbitration -framework IOKit -lm -framework AppKit -framework Security -framework ApplicationServices -framework CoreServices -framework CoreFoundation -framework Foundation /Users/zhanxiaochao/Qt/5.15.2/lib/libqtpcre2.a -framework IOBluetooth /Users/zhanxiaochao/Qt/5.15.2/lib/libQt5Concurrent.a /Users/zhanxiaochao/Qt/5.15.2/lib/libQt5Core.a -framework DiskArbitration -framework IOKit -lm -framework AppKit -framework Security -framework ApplicationServices -framework CoreServices -framework CoreFoundation -framework Foundation /Users/zhanxiaochao/Qt/5.15.2/lib/libqtpcre2.a   
+Cflags: -DQT_BLUETOOTH_LIB -I${includedir}/QtBluetooth -I${includedir}
+Requires: Qt5Core
+

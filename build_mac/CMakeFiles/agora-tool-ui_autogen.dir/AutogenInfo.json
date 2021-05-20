@@ -1,0 +1,215 @@
+{
+	"BUILD_DIR" : "/Users/zhanxiaochao/Desktop/obs-studio/OBS/build_mac/agora-tool-ui_autogen",
+	"CMAKE_BINARY_DIR" : "/Users/zhanxiaochao/Desktop/obs-studio/OBS/build_mac",
+	"CMAKE_CURRENT_BINARY_DIR" : "/Users/zhanxiaochao/Desktop/obs-studio/OBS/build_mac",
+	"CMAKE_CURRENT_SOURCE_DIR" : "/Users/zhanxiaochao/Desktop/obs-studio/OBS",
+	"CMAKE_EXECUTABLE" : "/Applications/CMake.app/Contents/bin/cmake",
+	"CMAKE_LIST_FILES" : 
+	[
+		"/Users/zhanxiaochao/Desktop/obs-studio/OBS/CMakeLists.txt",
+		"/Users/zhanxiaochao/Desktop/obs-studio/OBS/build_mac/CMakeFiles/3.20.0/CMakeSystem.cmake",
+		"/Applications/CMake.app/Contents/share/cmake-3.20/Modules/CMakeSystemSpecificInitialize.cmake",
+		"/Applications/CMake.app/Contents/share/cmake-3.20/Modules/Platform/Darwin-Initialize.cmake",
+		"/Users/zhanxiaochao/Desktop/obs-studio/OBS/build_mac/CMakeFiles/3.20.0/CMakeCCompiler.cmake",
+		"/Users/zhanxiaochao/Desktop/obs-studio/OBS/build_mac/CMakeFiles/3.20.0/CMakeCXXCompiler.cmake",
+		"/Applications/CMake.app/Contents/share/cmake-3.20/Modules/CMakeSystemSpecificInformation.cmake",
+		"/Applications/CMake.app/Contents/share/cmake-3.20/Modules/CMakeGenericSystem.cmake",
+		"/Applications/CMake.app/Contents/share/cmake-3.20/Modules/CMakeInitializeConfigs.cmake",
+		"/Applications/CMake.app/Contents/share/cmake-3.20/Modules/Platform/Darwin.cmake",
+		"/Applications/CMake.app/Contents/share/cmake-3.20/Modules/Platform/UnixPaths.cmake",
+		"/Applications/CMake.app/Contents/share/cmake-3.20/Modules/CMakeCInformation.cmake",
+		"/Applications/CMake.app/Contents/share/cmake-3.20/Modules/CMakeLanguageInformation.cmake",
+		"/Applications/CMake.app/Contents/share/cmake-3.20/Modules/Compiler/AppleClang-C.cmake",
+		"/Applications/CMake.app/Contents/share/cmake-3.20/Modules/Compiler/Clang.cmake",
+		"/Applications/CMake.app/Contents/share/cmake-3.20/Modules/Compiler/CMakeCommonCompilerMacros.cmake",
+		"/Applications/CMake.app/Contents/share/cmake-3.20/Modules/Compiler/GNU.cmake",
+		"/Applications/CMake.app/Contents/share/cmake-3.20/Modules/Compiler/CMakeCommonCompilerMacros.cmake",
+		"/Applications/CMake.app/Contents/share/cmake-3.20/Modules/Platform/Apple-AppleClang-C.cmake",
+		"/Applications/CMake.app/Contents/share/cmake-3.20/Modules/Platform/Apple-Clang-C.cmake",
+		"/Applications/CMake.app/Contents/share/cmake-3.20/Modules/Platform/Apple-Clang.cmake",
+		"/Applications/CMake.app/Contents/share/cmake-3.20/Modules/CMakeCommonLanguageInclude.cmake",
+		"/Applications/CMake.app/Contents/share/cmake-3.20/Modules/CMakeCXXInformation.cmake",
+		"/Applications/CMake.app/Contents/share/cmake-3.20/Modules/CMakeLanguageInformation.cmake",
+		"/Applications/CMake.app/Contents/share/cmake-3.20/Modules/Compiler/AppleClang-CXX.cmake",
+		"/Applications/CMake.app/Contents/share/cmake-3.20/Modules/Compiler/Clang.cmake",
+		"/Applications/CMake.app/Contents/share/cmake-3.20/Modules/Platform/Apple-AppleClang-CXX.cmake",
+		"/Applications/CMake.app/Contents/share/cmake-3.20/Modules/Platform/Apple-Clang-CXX.cmake",
+		"/Applications/CMake.app/Contents/share/cmake-3.20/Modules/Platform/Apple-Clang.cmake",
+		"/Applications/CMake.app/Contents/share/cmake-3.20/Modules/CMakeCommonLanguageInclude.cmake",
+		"/Users/zhanxiaochao/Desktop/obs-studio/build_mac/libobs/LibObsConfigVersion.cmake",
+		"/Users/zhanxiaochao/Desktop/obs-studio/build_mac/libobs/LibObsConfig.cmake",
+		"/Users/zhanxiaochao/Desktop/obs-studio/build_mac/libobs/LibObsTarget.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5/Qt5ConfigVersion.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5/Qt5Config.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5/Qt5ModuleLocation.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5Core/Qt5CoreConfigVersion.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5Core/Qt5CoreConfig.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5Core/Qt5CoreConfigExtras.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5Core/Qt5CoreConfigExtrasMkspecDir.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5Core/Qt5CoreMacros.cmake",
+		"/Applications/CMake.app/Contents/share/cmake-3.20/Modules/CMakeParseArguments.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5Widgets/Qt5WidgetsConfigVersion.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5Widgets/Qt5WidgetsConfig.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5Gui/Qt5GuiConfigVersion.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5Gui/Qt5GuiConfig.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5Gui/Qt5Gui_QCocoaIntegrationPlugin.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5Gui/Qt5Gui_QGifPlugin.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5Gui/Qt5Gui_QICNSPlugin.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5Gui/Qt5Gui_QICOPlugin.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5Gui/Qt5Gui_QJpegPlugin.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5Gui/Qt5Gui_QMacHeifPlugin.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5Gui/Qt5Gui_QMacJp2Plugin.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5Gui/Qt5Gui_QMinimalIntegrationPlugin.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5Gui/Qt5Gui_QOffscreenIntegrationPlugin.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5Gui/Qt5Gui_QPdfPlugin.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5Gui/Qt5Gui_QSvgIconPlugin.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5Gui/Qt5Gui_QSvgPlugin.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5Gui/Qt5Gui_QTgaPlugin.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5Gui/Qt5Gui_QTiffPlugin.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5Gui/Qt5Gui_QTuioTouchPlugin.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5Gui/Qt5Gui_QVirtualKeyboardPlugin.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5Gui/Qt5Gui_QWbmpPlugin.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5Gui/Qt5Gui_QWebGLIntegrationPlugin.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5Gui/Qt5Gui_QWebpPlugin.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5Gui/Qt5Gui_QXdgDesktopPortalThemePlugin.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5Gui/Qt5GuiConfigExtras.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5Widgets/Qt5Widgets_QMacStylePlugin.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5Widgets/Qt5WidgetsConfigExtras.cmake",
+		"/usr/local/Cellar/qt/5.15.2/lib/cmake/Qt5Widgets/Qt5WidgetsMacros.cmake",
+		"/Applications/CMake.app/Contents/share/cmake-3.20/Modules/CMakeParseArguments.cmake"
+	],
+	"CMAKE_SOURCE_DIR" : "/Users/zhanxiaochao/Desktop/obs-studio/OBS",
+	"DEP_FILE" : "",
+	"DEP_FILE_RULE_NAME" : "",
+	"HEADERS" : 
+	[
+		[
+			"/Users/zhanxiaochao/Desktop/obs-studio/OBS/src/Agora/agorartcengine.hpp",
+			"MU",
+			"U3KM7JFWRN/moc_agorartcengine.cpp",
+			null
+		],
+		[
+			"/Users/zhanxiaochao/Desktop/obs-studio/OBS/src/agora-ui-main.h",
+			"MU",
+			"UVLADIE3JM/moc_agora-ui-main.cpp",
+			null
+		],
+		[
+			"/Users/zhanxiaochao/Desktop/obs-studio/OBS/src/forms/window-agora-main.hpp",
+			"MU",
+			"GYHPFG4CL2/moc_window-agora-main.cpp",
+			null
+		],
+		[
+			"/Users/zhanxiaochao/Desktop/obs-studio/OBS/src/forms/window-agora-settings.hpp",
+			"MU",
+			"GYHPFG4CL2/moc_window-agora-settings.cpp",
+			null
+		]
+	],
+	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
+	"INCLUDE_DIR" : "/Users/zhanxiaochao/Desktop/obs-studio/OBS/build_mac/agora-tool-ui_autogen/include",
+	"INCLUDE_DIR_Debug" : "/Users/zhanxiaochao/Desktop/obs-studio/OBS/build_mac/agora-tool-ui_autogen/include_Debug",
+	"INCLUDE_DIR_MinSizeRel" : "/Users/zhanxiaochao/Desktop/obs-studio/OBS/build_mac/agora-tool-ui_autogen/include_MinSizeRel",
+	"INCLUDE_DIR_RelWithDebInfo" : "/Users/zhanxiaochao/Desktop/obs-studio/OBS/build_mac/agora-tool-ui_autogen/include_RelWithDebInfo",
+	"INCLUDE_DIR_Release" : "/Users/zhanxiaochao/Desktop/obs-studio/OBS/build_mac/agora-tool-ui_autogen/include_Release",
+	"MOC_COMPILATION_FILE" : "/Users/zhanxiaochao/Desktop/obs-studio/OBS/build_mac/agora-tool-ui_autogen/mocs_compilation.cpp",
+	"MOC_DEFINITIONS" : [ "HAVE_OBSCONFIG_H", "agora_tool_ui_EXPORTS" ],
+	"MOC_DEPEND_FILTERS" : 
+	[
+		[
+			"Q_PLUGIN_METADATA",
+			"[\n][ \t]*Q_PLUGIN_METADATA[ \t]*\\([^\\)]*FILE[ \t]*\"([^\"]+)\""
+		]
+	],
+	"MOC_INCLUDES" : 
+	[
+		"/Users/zhanxiaochao/Desktop/obs-studio/OBS/build_mac",
+		"/Users/zhanxiaochao/Desktop/obs-studio/OBS",
+		"/Users/zhanxiaochao/Desktop/obs-studio/UI/obs-frontend-api",
+		"/Users/zhanxiaochao/Desktop/obs-studio/OBS/deps/mac/include",
+		"/Users/zhanxiaochao/Desktop/obs-studio/OBS/deps/mac/include/QtCore",
+		"/Users/zhanxiaochao/Desktop/obs-studio/OBS/deps/mac/include/QtGui",
+		"/Users/zhanxiaochao/Desktop/obs-studio/OBS/deps/mac/include/QtWidgets",
+		"/Users/zhanxiaochao/Desktop/obs-studio/OBS/deps/libyuv/include",
+		"/Users/zhanxiaochao/Desktop/obs-studio/libobs",
+		"/Users/zhanxiaochao/Desktop/obs-studio/build_mac/config",
+		"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1",
+		"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/12.0.0/include",
+		"/Library/Developer/CommandLineTools/SDKs/MacOSX11.0.sdk/usr/include",
+		"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"
+	],
+	"MOC_MACRO_NAMES" : [ "Q_OBJECT", "Q_GADGET", "Q_NAMESPACE", "Q_NAMESPACE_EXPORT" ],
+	"MOC_OPTIONS" : [],
+	"MOC_PATH_PREFIX" : false,
+	"MOC_PREDEFS_CMD" : 
+	[
+		"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++",
+		"-dM",
+		"-E",
+		"-c",
+		"/Applications/CMake.app/Contents/share/cmake-3.20/Modules/CMakeCXXCompilerABI.cpp"
+	],
+	"MOC_PREDEFS_FILE" : "/Users/zhanxiaochao/Desktop/obs-studio/OBS/build_mac/agora-tool-ui_autogen/moc_predefs.h",
+	"MOC_PREDEFS_FILE_Debug" : "/Users/zhanxiaochao/Desktop/obs-studio/OBS/build_mac/agora-tool-ui_autogen/moc_predefs_Debug.h",
+	"MOC_PREDEFS_FILE_MinSizeRel" : "/Users/zhanxiaochao/Desktop/obs-studio/OBS/build_mac/agora-tool-ui_autogen/moc_predefs_MinSizeRel.h",
+	"MOC_PREDEFS_FILE_RelWithDebInfo" : "/Users/zhanxiaochao/Desktop/obs-studio/OBS/build_mac/agora-tool-ui_autogen/moc_predefs_RelWithDebInfo.h",
+	"MOC_PREDEFS_FILE_Release" : "/Users/zhanxiaochao/Desktop/obs-studio/OBS/build_mac/agora-tool-ui_autogen/moc_predefs_Release.h",
+	"MOC_RELAXED_MODE" : false,
+	"MOC_SKIP" : [],
+	"MULTI_CONFIG" : true,
+	"PARALLEL" : 4,
+	"PARSE_CACHE_FILE" : "/Users/zhanxiaochao/Desktop/obs-studio/OBS/build_mac/CMakeFiles/agora-tool-ui_autogen.dir/ParseCache.txt",
+	"PARSE_CACHE_FILE_Debug" : "/Users/zhanxiaochao/Desktop/obs-studio/OBS/build_mac/CMakeFiles/agora-tool-ui_autogen.dir/ParseCache_Debug.txt",
+	"PARSE_CACHE_FILE_MinSizeRel" : "/Users/zhanxiaochao/Desktop/obs-studio/OBS/build_mac/CMakeFiles/agora-tool-ui_autogen.dir/ParseCache_MinSizeRel.txt",
+	"PARSE_CACHE_FILE_RelWithDebInfo" : "/Users/zhanxiaochao/Desktop/obs-studio/OBS/build_mac/CMakeFiles/agora-tool-ui_autogen.dir/ParseCache_RelWithDebInfo.txt",
+	"PARSE_CACHE_FILE_Release" : "/Users/zhanxiaochao/Desktop/obs-studio/OBS/build_mac/CMakeFiles/agora-tool-ui_autogen.dir/ParseCache_Release.txt",
+	"QT_MOC_EXECUTABLE" : "/usr/local/Cellar/qt/5.15.2/bin/moc",
+	"QT_UIC_EXECUTABLE" : "/usr/local/Cellar/qt/5.15.2/bin/uic",
+	"QT_VERSION_MAJOR" : 5,
+	"QT_VERSION_MINOR" : 15,
+	"SETTINGS_FILE" : "/Users/zhanxiaochao/Desktop/obs-studio/OBS/build_mac/CMakeFiles/agora-tool-ui_autogen.dir/AutogenUsed.txt",
+	"SETTINGS_FILE_Debug" : "/Users/zhanxiaochao/Desktop/obs-studio/OBS/build_mac/CMakeFiles/agora-tool-ui_autogen.dir/AutogenUsed_Debug.txt",
+	"SETTINGS_FILE_MinSizeRel" : "/Users/zhanxiaochao/Desktop/obs-studio/OBS/build_mac/CMakeFiles/agora-tool-ui_autogen.dir/AutogenUsed_MinSizeRel.txt",
+	"SETTINGS_FILE_RelWithDebInfo" : "/Users/zhanxiaochao/Desktop/obs-studio/OBS/build_mac/CMakeFiles/agora-tool-ui_autogen.dir/AutogenUsed_RelWithDebInfo.txt",
+	"SETTINGS_FILE_Release" : "/Users/zhanxiaochao/Desktop/obs-studio/OBS/build_mac/CMakeFiles/agora-tool-ui_autogen.dir/AutogenUsed_Release.txt",
+	"SOURCES" : 
+	[
+		[
+			"/Users/zhanxiaochao/Desktop/obs-studio/OBS/src/Agora/agorartcengine.cpp",
+			"MU",
+			null
+		],
+		[
+			"/Users/zhanxiaochao/Desktop/obs-studio/OBS/src/agora-plugin/agora-output.cpp",
+			"MU",
+			null
+		],
+		[
+			"/Users/zhanxiaochao/Desktop/obs-studio/OBS/src/agora-plugin/agora-pcm-encoder.cpp",
+			"MU",
+			null
+		],
+		[
+			"/Users/zhanxiaochao/Desktop/obs-studio/OBS/src/agora-ui-main.cpp",
+			"MU",
+			null
+		],
+		[
+			"/Users/zhanxiaochao/Desktop/obs-studio/OBS/src/forms/window-agora-main.cpp",
+			"MU",
+			null
+		],
+		[
+			"/Users/zhanxiaochao/Desktop/obs-studio/OBS/src/forms/window-agora-settings.cpp",
+			"MU",
+			null
+		]
+	],
+	"UIC_OPTIONS" : [],
+	"UIC_SEARCH_PATHS" : [],
+	"UIC_SKIP" : [],
+	"UIC_UI_FILES" : [],
+	"VERBOSITY" : 0
+}

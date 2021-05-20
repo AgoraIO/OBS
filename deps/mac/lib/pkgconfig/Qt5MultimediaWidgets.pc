@@ -1,0 +1,14 @@
+prefix=/Users/zhanxiaochao/Qt/5.15.2
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+
+Name: Qt5 MultimediaWidgets
+Description: Qt MultimediaWidgets module
+Version: 5.15.2
+Libs: -L${libdir} -lQt5MultimediaWidgets 
+Libs.private: /Users/zhanxiaochao/Qt/5.15.2/lib/libQt5Multimedia.a /Users/zhanxiaochao/Qt/5.15.2/lib/libQt5Widgets.a -lz /Users/zhanxiaochao/Qt/5.15.2/lib/libQt5Gui.a -framework Metal -framework CoreGraphics -framework OpenGL -framework AGL /Users/zhanxiaochao/Qt/5.15.2/lib/libqtlibpng.a /Users/zhanxiaochao/Qt/5.15.2/lib/libqtharfbuzz.a /Users/zhanxiaochao/Qt/5.15.2/lib/libQt5Network.a -framework SystemConfiguration -framework GSS /Users/zhanxiaochao/Qt/5.15.2/lib/libQt5Core.a -framework DiskArbitration -framework IOKit -lm -framework AppKit -framework Security -framework ApplicationServices -framework CoreServices -framework CoreFoundation -framework Foundation /Users/zhanxiaochao/Qt/5.15.2/lib/libqtpcre2.a /Users/zhanxiaochao/Qt/5.15.2/lib/libQt5Multimedia.a /Users/zhanxiaochao/Qt/5.15.2/lib/libQt5OpenGL.a /Users/zhanxiaochao/Qt/5.15.2/lib/libQt5Widgets.a -lz /Users/zhanxiaochao/Qt/5.15.2/lib/libQt5Gui.a -framework Metal -framework CoreGraphics /Users/zhanxiaochao/Qt/5.15.2/lib/libqtlibpng.a /Users/zhanxiaochao/Qt/5.15.2/lib/libqtharfbuzz.a /Users/zhanxiaochao/Qt/5.15.2/lib/libQt5Network.a -framework SystemConfiguration -framework GSS /Users/zhanxiaochao/Qt/5.15.2/lib/libQt5Core.a -framework DiskArbitration -framework IOKit -lm -framework AppKit -framework Security -framework ApplicationServices -framework CoreServices -framework CoreFoundation -framework Foundation /Users/zhanxiaochao/Qt/5.15.2/lib/libqtpcre2.a -framework OpenGL -framework AGL   
+Cflags: -DQT_MULTIMEDIAWIDGETS_LIB -I${includedir}/QtMultimediaWidgets -I${includedir}
+Requires: Qt5Core Qt5Gui Qt5Multimedia Qt5Widgets
+

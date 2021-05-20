@@ -1,0 +1,14 @@
+prefix=/Users/zhanxiaochao/Qt/5.15.2
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+
+Name: Qt5 QmlModels
+Description: Qt QmlModels module
+Version: 5.15.2
+Libs: -L${libdir} -lQt5QmlModels 
+Libs.private: /Users/zhanxiaochao/Qt/5.15.2/lib/libQt5Qml.a /Users/zhanxiaochao/Qt/5.15.2/lib/libQt5Network.a -framework SystemConfiguration -framework GSS /Users/zhanxiaochao/Qt/5.15.2/lib/libQt5Core.a -framework DiskArbitration -framework IOKit -lm -framework AppKit -framework Security -framework ApplicationServices -framework CoreServices -framework CoreFoundation -framework Foundation /Users/zhanxiaochao/Qt/5.15.2/lib/libqtpcre2.a    
+Cflags: -DQT_QMLMODELS_LIB -I${includedir}/QtQmlModels -I${includedir}
+Requires: Qt5Core Qt5Qml
+

@@ -1,0 +1,4 @@
+/Users/zhanxiaochao/Desktop/obs-studio/OBS/build_mac/CMakeFiles/agora-tool-ui.dir
+/Users/zhanxiaochao/Desktop/obs-studio/OBS/build_mac/CMakeFiles/agora-tool-ui_autogen.dir
+/Users/zhanxiaochao/Desktop/obs-studio/OBS/build_mac/CMakeFiles/ALL_BUILD.dir
+/Users/zhanxiaochao/Desktop/obs-studio/OBS/build_mac/CMakeFiles/ZERO_CHECK.dir

@@ -1,0 +1,25 @@
+dependencies: \
+  /Users/zhanxiaochao/Desktop/obs-studio/OBS/src/Agora/agorartcengine.cpp \
+  /Users/zhanxiaochao/Desktop/obs-studio/OBS/src/Agora/agorartcengine.hpp \
+  /Users/zhanxiaochao/Desktop/obs-studio/OBS/deps/mac/libs/AgoraRtcKit.framework/Headers/IAgoraRtcEngine.h \
+  /Users/zhanxiaochao/Desktop/obs-studio/OBS/deps/mac/libs/AgoraRtcKit.framework/Headers/AgoraBase.h \
+  /Users/zhanxiaochao/Desktop/obs-studio/OBS/deps/mac/libs/AgoraRtcKit.framework/Headers/IAgoraService.h \
+  /Users/zhanxiaochao/Desktop/obs-studio/OBS/deps/mac/libs/AgoraRtcKit.framework/Headers/IAgoraMediaEngine.h \
+  /Users/zhanxiaochao/Desktop/obs-studio/OBS/deps/libyuv/include/libyuv.h \
+  /Users/zhanxiaochao/Desktop/obs-studio/OBS/deps/libyuv/include/libyuv/basic_types.h \
+  /Users/zhanxiaochao/Desktop/obs-studio/OBS/deps/libyuv/include/libyuv/compare.h \
+  /Users/zhanxiaochao/Desktop/obs-studio/OBS/deps/libyuv/include/libyuv/convert.h \
+  /Users/zhanxiaochao/Desktop/obs-studio/OBS/deps/libyuv/include/libyuv/rotate.h \
+  /Users/zhanxiaochao/Desktop/obs-studio/OBS/deps/libyuv/include/libyuv/convert_argb.h \
+  /Users/zhanxiaochao/Desktop/obs-studio/OBS/deps/libyuv/include/libyuv/convert_from.h \
+  /Users/zhanxiaochao/Desktop/obs-studio/OBS/deps/libyuv/include/libyuv/planar_functions.h \
+  /Users/zhanxiaochao/Desktop/obs-studio/OBS/deps/libyuv/include/libyuv/convert_from_argb.h \
+  /Users/zhanxiaochao/Desktop/obs-studio/OBS/deps/libyuv/include/libyuv/cpu_id.h \
+  /Users/zhanxiaochao/Desktop/obs-studio/OBS/deps/libyuv/include/libyuv/mjpeg_decoder.h \
+  /Users/zhanxiaochao/Desktop/obs-studio/OBS/deps/libyuv/include/libyuv/rotate_argb.h \
+  /Users/zhanxiaochao/Desktop/obs-studio/OBS/deps/libyuv/include/libyuv/row.h \
+  /Users/zhanxiaochao/Desktop/obs-studio/OBS/deps/libyuv/include/libyuv/scale.h \
+  /Users/zhanxiaochao/Desktop/obs-studio/OBS/deps/libyuv/include/libyuv/scale_argb.h \
+  /Users/zhanxiaochao/Desktop/obs-studio/OBS/deps/libyuv/include/libyuv/scale_row.h \
+  /Users/zhanxiaochao/Desktop/obs-studio/OBS/deps/libyuv/include/libyuv/version.h \
+  /Users/zhanxiaochao/Desktop/obs-studio/OBS/deps/libyuv/include/libyuv/video_common.h
