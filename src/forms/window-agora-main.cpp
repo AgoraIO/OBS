@@ -39,6 +39,7 @@ AgoraBasic::AgoraBasic(QMainWindow *parent)
 	, audio_encoder(nullptr)
 {
 	ui->setupUi(this);
+	setWindowFlags(windowFlags() | Qt::WindowMinimizeButtonHint);
 	//ui->previewDisabledWidget->setVisible(false);
 	ui->menubar->setVisible(false);
 
