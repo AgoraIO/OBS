@@ -586,10 +586,15 @@ void AgoraBasic::closeEvent(QCloseEvent *event)
 }
 
 void AgoraBasic::ToggleAgoraDialog() {
-	if (!isVisible())
+	if (!isVisible()) {
+
+		ResetBasicConfig();
+		m_agoraToolSettings.obs_bitrate = GetOBSBitrate();
 		setVisible(true);
-	else
+	}
+	else {
 		setVisible(false);
+	}
 }
 
 void AgoraBasic::on_settingsButton_clicked()
