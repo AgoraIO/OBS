@@ -174,6 +174,29 @@ int AgoraBasic::GetProfilePath(char *path, size_t size, const char *file)
 	return snprintf(path, size, "%s/%s/%s", profiles_path, profile, file);
 }
 
+void AgoraBasic::ResetBasicConfig()
+{
+	basicConfig.Close();
+	char configPath[512];
+
+	int ret = GetProfilePath(configPath, sizeof(configPath), "");
+	if (ret <= 0) {
+		blog(LOG_INFO, "Failed to get profile path");
+		return;
+	}
+
+	ret = GetProfilePath(configPath, sizeof(configPath), "basic.ini");
+	if (ret <= 0) {
+		blog(LOG_INFO, "Failed to get basic.ini path");
+		return;
+	}
+
+	int code = basicConfig.Open(configPath, CONFIG_OPEN_ALWAYS);
+	if (code != CONFIG_SUCCESS) {
+		blog(LOG_INFO, "Failed to open basic.ini: %d", code);
+		return;
+	}
+}
 
 void AgoraBasic::InitBasicConfig()
 {
@@ -473,8 +496,8 @@ void AgoraBasic::joinChannel(std::string token)
 	if (current_source) {
 		obs_get_video_info(&ovi);
 		video_scale_info info;
-		info.width = ovi.base_width;
-		info.height = ovi.base_height;
+		info.width = ovi.output_width;
+		info.height = ovi.output_height;
 		info.format = ovi.output_format;
 		info.range = ovi.range;
 		info.colorspace = ovi.colorspace;
@@ -587,7 +610,7 @@ void AgoraBasic::closeEvent(QCloseEvent *event)
 
 void AgoraBasic::ToggleAgoraDialog() {
 	if (!isVisible()) {
-
+		
 		ResetBasicConfig();
 		m_agoraToolSettings.obs_bitrate = GetOBSBitrate();
 		setVisible(true);
@@ -924,7 +947,7 @@ void AgoraBasic::RawVideoCallback (void *param, struct video_data *frame)
 	struct obs_video_info ovi;
 	AgoraBasic* basic = (AgoraBasic*)param;
 	
-	if (obs_get_video_info(&ovi) ) {
+	if (obs_get_video_info(&ovi) && basic->started) {
 		AgoraRtcEngine::GetInstance()->PushVideoFrame(frame);
 	}
 }
@@ -1291,6 +1314,7 @@ void AgoraBasic::OBSEvent(enum obs_frontend_event event, void * data)
 {
 	if (event == OBS_FRONTEND_EVENT_EXIT) {
 		AgoraBasic* basic = (AgoraBasic*)data;
+
 		obs_display_remove_draw_callback(basic->display, DrawPreview, basic);
 		QString str = basic->ui->agoraSteramButton->text();
 		if (basic->stop_text.compare(str) == 0) {

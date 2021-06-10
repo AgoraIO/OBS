@@ -231,8 +231,8 @@ void AgoraRtcEngine::SetExternalVideoFrame()
 {
 	struct obs_video_info ovi;
 	obs_get_video_info(&ovi);
-	agora_out_cx = ovi.base_width;
-	agora_out_cy = ovi.base_height;
+	agora_out_cx = ovi.output_width;
+	agora_out_cy = ovi.output_height;
 
 	m_externalVideoFrame.buffer = NULL;
 	m_externalVideoFrame.cropLeft = 0;
@@ -615,8 +615,8 @@ void AgoraRtcEngine::PushVideoFrame(struct video_data *frame)
 	struct obs_video_info ovi;
 	obs_get_video_info(&ovi);
 
-	if (m_externalVideoFrame.stride != ((ovi.base_width << 4) >> 4)
-		|| m_externalVideoFrame.height != ovi.base_height
+	if (m_externalVideoFrame.stride != ((ovi.output_width << 4) >> 4)
+		|| m_externalVideoFrame.height != ovi.output_height
 		|| m_format != ovi.output_format) {
 		delete[] m_externalVideoFrame.buffer;
 		m_externalVideoFrame.buffer = nullptr;
@@ -644,7 +644,7 @@ void AgoraRtcEngine::PushVideoFrame(struct video_data *frame)
 	case VIDEO_FORMAT_RGBA:
 		libyuv::ABGRToARGB(frame->data[0], frame->linesize[0], 
 			(uint8_t*)m_externalVideoFrame.buffer, frame->linesize[0], 
-			ovi.base_width, ovi.base_height);
+			ovi.output_width, ovi.output_height);
 		//copy_frame_data_plane(dst, m_externalVideoFrame.stride * 4, frame, 0, m_externalVideoFrame.height);
 		break;
 
@@ -655,7 +655,7 @@ void AgoraRtcEngine::PushVideoFrame(struct video_data *frame)
 			frame->data[2], frame->linesize[2],
 			(uint8_t*)m_externalVideoFrame.buffer,
 			m_externalVideoFrame.stride * 4,
-			ovi.base_width, ovi.base_height);
+			ovi.output_width, ovi.output_height);
 		//copy_frame_data_plane(dst, m_externalVideoFrame.stride * 4, frame, 0, m_externalVideoFrame.height);
 		break;
 	}
