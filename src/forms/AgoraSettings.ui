@@ -71,12 +71,17 @@
          <string>Agora.Settings.Rtmp</string>
         </property>
        </item>
+       <item>
+        <property name="text">
+         <string>Agora.Setting.NetworkTest</string>
+        </property>
+       </item>
       </widget>
      </item>
      <item>
       <widget class="QStackedWidget" name="settingsPages">
        <property name="currentIndex">
-        <number>0</number>
+        <number>4</number>
        </property>
        <widget class="QWidget" name="agoraPage">
         <layout class="QVBoxLayout" name="verticalLayout_16">
@@ -108,8 +113,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>684</width>
-              <height>441</height>
+              <width>564</width>
+              <height>410</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_23">
@@ -1055,8 +1060,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>659</width>
-              <height>251</height>
+              <width>650</width>
+              <height>219</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_50">
@@ -1491,7 +1496,7 @@
         </layout>
        </widget>
        <widget class="QWidget" name="rtmpPage">
-        <layout class="QFormLayout" name="formLayout_3">
+        <layout class="QFormLayout" name="formLayout_4">
          <property name="fieldGrowthPolicy">
           <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
          </property>
@@ -1547,6 +1552,33 @@
          </item>
          <item row="4" column="1">
           <widget class="QLineEdit" name="lineEditAgoraRtmpHeight"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="netTestPage">
+        <layout class="QFormLayout" name="formLayout_5">
+         <property name="fieldGrowthPolicy">
+          <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+         </property>
+         <property name="labelAlignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+         <item row="0" column="0">
+          <widget class="QPushButton" name="btnNetworkTest">
+           <property name="text">
+            <string>Agora.Setting.TestNet.Start</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLabel" name="labelTestNetWork">
+           <property name="styleSheet">
+            <string notr="true">color: rgb(255, 0, 0);</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>

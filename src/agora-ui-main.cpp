@@ -20,7 +20,7 @@ bool obs_module_load(void)
 	blog(LOG_INFO, "register agora audio encoder");
 	RegisterAgoraOutput();
 	blog(LOG_INFO, "register agora output");
-  initQT();
+    initQT();
 	blog(LOG_INFO, "loaded agora tool!");
 	return true;
 }

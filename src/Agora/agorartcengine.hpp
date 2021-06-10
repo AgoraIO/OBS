@@ -54,7 +54,7 @@ public:
 	bool  keepPreRotation(bool bRotate);
 	bool  setVideoProfileEx(int nWidth, int nHeight, int nFrameRate, int nBitRate, bool Agora = false);
 	bool  enableLocalCameara(bool bEnable);
-
+	void enableLastmileTest(bool bEnable);
 	bool enableExtendPlayDevice(bool bEnable);
 
 	void* AgoraAudioObserver_Create();
@@ -109,7 +109,7 @@ signals:
 	void onUserOffline(unsigned int uid, int reason);
 	void onFirstRemoteVideoDecoded(unsigned int uid, int width, int height,
 		int elapsed);
-
+	void onLastmileQuality(int quality);
 	void onConnectionStateChanged(int state, int reason);
 
 	void onRemoteVideoStateChanged(unsigned int uid, int state, int reason, int elapsed);

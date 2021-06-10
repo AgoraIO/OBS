@@ -41,6 +41,21 @@ private:
 	QString empty_appid_info = "";
 	QString init_failed_info = "";
 	QString tokenUrlText = "";
+	QString startTestNet = "";
+	QString stopTestNet = "";
+	QString qualityUnknown;
+	QString qualityExcellent;
+	QString qualityGood;
+	QString qualityPoor;
+	QString qualityBad;
+	QString qualityVBad;
+	QString qualityDown;
+	QString qualityUnSupported;
+	QString qualityDetecting;
+	QString testingNet = "";
+	QString testingNetInfo = "";
+
+	bool networkTest = false;
 
 	std::vector<RESOLUTION> m_vecResolution;
 	inline void EnableApplyButton(bool en)
@@ -73,6 +88,7 @@ private:
 	void LoadAudioDevice();
 
 	virtual void showEvent(QShowEvent *event)override;
+	bool checkTestNetwork();
 public:
 	AgoraSettings(QWidget *parent);
 	~AgoraSettings();
@@ -93,4 +109,6 @@ private slots:
 	
 	void onChkSaveAppidSettings(bool bCheck);
 	void on_cmbGetMode_currentIndexChanged(int index);
+	void on_btnNetworkTest_clicked();
+	void OnLastmileTest(int quality);
 };

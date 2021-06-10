@@ -65,6 +65,10 @@ public:
 		emit m_engine.onJoinChannelSuccess(channel, uid, elapsed);
 	}
 
+	virtual void onLastmileQuality(int quality) override
+	{
+		emit m_engine.onLastmileQuality(quality);
+	}
 	virtual void onLeaveChannel(const RtcStats &stats) override
 	{
 		Sleep(200);
@@ -605,6 +609,14 @@ void copy_frame_data_line(uint8_t *dst, int line_size,
 		memcpy(dst, src->data[plane],
 			line_size * (size_t)lines);
 	}
+}
+
+void AgoraRtcEngine::enableLastmileTest(bool bEnable)
+{
+	if (bEnable)
+		m_rtcEngine->enableLastmileTest();
+	else
+		m_rtcEngine->disableLastmileTest();
 }
 
 void AgoraRtcEngine::PushVideoFrame(struct video_data *frame)

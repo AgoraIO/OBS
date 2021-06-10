@@ -77,7 +77,22 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	ui->chkMuteAllRemoteAV->setText(tr("Basic.Settings.Agora.MutAllRemoteAudioVideo"));
 	ui->loadConfigButton->setText(tr("Basic.Settigs.Agora.LoadConfigButton"));
 	ui->buttonAppid->setText(tr("Agora.General.Appid.Set"));
-  ui->labUrl->setText(tr("Agora.Settings.Agora.APPTOKEN.URL"));
+    ui->labUrl->setText(tr("Agora.Settings.Agora.APPTOKEN.URL"));
+	startTestNet = tr("Agora.Setting.TestNet.Start");
+	stopTestNet = tr("Agora.Setting.TestNet.Stop");
+
+	qualityUnknown = tr("Agora.Test.Network.Result.Unknown");
+	qualityExcellent= tr("Agora.Test.Network.Result.Excellent");
+	qualityGood= tr("Agora.Test.Network.Result.Good");
+	qualityPoor= tr("Agora.Test.Network.Result.Poor");
+	qualityBad= tr("Agora.Test.Network.Result.Bad");
+	qualityVBad= tr("Agora.Test.Network.Result.VBad");
+	qualityDown= tr("Agora.Test.Network.Result.Down");
+	qualityUnSupported= tr("Agora.Test.Network.Result.UnSupported");
+	qualityDetecting= tr("Agora.Test.Network.Result.Detecting");
+	testingNet = tr("Agora.Network.Testing");
+	
+	testingNetInfo = tr("Agora.Network.Testing.Info");
 #if WIN32
 #else
 	ui->labUrl->hide();
@@ -138,6 +153,7 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	ui->listWidget->item(1)->setText(tr("Agora.Settings.Audio"));
 	ui->listWidget->item(2)->setText(tr("Agora.Settings.Video"));
 	ui->listWidget->item(3)->setText(tr("Agora.Settings.Rtmp"));
+	ui->listWidget->item(4)->setText(tr("Agora.Settings.NetworkTest"));
 
 	ui->labelAgoraRTmp->setText(tr("Agora.Settings.Rtmp.Url")); 
 	ui->labelAgoraRtmpFPS->setText(tr("Agora.Settings.Rtmp.FPS"));
@@ -163,7 +179,8 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	ui->cmbVideoEncoder->setCurrentIndex(0);
 
 	obs_frontend_pop_ui_translation();
-	
+	ui->btnNetworkTest->setText(startTestNet);
+	ui->labelTestNetWork->setText("");
 	ui->cmbAgoraFPS->setCurrentIndex(3);
 	fps_index = 0;
 	agora_fps[fps_index++] = 5;
@@ -240,6 +257,7 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 
 	HookWidget(ui->chkPersistSaving, CHECK_CHANGED, GENERAL_CHANGED);
 	connect(ui->chkPersistSaveAppid, &QCheckBox::toggled, this, &AgoraSettings::onChkSaveAppidSettings);
+	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onLastmileQuality, this, &AgoraSettings::OnLastmileTest);
 }
 
 
@@ -650,6 +668,9 @@ void AgoraSettings::on_buttonAppid_clicked()
 
 void AgoraSettings::on_buttonBox_clicked(QAbstractButton *button)
 {
+	if(checkTestNetwork())
+		return;
+	
 	QDialogButtonBox::ButtonRole val = ui->buttonBox->buttonRole(button);
 
 	if (val == QDialogButtonBox::ApplyRole ||
@@ -815,4 +836,73 @@ void AgoraSettings::onChkSaveAppidSettings(bool bCheck)
 	if (settings.savePersistAppid != bCheck) {
 		generalChanged = true;
 	}
+}
+
+void AgoraSettings::on_btnNetworkTest_clicked()
+{
+	if (!AgoraRtcEngine::GetInstance()->IsInitialize()) {
+		on_buttonAppid_clicked();
+		if (!AgoraRtcEngine::GetInstance()->IsInitialize())
+			return;
+	}
+	
+	if (!networkTest)
+		ui->labelTestNetWork->setText(testingNet);
+	else
+		ui->labelTestNetWork->setText("");
+
+	ui->btnNetworkTest->setText(networkTest ? startTestNet : stopTestNet);
+	AgoraRtcEngine::GetInstance()->enableLastmileTest(!networkTest);
+	networkTest = !networkTest;
+}
+
+void AgoraSettings::OnLastmileTest(int quality)
+{
+	agora::rtc::QUALITY_TYPE type = (agora::rtc::QUALITY_TYPE)quality;
+
+	QString info;
+	switch (type)
+	{
+	case agora::rtc::QUALITY_UNKNOWN:
+		info = qualityUnknown;
+		break;
+	case agora::rtc::QUALITY_EXCELLENT:
+		info = qualityExcellent;
+		break;
+	case agora::rtc::QUALITY_GOOD:
+		info = qualityGood;
+		break;
+	case agora::rtc::QUALITY_POOR:
+		info = qualityPoor;
+		break;
+	case agora::rtc::QUALITY_BAD:
+		info = qualityBad;
+		break;
+	case agora::rtc::QUALITY_VBAD:
+		info = qualityVBad;
+		break;
+	case agora::rtc::QUALITY_DOWN:
+		info = qualityDown;
+		break;
+	case agora::rtc::QUALITY_UNSUPPORTED:
+		info = qualityUnSupported;
+		break;
+	case agora::rtc::QUALITY_DETECTING:
+		info = qualityDetecting;
+		break;
+	default:
+		//info = qualityUnknown;
+		break;
+	}
+	ui->labelTestNetWork->setText(info);
+}
+
+bool AgoraSettings::checkTestNetwork()
+{
+	if (networkTest) {
+		QMessageBox::information(nullptr, title, testingNetInfo);
+		return false;
+	}
+
+	return true;
 }

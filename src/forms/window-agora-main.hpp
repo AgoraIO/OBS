@@ -143,6 +143,7 @@ private:
 	ConfigFile globalAgoraConfig;
 	void InitGlobalConfig();
 	void InitBasicConfig();
+	void ResetBasicConfig();
 	int GetOBSBitrate();
 	int GetProfilePath(char *path, size_t size, const char *file);
 	//HANDLE stopSignal = NULL;
