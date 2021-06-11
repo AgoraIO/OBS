@@ -906,3 +906,12 @@ bool AgoraSettings::checkTestNetwork()
 
 	return true;
 }
+
+void AgoraSettings::closeEvent(QCloseEvent *event)
+{
+	if (!checkTestNetwork()) {
+		event->ignore();
+		return;
+	}
+	close();
+}

@@ -89,6 +89,8 @@ private:
 
 	virtual void showEvent(QShowEvent *event)override;
 	bool checkTestNetwork();
+
+	virtual void closeEvent(QCloseEvent *event)override;
 public:
 	AgoraSettings(QWidget *parent);
 	~AgoraSettings();
