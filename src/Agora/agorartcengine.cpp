@@ -394,10 +394,10 @@ int AgoraRtcEngine::joinChannel(const std::string &key,
 	else if (audioChannel == 2 && m_bHighQuality) {
 		profile = AUDIO_PROFILE_MUSIC_HIGH_QUALITY_STEREO;
 	}
-//	m_rtcEngine->setAudioProfile(profile, (AUDIO_SCENARIO_TYPE)m_scenario);
-
+	
 	AParameter apm(m_rtcEngine);
-	apm->setParameters("{\"che.audio.specify.codec\": \"OPUSFB\"}");
+	apm->setParameters("{\"che.audio.codec.name\":\"OPUS\"}");
+	m_rtcEngine->setAudioProfile(profile, (AUDIO_SCENARIO_TYPE)m_scenario);
 
 	ChannelMediaOptions options;
 	options.autoSubscribeAudio = muteAudio;

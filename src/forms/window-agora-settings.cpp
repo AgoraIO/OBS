@@ -668,7 +668,7 @@ void AgoraSettings::on_buttonAppid_clicked()
 
 void AgoraSettings::on_buttonBox_clicked(QAbstractButton *button)
 {
-	if(checkTestNetwork())
+	if(!checkTestNetwork())
 		return;
 	
 	QDialogButtonBox::ButtonRole val = ui->buttonBox->buttonRole(button);
