@@ -396,9 +396,9 @@ int AgoraRtcEngine::joinChannel(const std::string &key,
 	}
 	
 	AParameter apm(m_rtcEngine);
-	apm->setParameters("{\"che.audio.codec.name\":\"OPUS\"}");
-	m_rtcEngine->setAudioProfile(profile, (AUDIO_SCENARIO_TYPE)m_scenario);
-
+	//apm->setParameters("{\"che.audio.codec.name\":\"OPUS\"}");
+	//m_rtcEngine->setAudioProfile(profile, (AUDIO_SCENARIO_TYPE)m_scenario);
+	apm->setParameters("{\"che.audio.specify.codec\": \"OPUSFB\"}");
 	ChannelMediaOptions options;
 	options.autoSubscribeAudio = muteAudio;
 	options.autoSubscribeVideo = muteVideo;
