@@ -2,8 +2,6 @@
 #include <obs-encoder.h>
 #include "../Agora/agorartcengine.hpp"
 
-int count = 0;
-
 static const char *AgoraGetAudioEncoderName(void*)
 {
 	return obs_module_text("AgoraAudioEnc");
@@ -22,11 +20,6 @@ static void AgoraPCM_Destroy(void* data)
 static bool AgoraPCM_Encode(void* data, struct encoder_frame* frame,
 struct encoder_packet* packet, bool *receive_packet)
 {
-	if (count % 200 == 0) {
-		blog(LOG_ERROR, "PushAudioFrame");
-		count = count % 200;
-	}
-	count++;
 	AgoraRtcEngine* engine = (AgoraRtcEngine*)data;
 	engine->PushAudioFrame(frame);
 	return true;
@@ -36,8 +29,6 @@ static void AgoraPCM_GetDefaults(obs_data_t *settings)
 {
 	
 }
-
-
 
 
 static bool AgoraPCM_GetExtraData(void *data, uint8_t **extra_data, size_t *size)
@@ -54,17 +45,14 @@ static bool AgoraPCM_GetExtraData(void *data, uint8_t **extra_data, size_t *size
 static void AgoraPCM_GetAudioInfo(void *, struct audio_convert_info *info)
 {
 	info->format          = AUDIO_FORMAT_16BIT;
-	info->samples_per_sec = AgoraRtcEngine::GetInstance()->sampleRate;
-	if (AgoraRtcEngine::GetInstance()->audioChannel == 2)
-		info->speakers = SPEAKERS_STEREO;
-	else
-		info->speakers = SPEAKERS_MONO;
+	info->samples_per_sec = 48000;
+	info->speakers        = SPEAKERS_STEREO;
 }
 
 static size_t AgoraPCM_GetFrameSize(void *data)
 {
 	UNUSED_PARAMETER(data);
-	return AgoraRtcEngine::GetInstance()->sampleRate / 100;
+	return 480;
 }
 
 void RegisterAgoraAudioEncoder()

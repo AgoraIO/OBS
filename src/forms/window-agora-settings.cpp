@@ -338,7 +338,7 @@ void AgoraSettings::SaveAudioSettings()
 	settings.bHighQuality = ui->chkAudioHighQuality->isChecked();
 	settings.scenario     = ui->cmbScenario->currentIndex();
 	settings.audioChannel = ui->cmbRecordChannelSetup->currentIndex() + 1;
-
+	main->SetAgoraSetting(settings);
 	AgoraRtcEngine::GetInstance()->SetAudioProfile(settings.scenario, settings.audioChannel, settings.bHighQuality);
 }
 

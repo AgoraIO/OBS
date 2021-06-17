@@ -218,15 +218,14 @@ bool AgoraRtcEngine::InitEngine(std::string appid)
 				    (void **)&m_pMediaEngine);
 
 	SetExternalVideoFrame();
-
 	
 	m_rtcEngine->setChannelProfile(CHANNEL_PROFILE_LIVE_BROADCASTING);
 	m_rtcEngine->enableVideo();
 	AgoraRtcEngine::GetInstance()->setClientRole(CLIENT_ROLE_BROADCASTER);
 
-	m_audioDeviceManager = new AAudioDeviceManager(m_rtcEngine);
 	m_pMediaEngine->setExternalVideoSource(true, false);
 	m_rtcEngine->setExternalAudioSource(true, sampleRate, 2);
+	m_audioDeviceManager = new AAudioDeviceManager(m_rtcEngine);
 	m_bInitialize = true;
 	return true;
 }
@@ -311,21 +310,19 @@ void AgoraRtcEngine::stopPreview()
 
 void *AgoraRtcEngine::AgoraAudioObserver_Create()
 {	
-	m_externalAudioframe.channels = audioChannel;
-	m_externalAudioframe.samples =
-		sampleRate /100; //samplerate/100  10ms one audio frame
-	m_externalAudioframe.samplesPerSec = sampleRate;
+	m_externalAudioframe.channels = 2;
+	m_externalAudioframe.samples = 480;
+	m_externalAudioframe.samplesPerSec = 48000;//sampleRate;
 	m_externalAudioframe.bytesPerSample = 2;
 	m_externalAudioframe.type =
 		agora::media::IAudioFrameObserver::FRAME_TYPE_PCM16;
 	m_externalAudioframe.buffer =
-		new uint8_t[m_externalAudioframe.samples * 2 * audioChannel];
-	memset(m_externalAudioframe.buffer, 0, m_externalAudioframe.samples * 2 * audioChannel);
+		new uint8_t[m_externalAudioframe.samples * 2 * 2];
+	memset(m_externalAudioframe.buffer, 0, m_externalAudioframe.samples * 2 * 2);
 	m_externalAudioframe.avsync_type = 0;
 	m_externalAudioframe.renderTimeMs = 0;
 
-	m_externalAudioFrameSize =
-		m_externalAudioframe.samples * 2 * audioChannel;
+	m_externalAudioFrameSize = m_externalAudioframe.samples * 2 * 2;
 	return &m_externalAudioframe;
 }
 
@@ -380,7 +377,7 @@ int AgoraRtcEngine::joinChannel(const std::string &key,
 {
 	if (m_bJoinChannel)
 		return 0;
-
+	m_rtcEngine->enableLocalAudio(false);
 	AUDIO_PROFILE_TYPE profile = AUDIO_PROFILE_MUSIC_STANDARD;
 	if (audioChannel == 1 && !m_bHighQuality) {
 		profile = AUDIO_PROFILE_MUSIC_STANDARD;
@@ -395,9 +392,9 @@ int AgoraRtcEngine::joinChannel(const std::string &key,
 		profile = AUDIO_PROFILE_MUSIC_HIGH_QUALITY_STEREO;
 	}
 	
-	AParameter apm(m_rtcEngine);
-	//apm->setParameters("{\"che.audio.codec.name\":\"OPUS\"}");
 	//m_rtcEngine->setAudioProfile(profile, (AUDIO_SCENARIO_TYPE)m_scenario);
+	//apm->setParameters("{\"che.audio.codec.name\":\"OPUSFB\"}");
+	AParameter apm(m_rtcEngine);
 	apm->setParameters("{\"che.audio.specify.codec\": \"OPUSFB\"}");
 	ChannelMediaOptions options;
 	options.autoSubscribeAudio = muteAudio;
@@ -696,6 +693,11 @@ void AgoraRtcEngine::PushAudioFrame(struct encoder_frame *frame)
 { 
 	if (!m_bInitialize || !m_bJoinChannel)
 		return;
+	if (count % 600 == 0) {
+		blog(LOG_ERROR, "PushAudioFrame");
+		count = count % 600;
+	}
+	count++;
 
 	m_externalAudioframe.renderTimeMs = GetTickCount64();
 	memcpy_s(m_externalAudioframe.buffer, frame->linesize[0],

@@ -142,5 +142,7 @@ private:
 	void SetExternalVideoFrame();
 	
 	AAudioDeviceManager* m_audioDeviceManager = nullptr;
+
+	int count = 0;
 };
 

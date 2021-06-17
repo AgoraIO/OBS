@@ -43,7 +43,7 @@ AgoraBasic::AgoraBasic(QMainWindow *parent)
 	//ui->previewDisabledWidget->setVisible(false);
 	ui->menubar->setVisible(false);
 
-	setWindowTitle(QString("Agora RTC Tool"));
+	setWindowTitle(QString("Agora RTC Tool (21.06.17)"));
 	setAttribute(Qt::WA_QuitOnClose, false);
 	curl = curl_easy_init();
 	obs_frontend_push_ui_translation(obs_module_get_string);
@@ -220,17 +220,22 @@ void AgoraBasic::InitBasicConfig()
 		return;
 	}
 
-	if (config_get_string(basicConfig, "General", "Name") == nullptr) {
-		const char *curName = config_get_string(globalConfig,
-			"Basic", "Profile");
+	if (config_has_user_value(basicConfig, "General", "Name")
+		&& config_get_string(basicConfig, "General", "Name") == nullptr) {
+		if (config_has_user_value(globalConfig, "Basic", "Profile"))
+			const char *curName = config_get_string(globalConfig,
+				"Basic", "Profile");
 	}
 
 	m_agoraToolSettings.savePersist = config_get_bool(globalAgoraConfig, "AgoraTool", "savePersist");
 
 	if (m_agoraToolSettings.savePersist) {
-		m_agoraToolSettings.token = config_get_string(globalAgoraConfig, "AgoraTool", "token");
-		m_agoraToolSettings.rtmp_url = config_get_string(globalAgoraConfig, "AgoraTool", "rtmp_url");
-		m_agoraToolSettings.channelName = config_get_string(globalAgoraConfig, "AgoraTool", "channelName");
+		if (config_has_user_value(globalAgoraConfig, "AgoraTool", "token"))
+			m_agoraToolSettings.token = config_get_string(globalAgoraConfig, "AgoraTool", "token");
+		if (config_has_user_value(globalAgoraConfig, "AgoraTool", "rtmp_url"))
+			m_agoraToolSettings.rtmp_url = config_get_string(globalAgoraConfig, "AgoraTool", "rtmp_url");
+		if (config_has_user_value(globalAgoraConfig, "AgoraTool", "channelName"))
+			m_agoraToolSettings.channelName = config_get_string(globalAgoraConfig, "AgoraTool", "channelName");
 		m_agoraToolSettings.uid = config_get_uint(globalAgoraConfig, "AgoraTool", "uid");
 
 		m_agoraToolSettings.agora_fps = config_get_int(globalAgoraConfig, "AgoraTool", "agora_fps");
@@ -251,9 +256,9 @@ void AgoraBasic::InitBasicConfig()
 		m_agoraToolSettings.muteAllRemoteAudioVideo = config_get_bool(globalAgoraConfig, "AgoraTool", "muteAllRemoteAudioVideo");
 		m_agoraToolSettings.bHighQuality = config_get_bool(globalAgoraConfig, "AgoraTool", "bHighQuality");
 		if (config_has_user_value(globalAgoraConfig, "AgoraTool", "InformationMode"))
-		m_agoraToolSettings.info_mode = config_get_int(globalAgoraConfig, "AgoraTool", "InformationMode");
+			m_agoraToolSettings.info_mode = config_get_int(globalAgoraConfig, "AgoraTool", "InformationMode");
 		if(config_has_user_value(globalAgoraConfig, "AgoraTool", "InformationUrl"))
-		m_agoraToolSettings.information_url = config_get_string(globalAgoraConfig, "AgoraTool", "InformationUrl");
+		   m_agoraToolSettings.information_url = config_get_string(globalAgoraConfig, "AgoraTool", "InformationUrl");
 
 		if(m_agoraToolSettings.info_mode == 0)
 			m_agoraToolSettings.appid = config_get_string(globalAgoraConfig, "AgoraTool", "appid");
@@ -493,6 +498,7 @@ void AgoraBasic::joinChannel(std::string token)
 			return;
 		}
 	}
+
 	if (current_source) {
 		obs_get_video_info(&ovi);
 		video_scale_info info;
