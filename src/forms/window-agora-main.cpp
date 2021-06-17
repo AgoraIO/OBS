@@ -362,6 +362,8 @@ AgoraBasic::~AgoraBasic()
 
 int AgoraBasic::GetOBSBitrate()
 {
+	if (!basicConfig)
+		return 2500;
 	const char *mode = config_get_string(basicConfig, "Output", "Mode");
 	bool advOut = astrcmpi(mode, "Advanced") == 0;
 
