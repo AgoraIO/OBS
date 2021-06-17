@@ -222,9 +222,10 @@ bool AgoraRtcEngine::InitEngine(std::string appid)
 	m_rtcEngine->setChannelProfile(CHANNEL_PROFILE_LIVE_BROADCASTING);
 	m_rtcEngine->enableVideo();
 	AgoraRtcEngine::GetInstance()->setClientRole(CLIENT_ROLE_BROADCASTER);
-
+	//m_rtcEngine->enableLocalAudio(false);
 	m_pMediaEngine->setExternalVideoSource(true, false);
 	m_rtcEngine->setExternalAudioSource(true, sampleRate, 2);
+	
 	m_audioDeviceManager = new AAudioDeviceManager(m_rtcEngine);
 	m_bInitialize = true;
 	return true;
@@ -377,7 +378,6 @@ int AgoraRtcEngine::joinChannel(const std::string &key,
 {
 	if (m_bJoinChannel)
 		return 0;
-	m_rtcEngine->enableLocalAudio(false);
 	AUDIO_PROFILE_TYPE profile = AUDIO_PROFILE_MUSIC_STANDARD;
 	if (audioChannel == 1 && !m_bHighQuality) {
 		profile = AUDIO_PROFILE_MUSIC_STANDARD;
