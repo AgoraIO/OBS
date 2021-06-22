@@ -75,6 +75,7 @@ public:
 
 	void PushVideoFrame(struct video_data *frame);
 	void PushAudioFrame(struct encoder_frame *frame);
+	void SavePcm(bool bSave);
 	
 	int setupRemoteVideo(unsigned int uid, void* view);
 	agora::rtc::IRtcEngine* getRtcEngine() { return m_rtcEngine; }//.get();}
@@ -83,7 +84,9 @@ public:
 	int agora_out_cx = 640;
 	int agora_out_cy = 360;
 	int agora_video_bitrate = 500;
-	
+	std::string pcmFolder = "";
+	FILE* fpPCM = nullptr;
+	bool savePcm = false;
 	void joinedChannelSuccess(const char* channel, unsigned int uid, int elapsed);
 	int audioChannel = 2;
 	int sampleRate = 44100;
@@ -116,6 +119,7 @@ signals:
 	void onFirstRemoteVideoFrame(unsigned uid, int width, int height, int elapsed);
 	void onRtmpStreamingStateChanged(const char *url, int state, int errCode);
 	void onClientRoleChanged(int oldRole, int newRole);
+	void onSystemCPU(int cpuUsage);
 private:
 	friend class AgoraRtcEngineEvent;
 private:

@@ -35,6 +35,7 @@
 #define AUDIO_CHANGED   SLOT(AudioChanged())
 #define VIDEO_CHANGED   SLOT(VideoChanged())
 #define RTMP_CHANGED     SLOT(RtmpChanged())
+#define SPINBOX_CHANGED   SIGNAL(valueChanged(int))
 AgoraSettings::AgoraSettings(QWidget *parent)
 	: QDialog(parent),
 	main(qobject_cast<AgoraBasic *>(parent)),
@@ -78,9 +79,11 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	ui->loadConfigButton->setText(tr("Basic.Settigs.Agora.LoadConfigButton"));
 	ui->buttonAppid->setText(tr("Agora.General.Appid.Set"));
     ui->labUrl->setText(tr("Agora.Settings.Agora.APPTOKEN.URL"));
+	
 	startTestNet = tr("Agora.Setting.TestNet.Start");
 	stopTestNet = tr("Agora.Setting.TestNet.Stop");
-
+	ui->chkSavePCM->setText(tr("Basic.Settings.Agora.Save.PCM"));
+	ui->labSystemCPU->setText(tr("Agora.CPU.Threshold"));
 	qualityUnknown = tr("Agora.Test.Network.Result.Unknown");
 	qualityExcellent= tr("Agora.Test.Network.Result.Excellent");
 	qualityGood= tr("Agora.Test.Network.Result.Good");
@@ -240,7 +243,7 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	HookWidget(ui->recordSampleRate, COMBO_CHANGED, AUDIO_CHANGED);
 	HookWidget(ui->cmbRecordChannelSetup, COMBO_CHANGED, AUDIO_CHANGED);
 	HookWidget(ui->cmbScenario, COMBO_CHANGED, AUDIO_CHANGED);
-	HookWidget(ui->chkAudioHighQuality, CHECK_CHANGED, GENERAL_CHANGED);
+	HookWidget(ui->chkAudioHighQuality, CHECK_CHANGED, AUDIO_CHANGED);
 	
 	HookWidget(ui->cmbAgoraFPS, COMBO_CHANGED, VIDEO_CHANGED);
 	HookWidget(ui->cmbAgoraBitrate, COMBO_CHANGED, VIDEO_CHANGED);
@@ -256,6 +259,8 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	HookWidget(ui->lineEditAgoraRtmpBitrate, EDIT_CHANGED, RTMP_CHANGED);
 
 	HookWidget(ui->chkPersistSaving, CHECK_CHANGED, GENERAL_CHANGED);
+	HookWidget(ui->chkSavePCM, CHECK_CHANGED, AUDIO_CHANGED);
+	HookWidget(ui->spinCPU, SPINBOX_CHANGED, GENERAL_CHANGED);
 	connect(ui->chkPersistSaveAppid, &QCheckBox::toggled, this, &AgoraSettings::onChkSaveAppidSettings);
 	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onLastmileQuality, this, &AgoraSettings::OnLastmileTest);
 }
@@ -338,6 +343,8 @@ void AgoraSettings::SaveAudioSettings()
 	settings.bHighQuality = ui->chkAudioHighQuality->isChecked();
 	settings.scenario     = ui->cmbScenario->currentIndex();
 	settings.audioChannel = ui->cmbRecordChannelSetup->currentIndex() + 1;
+	settings.SavePCM = ui->chkSavePCM->isChecked();
+	settings.cpuThreshold = ui->spinCPU->value();
 	main->SetAgoraSetting(settings);
 	AgoraRtcEngine::GetInstance()->SetAudioProfile(settings.scenario, settings.audioChannel, settings.bHighQuality);
 }
@@ -361,22 +368,23 @@ void AgoraSettings::SaveGeneralSettings()
 	main->GetAgoraSetting(settings);
 	QString strAppid = ui->lineEditAppid->text().toUtf8();
 	strAppid = strAppid.trimmed();
-  if (AgoraRtcEngine::GetInstance()->IsInitialize()
-			&& !settings.appid.empty() && settings.appid.compare(strAppid.toUtf8()) !=0)
-			appid_changed = true;
-		settings.appid = strAppid.toStdString();
+	if (AgoraRtcEngine::GetInstance()->IsInitialize()
+		&& !settings.appid.empty() && settings.appid.compare(strAppid.toUtf8()) != 0)
+		appid_changed = true;
+	settings.appid = strAppid.toStdString();
 
 	settings.appCerf = ui->lineEditAppCertificate->text().toStdString();
 	settings.token = ui->lineEditToken->text().toStdString();
 	settings.channelName = ui->lineEditChannel->text().toStdString();
 	settings.information_url = ui->lineEditUrl->text().toStdString();
 	settings.info_mode = ui->cmbGetMode->currentIndex();
-  if (!strAppid.isEmpty())
-    settings.appid = strAppid.toStdString();
-  settings.appCerf = ui->lineEditAppCertificate->text().toStdString();
-  settings.token = ui->lineEditToken->text().toStdString();
-  settings.channelName = ui->lineEditChannel->text().toStdString();
-  QString strUid = ui->lineEditUID->text();
+	if (!strAppid.isEmpty())
+		settings.appid = strAppid.toStdString();
+	settings.appCerf = ui->lineEditAppCertificate->text().toStdString();
+	settings.token = ui->lineEditToken->text().toStdString();
+	settings.channelName = ui->lineEditChannel->text().toStdString();
+	settings.cpuThreshold = ui->spinCPU->value();
+	QString strUid = ui->lineEditUID->text();
 	if (strUid.length() > 0)
 		settings.uid = strtoul(strUid.toUtf8().data(), NULL, 10);
 	else
@@ -391,16 +399,16 @@ void AgoraSettings::SaveGeneralSettings()
 	settings.savePersist = ui->chkPersistSaving->isChecked();
 	settings.muteAllRemoteAudioVideo = ui->chkMuteAllRemoteAV->isChecked();
 	settings.savePersistAppid = ui->chkPersistSaveAppid->isChecked();
-	
+
 	main->SetAgoraSetting(settings);
 
 	SaveCheckBox(ui->chkPersistSaving, "AgoraSettings", "PersistSave");
-	if(settings.savePersistAppid && !strAppid.isEmpty())
+	if (settings.savePersistAppid && !strAppid.isEmpty())
 		SaveEdit(ui->lineEditAppid, "AgoraSettings", "AppId");
 
 	if (settings.savePersist) {
 		SaveEdit(ui->lineEditUrl, "AgoraSettings", "InformationUrl");
-		
+
 		if (!strUid.isEmpty())
 			SaveEdit(ui->lineEditUID, "AgoraSettings", "UID");
 		if (!strExpired.isEmpty())
@@ -512,6 +520,7 @@ void AgoraSettings::LoadGeneralSettings()
 
 	ui->lineEditAgoraRtmpWidth->setText(QString("%1").arg(settings.rtmp_width));
 	ui->lineEditAgoraRtmpHeight->setText(QString("%1").arg(settings.rtmp_height));
+	ui->spinCPU->setValue(settings.cpuThreshold);
 }
 
 void AgoraSettings::LoadAudioDevice()
@@ -534,6 +543,8 @@ void AgoraSettings::LoadAudioSettings()
 	main->GetAgoraSetting(settings);
 	ui->chkAudioHighQuality->setChecked(settings.bHighQuality);
 	ui->cmbScenario->setCurrentIndex(settings.scenario);
+	ui->chkSavePCM->setChecked(settings.SavePCM);
+	
 	ui->cmbRecordChannelSetup->setCurrentIndex(settings.audioChannel - 1);
 	loading = false;
 }
@@ -675,6 +686,9 @@ void AgoraSettings::on_buttonBox_clicked(QAbstractButton *button)
 
 	if (val == QDialogButtonBox::ApplyRole ||
 		val == QDialogButtonBox::AcceptRole) {
+		if (ui->chkSavePCM->isChecked()) {
+
+		}
 		SaveSettings();
 		ClearChanged();
 	}
@@ -814,6 +828,7 @@ void AgoraSettings::showEvent(QShowEvent *event)
 
 	ui->cmbAgoraBitrate->setEnabled(bEnabled);
 	ui->cmbVideoEncoder->setEnabled(bEnabled);
+	ui->btnNetworkTest->setEnabled(bEnabled);
 }
 
 

@@ -61,6 +61,9 @@ typedef struct tagAgoraToolSettings {
 
 	std::string information_url = "";
 	int info_mode = 0;//0:manually 1:http get
+	bool SavePCM = false;
+
+	int cpuThreshold = 95;
 } AgoraToolSettings, *PAgoraToolSettings;
 
 class DisplayResizeEvent : public QObject
@@ -95,6 +98,7 @@ private:
 	QString invalidTokenlError = "";
 	QString joinFailedInfo = "";
 	QString requertTokenError = "";
+	QString cpuInformation = "";
 	AgoraToolSettings m_agoraToolSettings;
 	//show remote video
 	QVBoxLayout *remoteVideoLayout;
@@ -137,6 +141,9 @@ private:
 	bool started = false;
 	//token url
 	CURL *curl = nullptr;
+
+	std::vector<int> first2MinCpu;
+	std::vector<int> lastMinCpu;
 
 	ConfigFile globalConfig;
 	ConfigFile basicConfig;
@@ -181,6 +188,7 @@ public slots:
 	void onClientRoleChanged_slot(int oldRole, int newRole);
 	void joinFailed_slot();
 	void reuquestToken_slot(QString json, int err);
+	void onSystemCPU_slot(int cpuUsage);
 public:
 	void ToggleAgoraDialog();
 	AgoraBasic(QMainWindow *parent);

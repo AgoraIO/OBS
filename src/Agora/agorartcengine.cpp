@@ -120,6 +120,11 @@ public:
 	{
 		emit m_engine.onClientRoleChanged(oldRole, newRole);
 	}
+
+	virtual void onRtcStats(const RtcStats &stats) override
+	{
+		emit m_engine.onSystemCPU(stats.cpuTotalUsage);
+	}
 };
 
 AgoraRtcEngine *AgoraRtcEngine::m_agoraEngine = nullptr;
@@ -224,7 +229,7 @@ bool AgoraRtcEngine::InitEngine(std::string appid)
 	AgoraRtcEngine::GetInstance()->setClientRole(CLIENT_ROLE_BROADCASTER);
 	//m_rtcEngine->enableLocalAudio(false);
 	m_pMediaEngine->setExternalVideoSource(true, false);
-	m_rtcEngine->setExternalAudioSource(true, sampleRate, 2);
+	m_rtcEngine->setExternalAudioSource(true, 48000, 2);
 	
 	m_audioDeviceManager = new AAudioDeviceManager(m_rtcEngine);
 	m_bInitialize = true;
@@ -410,6 +415,10 @@ int AgoraRtcEngine::leaveChannel()
 		return -1;
 	m_bJoinChannel = false;
 	int r = m_rtcEngine->leaveChannel();
+	if (fpPCM) {
+		fclose(fpPCM);
+		fpPCM = nullptr;
+	}
 	return r;
 }
 
@@ -616,6 +625,14 @@ void AgoraRtcEngine::enableLastmileTest(bool bEnable)
 		m_rtcEngine->disableLastmileTest();
 }
 
+void AgoraRtcEngine::SavePcm(bool bSave)
+{
+	savePcm = bSave;
+		//AParameter apm(*m_rtcEngine);
+		//apm->setParameters("{\"che.audio.external.to.apm\", true}");
+		//apm->setParameters("{\"che.audio.start_debug_recording\":\"all\"}");
+}
+
 void AgoraRtcEngine::PushVideoFrame(struct video_data *frame)
 {
 	if (!m_bInitialize || !m_bJoinChannel)
@@ -689,6 +706,26 @@ void AgoraRtcEngine::MuteAllRemoteAudio(bool bMute)
 	m_rtcEngine->muteAllRemoteAudioStreams(bMute);
 }
 
+
+
+std::string CurrentTimeString()
+{
+	using namespace std::chrono;
+
+	struct tm tstruct;
+	char buf[80];
+
+	auto tp = system_clock::now();
+	auto now = system_clock::to_time_t(tp);
+	tstruct = *localtime(&now);
+	asctime_s(buf, &tstruct);
+	sprintf_s(buf, 80, "obs_agora_%d-%02d-%d_%d-%d-%d"
+		, tstruct.tm_year + 1900, tstruct.tm_mon + 1, tstruct.tm_mday
+		, tstruct.tm_hour, tstruct.tm_min, tstruct.tm_sec);
+	//size_t written = strftime(buf, sizeof(buf), "%X", &tstruct);
+	return buf;
+}
+
 void AgoraRtcEngine::PushAudioFrame(struct encoder_frame *frame)
 { 
 	if (!m_bInitialize || !m_bJoinChannel)
@@ -696,7 +733,24 @@ void AgoraRtcEngine::PushAudioFrame(struct encoder_frame *frame)
 	if (count % 600 == 0) {
 		blog(LOG_ERROR, "PushAudioFrame");
 		count = count % 600;
+		blog(LOG_INFO, "agora tool audio size: %d", frame->linesize[0]);
 	}
+
+	if (savePcm) {
+		if (!fpPCM) {
+			std::string filePath = pcmFolder + CurrentTimeString();
+			filePath += ".pcm";
+			fopen_s(&fpPCM, filePath.c_str(), "ab+");
+		}
+
+		if (fpPCM) {
+			fwrite(frame->data[0], 1, frame->linesize[0], fpPCM);
+		}
+		else
+			blog(LOG_INFO, "agora tool pcm save failed");
+	}
+	
+
 	count++;
 
 	m_externalAudioframe.renderTimeMs = GetTickCount64();

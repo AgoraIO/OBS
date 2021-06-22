@@ -81,7 +81,7 @@
      <item>
       <widget class="QStackedWidget" name="settingsPages">
        <property name="currentIndex">
-        <number>4</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="agoraPage">
         <layout class="QVBoxLayout" name="verticalLayout_16">
@@ -113,8 +113,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>564</width>
-              <height>410</height>
+              <width>684</width>
+              <height>470</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_23">
@@ -267,28 +267,28 @@
                      </item>
                     </layout>
                    </item>
-                   <item row="16" column="1">
+                   <item row="17" column="1">
                     <widget class="QCheckBox" name="chkAutoLoadConfig">
                      <property name="text">
                       <string>Basic.Agora.AutoLoadConfig</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="14" column="1">
+                   <item row="15" column="1">
                     <widget class="QCheckBox" name="chkPersistSaving">
                      <property name="text">
                       <string>Basic.Settings.Agora.PersistSave</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="14" column="0">
+                   <item row="15" column="0">
                     <widget class="QCheckBox" name="chkMuteAllRemoteAV">
                      <property name="text">
                       <string>Basic.Settings.Agora.MutAllRemoteAudioVideo</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="15" column="1">
+                   <item row="16" column="1">
                     <widget class="QCheckBox" name="chkPersistSaveAppid">
                      <property name="text">
                       <string>Basic.Settings.Agora.PersistSaveAppid</string>
@@ -324,6 +324,20 @@
                        <string>Agora.Settings.GetInfo.Mode.Http.Get</string>
                       </property>
                      </item>
+                    </widget>
+                   </item>
+                   <item row="14" column="0">
+                    <widget class="QLabel" name="labSystemCPU">
+                     <property name="text">
+                      <string>Agora.CPU.Threshold</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="14" column="1">
+                    <widget class="QSpinBox" name="spinCPU">
+                     <property name="value">
+                      <number>95</number>
+                     </property>
                     </widget>
                    </item>
                   </layout>
@@ -1060,8 +1074,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>650</width>
-              <height>219</height>
+              <width>698</width>
+              <height>426</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_50">
@@ -1197,6 +1211,13 @@
                     <widget class="QCheckBox" name="chkAudioHighQuality">
                      <property name="text">
                       <string>Basic.Settings.Agora.AudioProfile.High</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="4" column="1">
+                    <widget class="QCheckBox" name="chkSavePCM">
+                     <property name="text">
+                      <string>Basic.Settings.Agora.Save.PCM</string>
                      </property>
                     </widget>
                    </item>
