@@ -713,15 +713,21 @@ std::string CurrentTimeString()
 	using namespace std::chrono;
 
 	struct tm tstruct;
-	char buf[80];
-
+	
+	char buf[80] = { 0 };
 	auto tp = system_clock::now();
 	auto now = system_clock::to_time_t(tp);
 	tstruct = *localtime(&now);
-	asctime_s(buf, &tstruct);
-	sprintf_s(buf, 80, "obs_agora_%d-%02d-%d_%d-%d-%d"
+	asctime(&tstruct);
+	sprintf(buf, "obs_agora_%d-%02d-%d_%d-%d-%d"
 		, tstruct.tm_year + 1900, tstruct.tm_mon + 1, tstruct.tm_mday
 		, tstruct.tm_hour, tstruct.tm_min, tstruct.tm_sec);
+
+	//char buf[80];
+	//asctime_s(buf, &tstruct);
+	//sprintf_s(buf, 80, "obs_agora_%d-%02d-%d_%d-%d-%d"
+	//	, tstruct.tm_year + 1900, tstruct.tm_mon + 1, tstruct.tm_mday
+	//	, tstruct.tm_hour, tstruct.tm_min, tstruct.tm_sec);
 	//size_t written = strftime(buf, sizeof(buf), "%X", &tstruct);
 	return buf;
 }
@@ -740,7 +746,8 @@ void AgoraRtcEngine::PushAudioFrame(struct encoder_frame *frame)
 		if (!fpPCM) {
 			std::string filePath = pcmFolder + CurrentTimeString();
 			filePath += ".pcm";
-			fopen_s(&fpPCM, filePath.c_str(), "ab+");
+			fpPCM = fopen(filePath.c_str(), "ab+");
+			//fopen_s(&fpPCM, filePath.c_str(), "ab+");
 		}
 
 		if (fpPCM) {
