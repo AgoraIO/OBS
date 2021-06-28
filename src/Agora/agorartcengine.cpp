@@ -159,6 +159,8 @@ AgoraRtcEngine::AgoraRtcEngine()
 	, m_bJoinChannel(false)
 	 
 {
+	m_rtcEngine->setParameters("{\"che.audio.input.volume\": 60}");
+	m_rtcEngine->setParameters("{\"che.audio.current.recording.boostMode\": -1}");
 	m_externalAudioframe.buffer = NULL;
 	m_externalVideoFrame.buffer = NULL;
 	qRegisterMetaType<RtcStats>();
@@ -376,6 +378,11 @@ std::string AgoraRtcEngine::CalculateToken(std::string appid,
 	return agora::tools::RtcTokenBuilder::buildTokenWithUserAccount(
 		appid.c_str(), appcertificate.c_str(), channel.c_str(),
 		str.c_str(), agora::tools::Role_Publisher, privilegeExpiredTs);*/
+}
+
+void AgoraRtcEngine::SetRecordBoost()
+{
+	
 }
 
 int AgoraRtcEngine::joinChannel(const std::string &key,

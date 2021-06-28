@@ -235,7 +235,6 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	HookWidget(ui->lineEditChannel, EDIT_CHANGED, GENERAL_CHANGED);
 	HookWidget(ui->lineEditUID, EDIT_CHANGED, GENERAL_CHANGED);
 	HookWidget(ui->cmbGetMode, COMBO_CHANGED, GENERAL_CHANGED);
-
 	HookWidget(ui->chkPersistSaving, CHECK_CHANGED, GENERAL_CHANGED);
 	HookWidget(ui->chkMuteAllRemoteAV, CHECK_CHANGED, GENERAL_CHANGED);
 
@@ -244,7 +243,7 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	HookWidget(ui->cmbRecordChannelSetup, COMBO_CHANGED, AUDIO_CHANGED);
 	HookWidget(ui->cmbScenario, COMBO_CHANGED, AUDIO_CHANGED);
 	HookWidget(ui->chkAudioHighQuality, CHECK_CHANGED, AUDIO_CHANGED);
-	
+
 	HookWidget(ui->cmbAgoraFPS, COMBO_CHANGED, VIDEO_CHANGED);
 	HookWidget(ui->cmbAgoraBitrate, COMBO_CHANGED, VIDEO_CHANGED);
 	HookWidget(ui->agoraResolution, COMBO_CHANGED, VIDEO_CHANGED);
@@ -261,6 +260,7 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	HookWidget(ui->chkPersistSaving, CHECK_CHANGED, GENERAL_CHANGED);
 	HookWidget(ui->chkSavePCM, CHECK_CHANGED, AUDIO_CHANGED);
 	HookWidget(ui->spinCPU, SPINBOX_CHANGED, GENERAL_CHANGED);
+
 	connect(ui->chkPersistSaveAppid, &QCheckBox::toggled, this, &AgoraSettings::onChkSaveAppidSettings);
 	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onLastmileQuality, this, &AgoraSettings::OnLastmileTest);
 }
@@ -542,6 +542,7 @@ void AgoraSettings::LoadAudioSettings()
 	AgoraToolSettings settings;
 	main->GetAgoraSetting(settings);
 	ui->chkAudioHighQuality->setChecked(settings.bHighQuality);
+	
 	ui->cmbScenario->setCurrentIndex(settings.scenario);
 	ui->chkSavePCM->setChecked(settings.SavePCM);
 	

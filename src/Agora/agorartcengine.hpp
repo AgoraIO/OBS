@@ -46,7 +46,7 @@ public:
 	int  setLocalVideoMirrorMode(VIDEO_MIRROR_MODE_TYPE mirrorMode);
 	void startPreview();
 	void stopPreview();
-
+	void SetRecordBoost();
 	int joinChannel(const std::string &key, const std::string &channel,
 			unsigned uid, bool muteAudio = true, bool muteVideo = true);
 	int leaveChannel();

@@ -14,7 +14,7 @@ ManifestDPIAware true
 
 !ifndef APPVERSION
 !define APPVERSION "26.0.2"
-!define SHORTVERSION "3.0.0"
+!define SHORTVERSION "3.3.3"
 !endif
 
 ; Additional script dependencies

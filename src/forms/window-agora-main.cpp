@@ -11,7 +11,7 @@
 #include <util/platform.h>
 #include <util/dstr.h>
 #include <thread>
-#define AGORA_TOOL_VERSION "21.06.21"
+#define AGORA_TOOL_VERSION "21.06.23.18.00"
 #if _WIN32
 #else
 #include <dispatch/dispatch.h>
@@ -249,14 +249,14 @@ void AgoraBasic::InitBasicConfig()
 		m_agoraToolSettings.agora_height = config_get_int(globalAgoraConfig, "AgoraTool", "agora_height");
 
 
-		m_agoraToolSettings.rtmp_fps = config_get_int(globalAgoraConfig, "AgoraTool", "rtmp_fps");
+		m_agoraToolSettings.rtmp_fps     = config_get_int(globalAgoraConfig, "AgoraTool", "rtmp_fps");
 		m_agoraToolSettings.rtmp_bitrate = config_get_int(globalAgoraConfig, "AgoraTool", "rtmp_bitrate");
-		m_agoraToolSettings.rtmp_width = config_get_int(globalAgoraConfig, "AgoraTool", "rtmp_width");
-		m_agoraToolSettings.rtmp_height = config_get_int(globalAgoraConfig, "AgoraTool", "rtmp_height");
+		m_agoraToolSettings.rtmp_width   = config_get_int(globalAgoraConfig, "AgoraTool", "rtmp_width");
+		m_agoraToolSettings.rtmp_height  = config_get_int(globalAgoraConfig, "AgoraTool", "rtmp_height");
 
 		m_agoraToolSettings.audioChannel = config_get_int(globalAgoraConfig, "AgoraTool", "audioChannel");
-		m_agoraToolSettings.scenario = config_get_int(globalAgoraConfig, "AgoraTool", "scenario");
-		m_agoraToolSettings.obs_bitrate = config_get_int(globalAgoraConfig, "AgoraTool", "obs_bitrate");
+		m_agoraToolSettings.scenario     = config_get_int(globalAgoraConfig, "AgoraTool", "scenario");
+		m_agoraToolSettings.obs_bitrate  = config_get_int(globalAgoraConfig, "AgoraTool", "obs_bitrate");
 		m_agoraToolSettings.videoEncoder = config_get_int(globalAgoraConfig, "AgoraTool", "videoEncoder");
 		m_agoraToolSettings.muteAllRemoteAudioVideo = config_get_bool(globalAgoraConfig, "AgoraTool", "muteAllRemoteAudioVideo");
 		m_agoraToolSettings.bHighQuality = config_get_bool(globalAgoraConfig, "AgoraTool", "bHighQuality");

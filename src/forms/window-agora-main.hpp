@@ -53,6 +53,7 @@ typedef struct tagAgoraToolSettings {
 	int audioChannel = 2;
 	int scenario = 0;
 	bool bHighQuality = false;
+	
 	int obs_bitrate = 2500;
 
 	int videoEncoder = 0;//default agora bitrate
