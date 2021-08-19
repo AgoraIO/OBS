@@ -78,12 +78,16 @@ if(APPLE)
 	find_library(AGORASOUNDTOUCH AgoraSoundTouch "${CMAKE_SOURCE_DIR}/deps/mac/libs")
 	find_library(AV1 av1 "${CMAKE_SOURCE_DIR}/deps/mac/libs")
 	find_library(YUV yuv "${CMAKE_SOURCE_DIR}/deps/mac/libs")
-	find_library(obs-frontend-api obs-frontend-api "${CMAKE_SOURCE_DIR}/deps/mac/libs")
+	find_library(AVSE AgoraVideoSegmentationExtension "${CMAKE_SOURCE_DIR}/deps/mac/libs")
+	find_library(JND AgoraJNDExtension "${CMAKE_SOURCE_DIR}/deps/mac/libs")
+	find_library(ADV1E AgoraDav1dExtension "${CMAKE_SOURCE_DIR}/deps/mac/libs")
 
+
+	find_library(obs-frontend-api obs-frontend-api "${CMAKE_SOURCE_DIR}/deps/mac/libs")
 	find_library(QT5CORE QtCore "${CMAKE_SOURCE_DIR}/deps/mac/lib")
 	find_library(QT5GUI QtGui "${CMAKE_SOURCE_DIR}/deps/mac/lib")
 	find_library(QT5WIDGETS QtWidgets "${CMAKE_SOURCE_DIR}/deps/mac/lib")
-  find_library(CURL curl "${CMAKE_SOURCE_DIR}/deps/mac/libs")
+  	find_library(CURL curl "${CMAKE_SOURCE_DIR}/deps/mac/libs")
 
 
 
@@ -110,6 +114,9 @@ if(APPLE)
 			${AGORARTCKIT}
 			${AGORASOUNDTOUCH}
 			${AV1}
+			${AVSE}
+			${JND}
+			${ADV1E}
 			${YUV}
 			${obs-frontend-api}
 			${QT5CORE}
