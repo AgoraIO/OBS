@@ -386,7 +386,7 @@ void AgoraRtcEngine::SetRecordBoost()
 }
 
 int AgoraRtcEngine::joinChannel(const std::string &key,
-				const std::string &channel, unsigned int uid, bool muteAudio , bool muteVideo)
+				const std::string &channel, unsigned int uid, bool enableDual, bool muteAudio , bool muteVideo)
 {
 	if (m_bJoinChannel)
 		return 0;
@@ -411,6 +411,9 @@ int AgoraRtcEngine::joinChannel(const std::string &key,
 	ChannelMediaOptions options;
 	options.autoSubscribeAudio = muteAudio;
 	options.autoSubscribeVideo = muteVideo;
+
+	if (enableDual)
+		m_rtcEngine->enableDualStreamMode(true);
 
 	int r =  m_rtcEngine->joinChannel(key.data(), channel.data(), "", uid, options);//
 	return r;

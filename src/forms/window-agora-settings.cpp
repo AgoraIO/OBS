@@ -79,6 +79,7 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	ui->loadConfigButton->setText(tr("Basic.Settigs.Agora.LoadConfigButton"));
 	ui->buttonAppid->setText(tr("Agora.General.Appid.Set"));
     ui->labUrl->setText(tr("Agora.Settings.Agora.APPTOKEN.URL"));
+	ui->chkDualStream->setText(tr("Agora.Settings.DualStream"));
 	
 	startTestNet = tr("Agora.Setting.TestNet.Start");
 	stopTestNet = tr("Agora.Setting.TestNet.Stop");
@@ -237,6 +238,8 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	HookWidget(ui->cmbGetMode, COMBO_CHANGED, GENERAL_CHANGED);
 	HookWidget(ui->chkPersistSaving, CHECK_CHANGED, GENERAL_CHANGED);
 	HookWidget(ui->chkMuteAllRemoteAV, CHECK_CHANGED, GENERAL_CHANGED);
+
+	HookWidget(ui->chkDualStream, CHECK_CHANGED, GENERAL_CHANGED);
 
 	HookWidget(ui->playoutDevices, COMBO_CHANGED, AUDIO_CHANGED);
 	HookWidget(ui->recordSampleRate, COMBO_CHANGED, AUDIO_CHANGED);
@@ -400,6 +403,8 @@ void AgoraSettings::SaveGeneralSettings()
 	settings.muteAllRemoteAudioVideo = ui->chkMuteAllRemoteAV->isChecked();
 	settings.savePersistAppid = ui->chkPersistSaveAppid->isChecked();
 
+	settings.bDualStream = ui->chkDualStream->isChecked();
+
 	main->SetAgoraSetting(settings);
 
 	SaveCheckBox(ui->chkPersistSaving, "AgoraSettings", "PersistSave");
@@ -439,6 +444,10 @@ void AgoraSettings::SaveGeneralSettings()
 		SaveCheckBox(ui->chkMuteAllRemoteAV, "AgoraSettings",
 			"MuteAllRemoteAudioVideo",
 			settings.muteAllRemoteAudioVideo);
+
+		SaveCheckBox(ui->chkDualStream, "AgoraSettings",
+			"DualStream",
+			settings.bDualStream);
 	}
 }
 
@@ -506,6 +515,7 @@ void AgoraSettings::LoadGeneralSettings()
 	ui->chkPersistSaving->setChecked(settings.savePersist);
 	ui->chkPersistSaveAppid->setChecked(settings.savePersistAppid);
 	ui->chkMuteAllRemoteAV->setChecked(settings.muteAllRemoteAudioVideo);
+	ui->chkDualStream->setChecked(settings.bDualStream);
 	QString strExpired = QString("%1").arg(settings.expiredTime);
 	ui->lineEditExpiredTs->setText(strExpired);
 	loading = false;
@@ -632,6 +642,7 @@ void AgoraSettings::LoadAgoraSettings()
 	ui->chkPersistSaving->setChecked(settings.savePersist);
 	ui->chkPersistSaveAppid->setChecked(settings.savePersistAppid);
 	ui->chkMuteAllRemoteAV->setChecked(settings.muteAllRemoteAudioVideo);
+	ui->chkDualStream->setChecked(settings.bDualStream);
 	QString strExpired = QString("%1").arg(settings.expiredTime);
 	ui->lineEditExpiredTs->setText(strExpired);
 	loading = false;

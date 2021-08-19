@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>859</width>
+    <width>857</width>
     <height>512</height>
    </rect>
   </property>
@@ -81,7 +81,7 @@
      <item>
       <widget class="QStackedWidget" name="settingsPages">
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="agoraPage">
         <layout class="QVBoxLayout" name="verticalLayout_16">
@@ -113,7 +113,7 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>564</width>
+              <width>679</width>
               <height>435</height>
              </rect>
             </property>
@@ -267,13 +267,6 @@
                      </item>
                     </layout>
                    </item>
-                   <item row="17" column="1">
-                    <widget class="QCheckBox" name="chkAutoLoadConfig">
-                     <property name="text">
-                      <string>Basic.Agora.AutoLoadConfig</string>
-                     </property>
-                    </widget>
-                   </item>
                    <item row="15" column="1">
                     <widget class="QCheckBox" name="chkPersistSaving">
                      <property name="text">
@@ -337,6 +330,20 @@
                     <widget class="QSpinBox" name="spinCPU">
                      <property name="value">
                       <number>95</number>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="17" column="0">
+                    <widget class="QCheckBox" name="chkDualStream">
+                     <property name="text">
+                      <string>Agora.Settings.DualStream</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="17" column="1">
+                    <widget class="QCheckBox" name="chkAutoLoadConfig">
+                     <property name="text">
+                      <string>Basic.Agora.AutoLoadConfig</string>
                      </property>
                     </widget>
                    </item>
@@ -1074,8 +1081,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>698</width>
-              <height>423</height>
+              <width>650</width>
+              <height>241</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_50">
@@ -1321,6 +1328,34 @@
          <property name="labelAlignment">
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
+         <item row="1" column="0">
+          <widget class="QLabel" name="labelVideoEncoder">
+           <property name="text">
+            <string>Agora.Settings.Video.Encoder</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QComboBox" name="cmbVideoEncoder">
+           <item>
+            <property name="text">
+             <string>Agora.Settings.Video.Agora.Bitrate</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Agora.Settings.Video.OBS.Bitrate</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLabel" name="labelFPSResolution">
+           <property name="text">
+            <string>Agora.Settings.Video.FPS.Resolution</string>
+           </property>
+          </widget>
+         </item>
          <item row="3" column="0">
           <widget class="QLabel" name="label_8">
            <property name="minimumSize">
@@ -1383,39 +1418,6 @@
            </property>
           </widget>
          </item>
-         <item row="5" column="0">
-          <widget class="QLabel" name="label_4">
-           <property name="text">
-            <string>Agora.Settings.Video.Birate</string>
-           </property>
-          </widget>
-         </item>
-         <item row="6" column="0">
-          <widget class="QLabel" name="label_5">
-           <property name="text">
-            <string>Agora.Settings.Video.Devices</string>
-           </property>
-          </widget>
-         </item>
-         <item row="8" column="1">
-          <widget class="QLabel" name="videoMsg">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string notr="true"/>
-           </property>
-           <property name="wordWrap">
-            <bool>true</bool>
-           </property>
-           <property name="themeID" stdset="0">
-            <string>error</string>
-           </property>
-          </widget>
-         </item>
          <item row="4" column="1">
           <widget class="QComboBox" name="cmbAgoraFPS">
            <property name="sizePolicy">
@@ -1464,6 +1466,13 @@
            </item>
           </widget>
          </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>Agora.Settings.Video.Birate</string>
+           </property>
+          </widget>
+         </item>
          <item row="5" column="1">
           <widget class="QComboBox" name="cmbAgoraBitrate">
            <item>
@@ -1483,34 +1492,32 @@
            </item>
           </widget>
          </item>
-         <item row="6" column="1">
-          <widget class="QComboBox" name="cmbAgoraVideoDevice"/>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="labelVideoEncoder">
+         <item row="6" column="0">
+          <widget class="QLabel" name="label_5">
            <property name="text">
-            <string>Agora.Settings.Video.Encoder</string>
+            <string>Agora.Settings.Video.Devices</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
-          <widget class="QComboBox" name="cmbVideoEncoder">
-           <item>
-            <property name="text">
-             <string>Agora.Settings.Video.Agora.Bitrate</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Agora.Settings.Video.OBS.Bitrate</string>
-            </property>
-           </item>
-          </widget>
+         <item row="6" column="1">
+          <widget class="QComboBox" name="cmbAgoraVideoDevice"/>
          </item>
-         <item row="2" column="1">
-          <widget class="QLabel" name="labelFPSResolution">
+         <item row="7" column="1">
+          <widget class="QLabel" name="videoMsg">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="text">
-            <string>Agora.Settings.Video.FPS.Resolution</string>
+            <string notr="true"/>
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
+           </property>
+           <property name="themeID" stdset="0">
+            <string>error</string>
            </property>
           </widget>
          </item>

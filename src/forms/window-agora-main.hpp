@@ -65,6 +65,8 @@ typedef struct tagAgoraToolSettings {
 	bool SavePCM = false;
 
 	int cpuThreshold = 95;
+
+	bool bDualStream = false;
 } AgoraToolSettings, *PAgoraToolSettings;
 
 class DisplayResizeEvent : public QObject

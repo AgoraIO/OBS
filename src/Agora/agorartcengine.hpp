@@ -48,7 +48,7 @@ public:
 	void stopPreview();
 	void SetRecordBoost();
 	int joinChannel(const std::string &key, const std::string &channel,
-			unsigned uid, bool muteAudio = true, bool muteVideo = true);
+			unsigned uid, bool enableDual, bool muteAudio = true, bool muteVideo = true);
 	int leaveChannel();
 	
 	bool  keepPreRotation(bool bRotate);

@@ -259,6 +259,7 @@ void AgoraBasic::InitBasicConfig()
 		m_agoraToolSettings.obs_bitrate  = config_get_int(globalAgoraConfig, "AgoraTool", "obs_bitrate");
 		m_agoraToolSettings.videoEncoder = config_get_int(globalAgoraConfig, "AgoraTool", "videoEncoder");
 		m_agoraToolSettings.muteAllRemoteAudioVideo = config_get_bool(globalAgoraConfig, "AgoraTool", "muteAllRemoteAudioVideo");
+		m_agoraToolSettings.bDualStream = config_get_bool(globalAgoraConfig, "AgoraTool", "DualStream");
 		m_agoraToolSettings.bHighQuality = config_get_bool(globalAgoraConfig, "AgoraTool", "bHighQuality");
 		if (config_has_user_value(globalAgoraConfig, "AgoraTool", "InformationMode"))
 			m_agoraToolSettings.info_mode = config_get_int(globalAgoraConfig, "AgoraTool", "InformationMode");
@@ -326,6 +327,8 @@ AgoraBasic::~AgoraBasic()
 		config_set_int(globalAgoraConfig, "AgoraTool", "CPUThreshold", m_agoraToolSettings.cpuThreshold);
 
 		config_set_bool(globalAgoraConfig, "AgoraTool", "muteAllRemoteAudioVideo", m_agoraToolSettings.muteAllRemoteAudioVideo);
+		config_set_bool(globalAgoraConfig, "AgoraTool", "DualStream", m_agoraToolSettings.bDualStream);
+
 		config_set_bool(globalAgoraConfig, "AgoraTool", "bHighQuality", m_agoraToolSettings.bHighQuality);
 		config_set_bool(globalAgoraConfig, "AgoraTool", "savePersist", m_agoraToolSettings.savePersist);
 		config_set_string(globalAgoraConfig, "AgoraTool", "InformationUrl", m_agoraToolSettings.information_url.c_str());
@@ -356,6 +359,7 @@ AgoraBasic::~AgoraBasic()
 		config_set_int(globalAgoraConfig, "AgoraTool", "CPUThreshold", 0);
 
 		config_set_bool(globalAgoraConfig, "AgoraTool", "muteAllRemoteAudioVideo", false);
+		config_set_bool(globalAgoraConfig, "AgoraTool", "DualStream", false);
 		config_set_bool(globalAgoraConfig, "AgoraTool", "bHighQuality", false);
 		config_set_bool(globalAgoraConfig, "AgoraTool", "savePersist", false);
 	}
