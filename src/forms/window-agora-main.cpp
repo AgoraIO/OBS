@@ -560,7 +560,7 @@ void AgoraBasic::joinChannel(std::string token)
 	joinFailedTimer.start(10000);
 	blog(LOG_INFO, "agora token:%s", m_agoraToolSettings.token.c_str());
 	AgoraRtcEngine::GetInstance()->joinChannel(m_agoraToolSettings.token.c_str()
-		, m_agoraToolSettings.channelName.c_str(), m_agoraToolSettings.uid,
+		, m_agoraToolSettings.channelName.c_str(), m_agoraToolSettings.uid, m_agoraToolSettings.bDualStream,
 		!m_agoraToolSettings.muteAllRemoteAudioVideo, !m_agoraToolSettings.muteAllRemoteAudioVideo);
 	ui->agoraSteramButton->setText(starting_text);
 }
