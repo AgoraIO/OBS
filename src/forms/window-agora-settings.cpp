@@ -266,6 +266,8 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 
 	connect(ui->chkPersistSaveAppid, &QCheckBox::toggled, this, &AgoraSettings::onChkSaveAppidSettings);
 	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onLastmileQuality, this, &AgoraSettings::OnLastmileTest);
+
+	ui->labelTestNetWork->setWordWrap(true);
 }
 
 
@@ -833,7 +835,7 @@ void AgoraSettings::showEvent(QShowEvent *event)
 	ui->lineEditAppid->setEnabled(bEnabled);
 	ui->lineEditChannel->setEnabled(bEnabled);
 	ui->lineEditExpiredTs->setEnabled(bEnabled);
-	ui->lineEditUID ->setEnabled(bEnabled);
+	ui->lineEditUID->setEnabled(bEnabled);
 	ui->chkAudioHighQuality->setEnabled(bEnabled);
 	ui->cmbRecordChannelSetup->setEnabled(bEnabled);
 	ui->cmbScenario->setEnabled(bEnabled);
@@ -841,6 +843,7 @@ void AgoraSettings::showEvent(QShowEvent *event)
 	ui->cmbAgoraBitrate->setEnabled(bEnabled);
 	ui->cmbVideoEncoder->setEnabled(bEnabled);
 	ui->btnNetworkTest->setEnabled(bEnabled);
+	ui->buttonAppid->setEnabled(!AgoraRtcEngine::GetInstance()->IsInitialize());
 }
 
 

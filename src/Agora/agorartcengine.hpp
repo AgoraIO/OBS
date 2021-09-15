@@ -104,6 +104,9 @@ public:
 
 	void release();
 	void SetJoinChannel(bool bJoin) { m_bJoinChannel = bJoin; }
+
+	bool bFirstVideoFrame = false;
+	bool bFirstAudioFrame = false;
 signals:
 	void onJoinChannelSuccess(const char* channel, unsigned int uid, int elapsed);
 	void onLeaveChannel(const RtcStats &stats);

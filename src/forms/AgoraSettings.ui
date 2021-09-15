@@ -81,7 +81,7 @@
      <item>
       <widget class="QStackedWidget" name="settingsPages">
        <property name="currentIndex">
-        <number>0</number>
+        <number>4</number>
        </property>
        <widget class="QWidget" name="agoraPage">
         <layout class="QVBoxLayout" name="verticalLayout_16">
@@ -113,8 +113,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>679</width>
-              <height>435</height>
+              <width>578</width>
+              <height>470</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_23">
@@ -1081,8 +1081,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>650</width>
-              <height>241</height>
+              <width>659</width>
+              <height>275</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_50">
@@ -1600,11 +1600,26 @@
          </item>
          <item row="0" column="1">
           <widget class="QLabel" name="labelTestNetWork">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>60</height>
+            </size>
+           </property>
            <property name="styleSheet">
             <string notr="true">color: rgb(255, 0, 0);</string>
            </property>
            <property name="text">
             <string/>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::PlainText</enum>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
            </property>
           </widget>
          </item>

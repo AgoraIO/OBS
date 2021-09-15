@@ -425,6 +425,8 @@ int AgoraRtcEngine::leaveChannel()
 		return -1;
 	m_bJoinChannel = false;
 	int r = m_rtcEngine->leaveChannel();
+	bFirstAudioFrame = false;
+	bFirstVideoFrame = false;
 	if (fpPCM) {
 		fclose(fpPCM);
 		fpPCM = nullptr;
@@ -696,6 +698,12 @@ void AgoraRtcEngine::PushVideoFrame(struct video_data *frame)
 		break;
 	}
 	m_externalVideoFrame.timestamp = GetTickCount64();
+
+	if (!bFirstVideoFrame) {
+		auto millisec_since_epoch = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+		blog(LOG_INFO, "Agora First PushVideoFrame timestamp: %llu ms(system time)", millisec_since_epoch);
+		bFirstVideoFrame = true;
+	}
 	m_pMediaEngine->pushVideoFrame(&m_externalVideoFrame);
 }
 
@@ -774,6 +782,11 @@ void AgoraRtcEngine::PushAudioFrame(struct encoder_frame *frame)
 	memcpy_s(m_externalAudioframe.buffer, frame->linesize[0],
 		frame->data[0], frame->linesize[0]);
 	
+	if (!bFirstAudioFrame) {
+		auto millisec_since_epoch = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+		blog(LOG_INFO, "Agora First PushAudioFrame timestamp: %llu ms(system time)", millisec_since_epoch);
+		bFirstAudioFrame = true;
+	}
 	int ret = m_pMediaEngine->pushAudioFrame(AUDIO_RECORDING_SOURCE,
 		&m_externalAudioframe, false);
 	
