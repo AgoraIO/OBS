@@ -55,9 +55,13 @@ private:
 	QString testingNet = "";
 	QString testingNetInfo = "";
 
+	QString errEmptyCameraUID = "";
+	QString errSameUID = "";
+	QString emptyUrlError = "";
 	bool networkTest = false;
 
 	std::vector<RESOLUTION> m_vecResolution;
+	std::vector<RESOLUTION> m_vecCameraResolution;
 	inline void EnableApplyButton(bool en)
 	{
 		ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(en);
@@ -113,4 +117,5 @@ private slots:
 	void on_cmbGetMode_currentIndexChanged(int index);
 	void on_btnNetworkTest_clicked();
 	void OnLastmileTest(int quality);
+	void on_chkObsCamera_check(bool check);
 };

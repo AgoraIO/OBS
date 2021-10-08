@@ -13,6 +13,7 @@ OBS_MODULE_USE_DEFAULT_LOCALE("agora-tool-ui", "en-US")
 
 extern void RegisterAgoraOutput();
 extern void RegisterAgoraAudioEncoder();
+extern void RegistePluginVideoSource();
 bool obs_module_load(void)
 {
 	blog(LOG_INFO, "load agora tool plugin to communicate with agora rtc sdk");
@@ -20,6 +21,9 @@ bool obs_module_load(void)
 	blog(LOG_INFO, "register agora audio encoder");
 	RegisterAgoraOutput();
 	blog(LOG_INFO, "register agora output");
+
+	RegistePluginVideoSource();
+
     initQT();
 	blog(LOG_INFO, "loaded agora tool!");
 	return true;

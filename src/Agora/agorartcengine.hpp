@@ -4,6 +4,7 @@
 #include <memory>
 #ifdef _WIN32
 #include <IAgoraRtcEngine.h>
+#include <IAgoraMediaEngine.h>
 #else
 #include <AgoraRtcKit/IAgoraRtcEngine.h>
 #include <AgoraRtcKit/IAgoraMediaEngine.h>
@@ -48,15 +49,18 @@ public:
 	void stopPreview();
 	void SetRecordBoost();
 	int joinChannel(const std::string &key, const std::string &channel,
-			unsigned uid, bool enableDual, bool muteAudio = true, bool muteVideo = true);
-	int leaveChannel();
-	
-	bool  keepPreRotation(bool bRotate);
-	bool  setVideoProfileEx(int nWidth, int nHeight, int nFrameRate, int nBitRate, bool Agora = false);
-	bool  enableLocalCameara(bool bEnable);
-	void enableLastmileTest(bool bEnable);
-	bool enableExtendPlayDevice(bool bEnable);
+			unsigned uid, bool enableDual, bool muteAudio = true, 
+		    bool muteVideo = true, bool loopbackRecording = false);
 
+	int joinChannel(const std::string& key, const std::string& channel, unsigned uid);
+	int leaveChannel();
+	int leaveChannelCamera();
+	bool keepPreRotation(bool bRotate);
+	bool setVideoProfileEx(int nWidth, int nHeight, int nFrameRate, int nBitRate, bool Agora = false);
+	bool setCameraEncoderConfiguration(int w, int h, int fps, int bitrate);
+	void setConnection(const std::string& channel, unsigned uid);
+	void enableLastmileTest(bool bEnable);
+	
 	void* AgoraAudioObserver_Create();
 	void  AgoraAudioObserver_Destroy();
 	
@@ -72,7 +76,7 @@ public:
 	void SetPlayoutDevice(const char* id);
 	int  testSpeaker(bool start);
 	void EnableAgoraCaptureMicAudio(bool bCapture);
-
+	void PushCameraVideoFrame(struct obs_source_frame* frame);
 	void PushVideoFrame(struct video_data *frame);
 	void PushAudioFrame(struct encoder_frame *frame);
 	void SavePcm(bool bSave);
@@ -101,12 +105,10 @@ public:
 
 	void MuteAllRemoteVideo(bool bMute);
 	void MuteAllRemoteAudio(bool bMute);
+	void MuteRemoteVideo(unsigned int uid, bool bMute);
 
 	void release();
 	void SetJoinChannel(bool bJoin) { m_bJoinChannel = bJoin; }
-
-	bool bFirstVideoFrame = false;
-	bool bFirstAudioFrame = false;
 signals:
 	void onJoinChannelSuccess(const char* channel, unsigned int uid, int elapsed);
 	void onLeaveChannel(const RtcStats &stats);
@@ -125,11 +127,14 @@ signals:
 	void onSystemCPU(int cpuUsage);
 private:
 	friend class AgoraRtcEngineEvent;
+	void SetExternalVideoFrame();
+	void SetExternalVideoFrameCamera(struct obs_source_frame* frame);
 private:
 	
-	agora::rtc::IRtcEngine* m_rtcEngine = nullptr;
+	agora::rtc::IRtcEngineEx* m_rtcEngine = nullptr;
 	static AgoraRtcEngine* m_agoraEngine;
 	std::unique_ptr<agora::rtc::IRtcEngineEventHandler> m_eventHandler;
+	std::unique_ptr<agora::rtc::IRtcEngineEventHandler> m_eventHandlerCamera;
 	bool m_bJoinChannel = false;
 	bool m_bInitialize = false;
 	bool logFirstPushVideo = false;
@@ -139,17 +144,19 @@ private:
 	
 	int m_externalVideoFrameSize;
 	enum video_format m_format;
-	agora::media::ExternalVideoFrame m_externalVideoFrame;
+	enum video_format m_camera_format;
+	agora::media::base::ExternalVideoFrame m_externalVideoFrame;
+	agora::media::base::ExternalVideoFrame m_externalVideoFrameCamera;
 	int m_externalAudioFrameSize;
 	static agora::media::IAudioFrameObserver::AudioFrame m_externalAudioframe;
 	
 	bool m_bHighQuality = false;
 	AUDIO_SCENARIO_TYPE m_scenario = AUDIO_SCENARIO_DEFAULT;
-
-	void SetExternalVideoFrame();
-	
 	AAudioDeviceManager* m_audioDeviceManager = nullptr;
-
 	int count = 0;
+
+	agora::rtc::RtcConnection connection;
+	std::string channelId;
+	agora::rtc::uid_t localCameraUid = 0;
 };
 

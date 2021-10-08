@@ -13,8 +13,8 @@ ManifestDPIAware true
 !define APPNAME "Agora Tool"
 
 !ifndef APPVERSION
-!define APPVERSION "25.0.8"
-!define SHORTVERSION "25.0.8"
+!define APPVERSION "26.0.2"
+!define SHORTVERSION "3.6.200"
 !endif
 
 ; Additional script dependencies
@@ -23,12 +23,14 @@ ManifestDPIAware true
 
 ; Main Install settings
 Name "${APPNAME}"
-!define INSTALL64
-!ifdef INSTALL64
- OutFile "Agora-Tool-${SHORTVERSION}-Installer-x64.exe"
-!else
- OutFile "Agora-Tool-${SHORTVERSION}-Installer-x86.exe"
-!endif
+#!define INSTALL64
+#!ifdef INSTALL64
+# OutFile "Agora-Tool-${SHORTVERSION}-Installer-x64.exe"
+#!else
+# OutFile "Agora-Tool-${SHORTVERSION}-Installer-x86.exe"
+#!endif
+
+OutFile "Agora-Tool-${SHORTVERSION}-Installer.exe"
 
 ; Use compression
 SetCompressor /SOLID LZMA

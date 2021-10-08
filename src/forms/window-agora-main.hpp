@@ -50,6 +50,7 @@ typedef struct tagAgoraToolSettings {
 	int rtmp_width = 1280;
 	int rtmp_height = 720;
 
+	bool loopback = false;
 	int audioChannel = 2;
 	int scenario = 0;
 	bool bHighQuality = false;
@@ -59,14 +60,18 @@ typedef struct tagAgoraToolSettings {
 	int videoEncoder = 0;//default agora bitrate
 
 	bool savePersistAppid = false;
-
 	std::string information_url = "";
 	int info_mode = 0;//0:manually 1:http get
 	bool SavePCM = false;
-
 	int cpuThreshold = 95;
-
 	bool bDualStream = false;
+	bool bSendObsCamera = false;
+	unsigned int camera_uid = 0;
+	std::string camera_token = "";
+	int  plugin_camera_fps = 15;
+	int  plugin_camera_bitrate = 0;
+	int  plugin_camera_width = 320;
+	int  plugin_camera_height = 180;
 } AgoraToolSettings, *PAgoraToolSettings;
 
 class DisplayResizeEvent : public QObject
@@ -148,6 +153,8 @@ private:
 	std::vector<int> first2MinCpu;
 	std::vector<int> lastMinCpu;
 
+	obs_source* source_camera = nullptr;
+	obs_source_t *camera_filter;
 	ConfigFile globalConfig;
 	ConfigFile basicConfig;
 	ConfigFile globalAgoraConfig;
@@ -160,6 +167,7 @@ private:
 	virtual void showEvent(QShowEvent *event)override;
 	virtual void hideEvent(QHideEvent *event)override;
 	virtual void closeEvent(QCloseEvent *event)override;
+	static bool EnumSources(void* data, obs_source_t* source);
 private:
 	void CreateRemoteVideos();
 	void DestroyRemoteVideos();
