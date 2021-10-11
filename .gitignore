@@ -104,6 +104,8 @@ tags
 */.DS_Store
 */**/.DS_Store
 *.exe
+*.lib
+*.dll
 
 deps/libyuv/x86
 deps/libyuv/x64
