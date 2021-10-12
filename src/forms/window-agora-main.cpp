@@ -44,7 +44,6 @@ AgoraBasic::AgoraBasic(QMainWindow *parent)
 	//ui->previewDisabledWidget->setVisible(false);
 	ui->menubar->setVisible(false);
 
-	setWindowTitle(QString("Agora RTC Tool ( %1 )").arg(AGORA_TOOL_VERSION));
 	blog(LOG_INFO, "agora tool version: Agora RTC Tool ( %s )", AGORA_TOOL_VERSION);
 	setAttribute(Qt::WA_QuitOnClose, false);
 	curl = curl_easy_init();
@@ -68,6 +67,8 @@ AgoraBasic::AgoraBasic(QMainWindow *parent)
 	invalidTokenExpiredError = tr("Basic.Main.Agora.Token.Expired");
 	joinFailedInfo = tr("Agora.JoinChannelFailed.Token");
 	requertTokenError = tr("Agora.Main.Request.Token.Error");
+
+	setWindowTitle(QString("%1 ( %2 )").arg(tr("AgoraTool.Settings.DialogTitle")).arg(AGORA_TOOL_VERSION));
 	obs_frontend_pop_ui_translation();
 
 	ui->controlsDock->setWindowTitle(control_text);
