@@ -33,6 +33,7 @@ set(agora-tool-ui_SOURCES
 	src/forms/window-agora-settings.cpp
 	src/Agora/agorartcengine.cpp
 	src/agora-plugin/agora-output.cpp
+	src/agora-plugin/video-plugin-filter.cpp
     src/agora-plugin/agora-pcm-encoder.cpp)
 
 set(agora-tool-ui_HEADERS

@@ -11,7 +11,7 @@
 #include <util/platform.h>
 #include <util/dstr.h>
 #include <thread>
-#define AGORA_TOOL_VERSION "21.10.08.15.30"
+#define AGORA_TOOL_VERSION "21.10.11.18.30"
 #if _WIN32
 #else
 #include <dispatch/dispatch.h>

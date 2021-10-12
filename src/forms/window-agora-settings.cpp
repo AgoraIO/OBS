@@ -789,11 +789,13 @@ void AgoraSettings::on_buttonBox_clicked(QAbstractButton *button)
 		if (!checkTestNetwork())
 			return;
 
+		if (ui->cmbGetMode->currentIndex() == 1
+			&& ui->lineEditUrl->text().isEmpty()) {
+			QMessageBox::about(nullptr, title, emptyUrlError);
+			return;
+		}
+
 		if (ui->cmbGetMode->currentIndex() == 0){
-			if (ui->lineEditUrl->text().isEmpty()) {
-				QMessageBox::about(nullptr, title, emptyUrlError);
-				return;
-			}
 			if (ui->chkObsCamera->isChecked() && ui->lineEditCameraUID->text().isEmpty()) {
 				QMessageBox::about(nullptr, title, errEmptyCameraUID);
 				return;
@@ -1060,6 +1062,7 @@ void AgoraSettings::on_chkObsCamera_check(bool check)
 {
 	ui->labeCameraUID->setVisible(check);
 	ui->lineEditCameraUID->setVisible(check);
+	ui->lineEditCameraToken->setVisible(check);
 	ui->labCameraEncoderBitrate->setVisible(check);
 	ui->cmbCameraBitrate->setVisible(check);
 	ui->labCameraEncoderFPS->setVisible(check);
