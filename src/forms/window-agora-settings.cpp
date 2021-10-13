@@ -1063,6 +1063,7 @@ void AgoraSettings::on_chkObsCamera_check(bool check)
 	ui->labeCameraUID->setVisible(check);
 	ui->lineEditCameraUID->setVisible(check);
 	ui->lineEditCameraToken->setVisible(check);
+	ui->labelCameraToken->setVisible(check);
 	ui->labCameraEncoderBitrate->setVisible(check);
 	ui->cmbCameraBitrate->setVisible(check);
 	ui->labCameraEncoderFPS->setVisible(check);

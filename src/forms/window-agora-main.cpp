@@ -523,7 +523,13 @@ void AgoraBasic::on_agoraSteramButton_clicked()
 	}
 	else {
 		obs_remove_raw_video_callback(RawVideoCallback, this);
-		obs_source_filter_remove(source_camera, camera_filter);
+		if (source_camera ) {
+			if (obs_obj_invalid(source_camera)) {
+				obs_source_filter_remove(source_camera, camera_filter);
+				obs_source_release(source_camera);
+			}	
+			source_camera = nullptr;
+		}
 		StopAgoraOutput();
 		AgoraRtcEngine::GetInstance()->stopPreview();
 
