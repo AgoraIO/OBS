@@ -32,16 +32,16 @@ You can get details about agora sdk from [agora.io](https://www.agora.io/en)
 You can install release setup directly corresponding to OBS Stduio version.
 
 
-* [agora-tool-ui for windows](https://github.com/AgoraIO/OBS/releases/download/3.3.0/Agora-Tool-3.3.0-Installer.exe) (26.1 and later)
+* [agora-tool-ui for windows](https://github.com/AgoraIO/OBS/releases/download/3.6.200/Agora-Tool-3.6.200-Installer.exe) (26.1 and later)
 ## Compiling Agora RTC Tool
 
 ### Prerequisites
 
 1. Download dependencies
 
-     download [deps](https://github.com/AgoraIO/OBS/releases/download/3.3.3/deps.zip), After unzip deps.zip, copy deps to folder agora-tool-ui.If you need update agora sdk, donwload lastes version [agora sdk](https://docs.agora.io/cn/All/downloads?platform=All%20Platforms). Unzip sdk file, replace corresponding files under deps/Agora folder. If ther version is a big update. For example the agora sdk interface used by plugin changed, you need adapt to the new version sdk.
+     download [deps](https://github.com/AgoraIO/OBS/releases/download/3.6.200/deps.zip), After unzip deps.zip, copy deps to folder agora-tool-ui.If you need update agora sdk, donwload lastes version [agora sdk](https://docs.agora.io/cn/All/downloads?platform=All%20Platforms). Unzip sdk file, replace corresponding files under deps/Agora folder. If ther version is a big update. For example the agora sdk interface used by plugin changed, you need adapt to the new version sdk.
 
-2. You'll need [Qt 5.10.1](https://cdn-fastly.obsproject.com/downloads/Qt_5.10.1.7z),
+2. You'll need [Qt 5.14.2](https://github.com/sbd021/Basic-Video-Broadcasting/releases/download/5.14.2/Qt5.14.2.zip),
 [CMake](https://cmake.org/download/) and a working [OBS Studio development environment](https://obsproject.com/wiki/install-instructions) installed on your
 computer.
 

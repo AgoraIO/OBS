@@ -33,7 +33,7 @@
 
 可以直接安装OBS Stduio 对应版本的连麦工具
 
-* [agora-tool-ui for windows](https://github.com/AgoraIO/OBS/releases/download/3.3.0/Agora-Tool-3.3.0-Installer.exe) (26.1 and later)
+* [agora-tool-ui for windows](https://github.com/AgoraIO/OBS/releases/download/3.6.200/Agora-Tool-3.6.200-Installer.exe) (26.1 and later)
 
 
 
@@ -54,7 +54,7 @@
 
 1 下载依赖库
 
-   下载 [deps](https://github.com/AgoraIO/OBS/releases/download/3.3.3/deps.zip)，解压后将deps拷贝到agora-tool-ui下。如果要使用最新的SDK，到[agora sdk](https://docs.agora.io/cn/All/downloads?platform=All%20Platforms) 去下载,解压后替换r deps/Agora目录下的对应文件。 并且需要去适配声网SDK（如果版本差异太大，接口不同）
+   下载 [deps](https://github.com/AgoraIO/OBS/releases/download/3.6.200/deps.zip)，解压后将deps拷贝到agora-tool-ui下。如果要使用最新的SDK，到[agora sdk](https://docs.agora.io/cn/All/downloads?platform=All%20Platforms) 去下载,解压后替换r deps/Agora目录下的对应文件。 并且需要去适配声网SDK（如果版本差异太大，接口不同）
 
 
 2 需要在电脑上安装[Qt 5.14.2](https://github.com/sbd021/Basic-Video-Broadcasting/releases/download/5.14.2/Qt5.14.2.zip),
