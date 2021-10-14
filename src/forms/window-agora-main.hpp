@@ -153,7 +153,8 @@ private:
 	std::vector<int> first2MinCpu;
 	std::vector<int> lastMinCpu;
 
-	obs_source* source_camera = nullptr;
+	std::vector<obs_source*> m_vecCameraSources;
+	//obs_source* source_camera = nullptr;
 	obs_source_t *camera_filter;
 	ConfigFile globalConfig;
 	ConfigFile basicConfig;

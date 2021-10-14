@@ -11,7 +11,7 @@
 #include <util/platform.h>
 #include <util/dstr.h>
 #include <thread>
-#define AGORA_TOOL_VERSION "21.10.11.18.30"
+#define AGORA_TOOL_VERSION "21.10.14.18.20"
 #if _WIN32
 #else
 #include <dispatch/dispatch.h>
@@ -442,15 +442,14 @@ size_t http_callback(void *str, size_t size, size_t count, void *out_str)
 
 bool AgoraBasic::EnumSources(void* data, obs_source_t* source)
 {
-	AgoraBasic* window =
-		static_cast<AgoraBasic*>(data);
+	AgoraBasic* window = static_cast<AgoraBasic*>(data);
 	const char* name = obs_source_get_name(source);
 	const char* id = obs_source_get_id(source);
 
 	if (strcmp(id, "dshow_input") == 0) {
 		obs_data_t* settings = obs_source_get_settings(source);
 		std::string video_device_id = obs_data_get_string(settings, "video_device_id");
-		window->source_camera = source;
+		window->m_vecCameraSources.push_back(source);
 	}
 	return true;
 }
@@ -523,12 +522,12 @@ void AgoraBasic::on_agoraSteramButton_clicked()
 	}
 	else {
 		obs_remove_raw_video_callback(RawVideoCallback, this);
-		if (source_camera ) {
-			if (obs_obj_invalid(source_camera)) {
-				obs_source_filter_remove(source_camera, camera_filter);
-				obs_source_release(source_camera);
+		if (!m_vecCameraSources.empty()) {
+			if (obs_obj_invalid(m_vecCameraSources[0])) {
+				obs_source_filter_remove(m_vecCameraSources[0], camera_filter);
+				obs_source_release(m_vecCameraSources[0]);
 			}	
-			source_camera = nullptr;
+			//source_camera = nullptr;
 		}
 		StopAgoraOutput();
 		AgoraRtcEngine::GetInstance()->stopPreview();
@@ -577,8 +576,8 @@ void AgoraBasic::joinChannel(std::string token)
 	if (current_source) {
 		obs_enum_sources(EnumSources, this);
 		
-		if(source_camera)
-		    obs_source_filter_add(source_camera, camera_filter);
+		if(!m_vecCameraSources.empty())
+		    obs_source_filter_add(m_vecCameraSources[0], camera_filter);
 		obs_get_video_info(&ovi);
 		video_scale_info info;
 		info.width = ovi.output_width;
