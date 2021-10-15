@@ -125,6 +125,18 @@ public:
 	}
 };
 
+class CameraRtcEngineEvent :public QObject,
+	public IRtcEngineEventHandler
+{
+	AgoraRtcEngine* m_engine;
+public:
+	CameraRtcEngineEvent(AgoraRtcEngine* engine) : m_engine(engine) {}
+	virtual void onConnectionStateChanged(CONNECTION_STATE_TYPE state, CONNECTION_CHANGED_REASON_TYPE reason) override
+	{
+		emit m_engine->onCameraConnectionStateChanged((int)state, (int)reason);
+	}
+};
+
 AgoraRtcEngine *AgoraRtcEngine::m_agoraEngine = nullptr;
 agora::media::IAudioFrameObserver::AudioFrame AgoraRtcEngine::m_externalAudioframe;
 
@@ -202,7 +214,7 @@ void AgoraRtcEngine::ReleaseInstance()
 
 AgoraRtcEngine::AgoraRtcEngine()
 	: m_eventHandler(new AgoraRtcEngineEvent(*this))
-	, m_eventHandlerCamera(new IRtcEngineEventHandler())
+	, m_eventHandlerCamera(new CameraRtcEngineEvent(this))
 	, logFirstPushVideo(false)
 	, sampleRate(48000)
 	, audioChannel(2)
@@ -686,7 +698,7 @@ int AgoraRtcEngine::joinChannel(const std::string & key, const std::string & cha
 	options.clientRoleType = CLIENT_ROLE_BROADCASTER;
 	options.channelProfile = CHANNEL_PROFILE_LIVE_BROADCASTING;
 	blog(LOG_INFO, "joinChannelEx: connection channel=%s, uid=%d", connection.channelId, connection.localUid);
-	int r = m_rtcEngine->joinChannelEx(key.data(), connection, options, m_eventHandlerCamera.get());//joinChannel(key.data(), channel.data(), "", uid, options);//
+	int r = m_rtcEngine->joinChannelEx(key.c_str(), connection, options, m_eventHandlerCamera.get());//joinChannel(key.data(), channel.data(), "", uid, options);//
 	return r;
 }
 

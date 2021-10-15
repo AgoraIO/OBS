@@ -119,6 +119,7 @@ signals:
 		int elapsed);
 	void onLastmileQuality(int quality);
 	void onConnectionStateChanged(int state, int reason);
+	void onCameraConnectionStateChanged(int state, int reason);
 
 	void onRemoteVideoStateChanged(unsigned int uid, int state, int reason, int elapsed);
 	void onFirstRemoteVideoFrame(unsigned uid, int width, int height, int elapsed);

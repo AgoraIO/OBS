@@ -107,6 +107,8 @@ private:
 	QString joinFailedInfo = "";
 	QString requertTokenError = "";
 	QString cpuInformation = "";
+	QString emptyCameraToken = "";
+	QString invalidCameraToken = "";
 	AgoraToolSettings m_agoraToolSettings;
 	//show remote video
 	QVBoxLayout *remoteVideoLayout;
@@ -179,6 +181,7 @@ private:
 	bool StartAgoraOutput();
 	void StopAgoraOutput();
 	void joinChannel(std::string token);
+	void RemoveVideoPluginFilters();
 	static void OBSEvent(obs_frontend_event event, void *);
 public slots:
 	void on_agoraSteramButton_clicked();
@@ -193,6 +196,7 @@ public slots:
 	void onUserOffline_slot(uid_t uid, int reason);
 	void onFirstRemoteVideoDecoded_slot(uid_t uid, int width, int height, int elapsed);
 	void onConnectionStateChanged_slot(int state, int reason);
+	void onCameraConnectionStateChanged_slot(int state, int reason);
 	void onRemoteVideoStateChanged_slot(unsigned int uid, int state, int reason, int elapsed);
 	void onFirstRemoteVideoFrame_slot(unsigned uid, int width, int height, int elapsed);
 	void transcoding_slot();

@@ -66,6 +66,8 @@ AgoraBasic::AgoraBasic(QMainWindow *parent)
 	invalidTokenExpiredError = tr("Basic.Main.Agora.Token.Expired");
 	joinFailedInfo = tr("Agora.JoinChannelFailed.Token");
 	requertTokenError = tr("Agora.Main.Request.Token.Error");
+	emptyCameraToken = tr("Basic.Main.Agora.Empty.CameraToken");
+	invalidCameraToken = tr("Basic.Main.Agora.Invalid.CameraToken");
 
 	setWindowTitle(QString("%1 ( %2 )").arg(tr("AgoraTool.Settings.DialogTitle")).arg(AGORA_TOOL_VERSION));
 	obs_frontend_pop_ui_translation();
@@ -80,6 +82,8 @@ AgoraBasic::AgoraBasic(QMainWindow *parent)
 	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onUserOffline, this, &AgoraBasic::onUserOffline_slot);
 	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onFirstRemoteVideoDecoded, this, &AgoraBasic::onFirstRemoteVideoDecoded_slot);
 	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onConnectionStateChanged, this, &AgoraBasic::onConnectionStateChanged_slot);
+	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onCameraConnectionStateChanged, this, &AgoraBasic::onCameraConnectionStateChanged_slot);
+	
 	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onRemoteVideoStateChanged, this, &AgoraBasic::onRemoteVideoStateChanged_slot);
 	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onFirstRemoteVideoFrame, this, &AgoraBasic::onFirstRemoteVideoFrame_slot);
 	connect(&transcodingTimer, &QTimer::timeout, this, &AgoraBasic::transcoding_slot);
@@ -442,6 +446,9 @@ size_t http_callback(void *str, size_t size, size_t count, void *out_str)
 
 bool AgoraBasic::EnumSources(void* data, obs_source_t* source)
 {
+	if (obs_obj_invalid(source))
+		return false;
+
 	AgoraBasic* window = static_cast<AgoraBasic*>(data);
 	const char* name = obs_source_get_name(source);
 	const char* id = obs_source_get_id(source);
@@ -452,6 +459,16 @@ bool AgoraBasic::EnumSources(void* data, obs_source_t* source)
 		window->m_vecCameraSources.push_back(source);
 	}
 	return true;
+}
+
+void AgoraBasic::RemoveVideoPluginFilters()
+{
+	for (int i = 0; i < m_vecCameraSources.size(); ++i) {
+		obs_source_t* filter = nullptr;
+		while (filter = obs_source_get_filter_by_name(m_vecCameraSources[i], "VideoPluginFilter")) {
+			obs_source_filter_remove(m_vecCameraSources[i], filter);
+		}
+	}
 }
 
 void AgoraBasic::on_agoraSteramButton_clicked()
@@ -527,7 +544,8 @@ void AgoraBasic::on_agoraSteramButton_clicked()
 				obs_source_filter_remove(m_vecCameraSources[0], camera_filter);
 				obs_source_release(m_vecCameraSources[0]);
 			}	
-			//source_camera = nullptr;
+			m_vecCameraSources[0] = nullptr;
+			m_vecCameraSources.erase(m_vecCameraSources.begin());
 		}
 		StopAgoraOutput();
 		AgoraRtcEngine::GetInstance()->stopPreview();
@@ -574,8 +592,10 @@ void AgoraBasic::joinChannel(std::string token)
 	}
 
 	if (current_source) {
+		m_vecCameraSources.clear();
 		obs_enum_sources(EnumSources, this);
-		
+		RemoveVideoPluginFilters();
+
 		if(!m_vecCameraSources.empty())
 		    obs_source_filter_add(m_vecCameraSources[0], camera_filter);
 		obs_get_video_info(&ovi);
@@ -1283,13 +1303,54 @@ void AgoraBasic::onFirstRemoteVideoDecoded_slot(uid_t uid, int width, int height
 void AgoraBasic::onConnectionStateChanged_slot(int state, int reason)
 {
 	if (reason == 8 || reason == 9 ||
-		reason == 6 || reason == 7) {
+		reason == 6 || reason == 7 ||
+		reason == 10) {
 		joinFailed = true;
 		std::string info = "";
 		switch (reason)
 		{
 		case 8: //CONNECTION_CHANGED_INVALID_TOKEN
+		case 10: //CONNECTION_CHANGED_REJECTED_BY_SERVER
 			info = invalidTokenlError.toStdString();
+			break;
+		case 9: //CONNECTION_CHANGED_TOKEN_EXPIRED
+			info = invalidTokenExpiredError.toStdString();
+			break;
+		case 6: //CONNECTION_CHANGED_INVALID_APP_ID
+			info = invalidAppidError.toStdString();
+			break;
+		case 7: //CONNECTION_CHANGED_INVALID_CHANNEL_NAME
+			info = invalidChannelError.toStdString();
+			break;
+		default:
+			break;
+		}
+		joinFailedTimer.stop();
+
+		QMessageBox::critical(NULL, "Error", info.c_str());
+
+		on_agoraSteramButton_clicked();
+		joinFailed = false;
+	}
+}
+
+void AgoraBasic::onCameraConnectionStateChanged_slot(int state, int reason)
+{
+	if (reason == 8 || reason == 9 ||
+		reason == 6 || reason == 7 ||
+		reason == 10) {
+		joinFailed = true;
+		std::string info = "";
+		switch (reason)
+		{
+		case 8: //CONNECTION_CHANGED_INVALID_TOKEN
+		case 10: //CONNECTION_CHANGED_REJECTED_BY_SERVER
+			if (m_agoraToolSettings.camera_token.empty()) {
+				info = emptyCameraToken.toStdString();
+			}
+			else {
+				info = invalidCameraToken.toStdString();
+			}
 			break;
 		case 9: //CONNECTION_CHANGED_TOKEN_EXPIRED
 			info = invalidTokenExpiredError.toStdString();
