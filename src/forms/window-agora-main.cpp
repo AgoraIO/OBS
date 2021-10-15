@@ -897,7 +897,6 @@ void AgoraBasic::CreateRemoteVideos()
 {
 	for (int i = 0; i < REMOTE_VIDEO_COUNT; i++) {
 		remoteVideoInfos[i].remoteVideo = new QWidget;
-		//remoteVideos[i] = new QWidget;
 		remoteVideoInfos[i].remoteVideo->setSizePolicy(
 			QSizePolicy::Expanding, QSizePolicy::Expanding);
 		remoteVideoInfos[i].uid = 0;
@@ -1398,8 +1397,7 @@ void AgoraBasic::onFirstRemoteVideoFrame_slot(unsigned uid, int width, int heigh
 
 	int count = m_lstRemoteVideoUids.size() > REMOTE_VIDEO_COUNT ? REMOTE_VIDEO_COUNT : m_lstRemoteVideoUids.size();
 	for (int i = 0; i < count; ++i) {
-		remoteVideoInfos[i].remoteVideo->show();
-		//remoteVideoInfos[i].remoteVideo->setUpdatesEnabled(false);
+		//remoteVideoInfos[i].remoteVideo->show();
 	}
 }
 
@@ -1449,7 +1447,7 @@ void AgoraBasic::showRemote_slot()
 				break;
 			remoteVideoInfos[index].iRemoteVideoHLayout = i;
 			remoteVideoInfos[index].uid = *iter;
-			remoteVideoInfos[index].remoteVideo->hide();
+			remoteVideoInfos[index].remoteVideo->show();
 			AgoraRtcEngine::GetInstance()->setupRemoteVideo(*iter, (view_t)remoteVideoInfos[index].remoteVideo->winId());
 			remoteVideoHLayout[i]->addWidget(remoteVideoInfos[index].remoteVideo);
 			++iter;

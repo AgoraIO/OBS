@@ -91,7 +91,7 @@ public:
 	virtual void onFirstRemoteVideoDecoded(uid_t uid, int width, int height,
 		int elapsed) override
 	{
-		emit m_engine.onFirstRemoteVideoDecoded(uid, width, height, elapsed);
+		//emit m_engine.onFirstRemoteVideoDecoded(uid, width, height, elapsed);
 	}
 
 	virtual void onFirstRemoteVideoFrame(uid_t uid, int width, int height, int elapsed) override
