@@ -552,6 +552,9 @@ void AgoraRtcEngine::PushCameraVideoFrame(struct obs_source_frame* frame)
 			frame->width, frame->height
 		);
 	}
+	else {
+		blog(LOG_INFO, "PushCameraFrame: format:%d no support yet", frame->format);
+	}
 	connection.channelId = channelId.c_str();
 	connection.localUid = localCameraUid;
 	m_externalVideoFrame.timestamp = GetTickCount64();
