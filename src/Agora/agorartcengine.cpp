@@ -430,11 +430,15 @@ void AgoraRtcEngine::SetExternalVideoFrameCamera(struct obs_source_frame* frame)
 			agora::media::base::VIDEO_PIXEL_NV12;
 		m_externalVideoFrameCamera.buffer = new uint8_t[m_externalVideoFrameCamera.stride * m_externalVideoFrameCamera.height * 3 / 2];
 	}
-	else if (frame->format == VIDEO_FORMAT_BGRA) {
+	else if (frame->format == VIDEO_FORMAT_BGRA
+		|| frame->format == VIDEO_FORMAT_BGRX) {
 		m_externalVideoFrameCamera.format =
 			agora::media::base::VIDEO_PIXEL_BGRA;
 		m_externalVideoFrameCamera.buffer = new uint8_t[m_externalVideoFrameCamera.stride * m_externalVideoFrameCamera.height * 4];
+		if (frame->format == VIDEO_FORMAT_BGRX)
+			m_externalVideoFrameCamera.rotation = 180;
 	}
+
 	else if (frame->format == VIDEO_FORMAT_RGBA) {
 		m_externalVideoFrameCamera.format =
 			agora::media::base::VIDEO_PIXEL_RGBA;
@@ -499,9 +503,11 @@ void AgoraRtcEngine::PushCameraVideoFrame(struct obs_source_frame* frame)
 		dst += m_externalVideoFrameCamera.stride * m_externalVideoFrameCamera.height;
 		copy_frame_data_plane2(dst, m_externalVideoFrameCamera.stride, frame, 1, m_externalVideoFrameCamera.height / 2);
 	}
-	else if (frame->format == VIDEO_FORMAT_BGRA) {
+	else if (frame->format == VIDEO_FORMAT_BGRA
+		|| frame->format == VIDEO_FORMAT_BGRX) {
 		copy_frame_data_plane2(dst, m_externalVideoFrameCamera.stride * 4, frame, 0, m_externalVideoFrameCamera.height);
 	}
+	
 	else if (frame->format == VIDEO_FORMAT_RGBA) {
 		copy_frame_data_plane2(dst, m_externalVideoFrameCamera.stride * 4, frame, 0, m_externalVideoFrameCamera.height);
 	}

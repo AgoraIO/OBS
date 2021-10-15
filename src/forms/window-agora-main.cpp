@@ -456,17 +456,17 @@ bool AgoraBasic::EnumSources(void* data, obs_source_t* source)
 	if (strcmp(id, "dshow_input") == 0) {
 		obs_data_t* settings = obs_source_get_settings(source);
 		std::string video_device_id = obs_data_get_string(settings, "video_device_id");
-		window->m_vecCameraSources.push_back(source);
+		window->vecCameraSources_.push_back(source);
 	}
 	return true;
 }
 
 void AgoraBasic::RemoveVideoPluginFilters()
 {
-	for (int i = 0; i < m_vecCameraSources.size(); ++i) {
+	for (int i = 0; i < vecCameraSources_.size(); ++i) {
 		obs_source_t* filter = nullptr;
-		while (filter = obs_source_get_filter_by_name(m_vecCameraSources[i], "VideoPluginFilter")) {
-			obs_source_filter_remove(m_vecCameraSources[i], filter);
+		while (filter = obs_source_get_filter_by_name(vecCameraSources_[i], "VideoPluginFilter")) {
+			obs_source_filter_remove(vecCameraSources_[i], filter);
 		}
 	}
 }
@@ -539,13 +539,19 @@ void AgoraBasic::on_agoraSteramButton_clicked()
 	}
 	else {
 		obs_remove_raw_video_callback(RawVideoCallback, this);
-		if (!m_vecCameraSources.empty()) {
-			if (obs_obj_invalid(m_vecCameraSources[0])) {
-				obs_source_filter_remove(m_vecCameraSources[0], camera_filter);
-				obs_source_release(m_vecCameraSources[0]);
-			}	
-			m_vecCameraSources[0] = nullptr;
-			m_vecCameraSources.erase(m_vecCameraSources.begin());
+		if (!vecCameraSources_.empty()) {
+			obs_source* currentCameraSource = vecCameraSources_[0];
+			vecCameraSources_.clear();
+			obs_enum_sources(EnumSources, this);
+			for (int i = 0; i < vecCameraSources_.size(); ++i) {
+				if (currentCameraSource == vecCameraSources_[i]) {
+					blog(LOG_INFO, "plugin remove camera filter");
+					obs_source_filter_remove(currentCameraSource, camera_filter);
+					vecCameraSources_.erase(vecCameraSources_.begin());
+					break;
+				}
+			}
+			vecCameraSources_.clear();
 		}
 		StopAgoraOutput();
 		AgoraRtcEngine::GetInstance()->stopPreview();
@@ -592,12 +598,12 @@ void AgoraBasic::joinChannel(std::string token)
 	}
 
 	if (current_source) {
-		m_vecCameraSources.clear();
+		vecCameraSources_.clear();
 		obs_enum_sources(EnumSources, this);
 		RemoveVideoPluginFilters();
 
-		if(!m_vecCameraSources.empty())
-		    obs_source_filter_add(m_vecCameraSources[0], camera_filter);
+		if(!vecCameraSources_.empty())
+		    obs_source_filter_add(vecCameraSources_[0], camera_filter);
 		obs_get_video_info(&ovi);
 		video_scale_info info;
 		info.width = ovi.output_width;
