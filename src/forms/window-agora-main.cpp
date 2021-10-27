@@ -11,14 +11,7 @@
 #include <util/platform.h>
 #include <util/dstr.h>
 #include <thread>
-#define AGORA_TOOL_VERSION "21.10.14.18.20"
-#if _WIN32
-#else
-#include <dispatch/dispatch.h>
-#define Sleep(x)          \
-    std::this_thread::sleep_for(std::chrono::milliseconds(x))
-
-#endif
+#define AGORA_TOOL_VERSION "21.10.27.23.00"
 using namespace std;
 
 bool DisplayResizeEvent::eventFilter(QObject *obj, QEvent *event)

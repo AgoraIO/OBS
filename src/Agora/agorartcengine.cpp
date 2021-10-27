@@ -4,21 +4,6 @@
 #else
 #include <AgoraRtcKit/AgoraBase.h>
 #include <thread>
-#include <chrono>
-#define  DEFINE_GET_TIME_NOW(getTickCount64)   \
-         int64_t getTickCount64() \
-        {       \
-          std::chrono::system_clock::duration d = std::chrono::system_clock::now().time_since_epoch();\
-          std::chrono::milliseconds mic = std::chrono::duration_cast<std::chrono::milliseconds>(d);\
-          return mic.count();\
-        }
-
-DEFINE_GET_TIME_NOW(GetTickCount64)
-DEFINE_GET_TIME_NOW(GetTickCount)
-
-#define Sleep(x)          \
-    std::this_thread::sleep_for(std::chrono::milliseconds(x))
-
 #define DEFINE_MEMCPY_S(func)                                     \
       int func(void *det, size_t detSize, const void * src, size_t srcSize)                                            \
       {                                                        \
@@ -43,6 +28,7 @@ DEFINE_GET_TIME_NOW(GetTickCount)
 
 DEFINE_MEMCPY_S(memcpy_s)
 #endif
+#include <chrono>
 #include "obs.h"
 #include <libyuv.h>
 
@@ -50,7 +36,12 @@ DEFINE_MEMCPY_S(memcpy_s)
 using namespace agora::rtc;
 using namespace agora;
 
-
+int64_t getTickCount64()
+{
+	std::chrono::system_clock::duration d = std::chrono::system_clock::now().time_since_epoch();
+	std::chrono::milliseconds mic = std::chrono::duration_cast<std::chrono::milliseconds>(d);
+	return mic.count();
+}
 
 class AgoraRtcEngineEvent :public QObject,
 	public IRtcEngineEventHandler
@@ -402,7 +393,7 @@ void AgoraRtcEngine::PushVideoFrame(struct video_data* frame)
 		//copy_frame_data_plane(dst, m_externalVideoFrame.stride * 4, frame, 0, m_externalVideoFrame.height);
 		break;
 	}
-	m_externalVideoFrame.timestamp = GetTickCount64();
+	m_externalVideoFrame.timestamp = getTickCount64();
 	m_pMediaEngine->pushVideoFrame(&m_externalVideoFrame);
 }
 
@@ -560,7 +551,7 @@ void AgoraRtcEngine::PushCameraVideoFrame(struct obs_source_frame* frame)
 	}
 	connection.channelId = channelId.c_str();
 	connection.localUid = localCameraUid;
-	m_externalVideoFrame.timestamp = GetTickCount64();
+	m_externalVideoFrame.timestamp = getTickCount64();
 	m_pMediaEngine->pushVideoFrame(&m_externalVideoFrameCamera, connection);
 }
 
@@ -871,7 +862,7 @@ int AgoraRtcEngine::EnableWebSdkInteroperability(bool enabled)
 
 void AgoraRtcEngine::logAudioFrameTimestamp()
 {
-	unsigned int audioTime = GetTickCount();
+	
 }
 
 void AgoraRtcEngine::enableLogTimestamp(bool bEnable)
