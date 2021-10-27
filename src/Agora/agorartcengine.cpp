@@ -135,6 +135,11 @@ public:
 	{
 		emit m_engine->onCameraConnectionStateChanged((int)state, (int)reason);
 	}
+
+	virtual void onJoinChannelSuccess(const char* channel, uid_t uid, int elapsed) override
+	{
+		emit m_engine->onCameraJoinChannelSuccess(channel, uid, elapsed);
+	}
 };
 
 AgoraRtcEngine *AgoraRtcEngine::m_agoraEngine = nullptr;
@@ -224,10 +229,6 @@ AgoraRtcEngine::AgoraRtcEngine()
 	, m_bInitialize(false)
 	, m_bJoinChannel(false)
 {
-	//AParameter apm(*m_rtcEngine);
-
-//	apm->setParameters("{\"che.audio.input.volume\": 60}");
-//	apm->setParameters("{\"che.audio.current.recording.boostMode\": -1}");
 	m_externalAudioframe.buffer = NULL;
 	m_externalVideoFrame.buffer = NULL;
 	qRegisterMetaType<RtcStats>();
@@ -300,7 +301,6 @@ bool AgoraRtcEngine::InitEngine(std::string appid)
 	m_rtcEngine->setChannelProfile(CHANNEL_PROFILE_LIVE_BROADCASTING);
 	m_rtcEngine->enableVideo();
 	AgoraRtcEngine::GetInstance()->setClientRole(CLIENT_ROLE_BROADCASTER);
-	//m_rtcEngine->enableLocalAudio(false);
 	m_pMediaEngine->setExternalVideoSource(true, false);
 	m_rtcEngine->setExternalAudioSource(true, 48000, 2);
 	
@@ -503,11 +503,14 @@ void AgoraRtcEngine::PushCameraVideoFrame(struct obs_source_frame* frame)
 		dst += m_externalVideoFrameCamera.stride * m_externalVideoFrameCamera.height;
 		copy_frame_data_plane2(dst, m_externalVideoFrameCamera.stride, frame, 1, m_externalVideoFrameCamera.height / 2);
 	}
-	else if (frame->format == VIDEO_FORMAT_BGRA
-		|| frame->format == VIDEO_FORMAT_BGRX) {
+	else if (frame->format == VIDEO_FORMAT_BGRA) {
 		copy_frame_data_plane2(dst, m_externalVideoFrameCamera.stride * 4, frame, 0, m_externalVideoFrameCamera.height);
 	}
-	
+	else if (frame->format == VIDEO_FORMAT_BGRX) {
+		//copy_frame_data_plane2(dst, m_externalVideoFrameCamera.stride * 4, frame, 0, m_externalVideoFrameCamera.height);
+		libyuv::ARGBMirror(frame->data[0], frame->linesize[0], dst, m_externalVideoFrameCamera.stride * 4
+			, m_externalVideoFrameCamera.stride, m_externalVideoFrameCamera.height);
+	}
 	else if (frame->format == VIDEO_FORMAT_RGBA) {
 		copy_frame_data_plane2(dst, m_externalVideoFrameCamera.stride * 4, frame, 0, m_externalVideoFrameCamera.height);
 	}

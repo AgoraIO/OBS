@@ -117,7 +117,7 @@ private:
 	std::list<uint32_t> m_lstRemoteVideoUids;
 	uint32_t remote_uid = 0;
 	uint32_t local_uid = 0;
-	unsigned int uids[17];
+	unsigned int uids[17] = { 0 };
 	RemoteVideoInfo remoteVideoInfos[REMOTE_VIDEO_COUNT];
 	//
 	std::string app_id;
@@ -129,10 +129,6 @@ private:
 	obs_source_t *current_source;
 
 	video_t *video_queue;
-	gs_texrender_t *texrender;
-	gs_stagesurf_t *stagesurface;
-	uint8_t *video_data;
-	uint32_t video_linesize;
 
 	obs_video_info ovi;
 	OBSDisplay display;
@@ -181,6 +177,7 @@ private:
 	void StopAgoraOutput();
 	void joinChannel(std::string token);
 	void RemoveVideoPluginFilters();
+	
 	static void OBSEvent(obs_frontend_event event, void *);
 public slots:
 	void on_agoraSteramButton_clicked();
@@ -189,6 +186,7 @@ public slots:
 	
 	// rtc envetn handler slot
 	void onJoinChannelSuccess_slot(const char* channel, unsigned int uid, int elapsed);
+	void joinSuccess(const char* channel, unsigned int uid, int elapsed);
 	void onLeaveChannel_slot(const RtcStats &stats);
 	void onError_slot(int err, const char *msg);
 	void onUserJoined_slot(uid_t uid, int elapsed);

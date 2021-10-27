@@ -76,6 +76,7 @@ AgoraBasic::AgoraBasic(QMainWindow *parent)
 	ui->agoraSteramButton->setText(start_text);
 	
 	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onJoinChannelSuccess, this, &AgoraBasic::onJoinChannelSuccess_slot);
+	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onCameraJoinChannelSuccess, this, &AgoraBasic::joinSuccess);
 	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onLeaveChannel, this, &AgoraBasic::onLeaveChannel_slot);
 	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onError, this, &AgoraBasic::onError_slot);
 	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onUserJoined, this, &AgoraBasic::onUserJoined_slot);
@@ -307,6 +308,7 @@ void AgoraBasic::InitBasicConfig()
 
 AgoraBasic::~AgoraBasic()
 {
+	DestroyRemoteVideos();
 	if (current_source)
 		obs_source_release(current_source);
 
@@ -315,6 +317,10 @@ AgoraBasic::~AgoraBasic()
 
 	if (audio_encoder)
 		obs_encoder_release(audio_encoder);
+
+	if (camera_filter) 
+		obs_source_release(camera_filter);
+	
 
 	if (curl) {
 		curl_easy_cleanup(curl);
@@ -656,16 +662,6 @@ void AgoraBasic::joinChannel(std::string token)
 		, m_agoraToolSettings.channelName.c_str(), m_agoraToolSettings.uid, m_agoraToolSettings.bDualStream,
 		!m_agoraToolSettings.muteAllRemoteAudioVideo, !m_agoraToolSettings.muteAllRemoteAudioVideo, 
 		m_agoraToolSettings.loopback);
-	if (m_agoraToolSettings.bSendObsCamera) {
-		AgoraRtcEngine::GetInstance()->joinChannel(m_agoraToolSettings.camera_token.c_str(),
-			m_agoraToolSettings.channelName.c_str(), m_agoraToolSettings.camera_uid);
-		AgoraRtcEngine::GetInstance()->setCameraEncoderConfiguration(
-			m_agoraToolSettings.plugin_camera_width,
-			m_agoraToolSettings.plugin_camera_height,
-			m_agoraToolSettings.plugin_camera_fps,
-			m_agoraToolSettings.plugin_camera_bitrate);
-
-	}
 	ui->agoraSteramButton->setText(starting_text);
 }
 
@@ -736,9 +732,8 @@ void AgoraBasic::closeEvent(QCloseEvent *event)
 	QString str = ui->agoraSteramButton->text();
 	if (stop_text.compare(str) == 0) {
 		on_agoraSteramButton_clicked();
-		
 	}
-	
+	ui->preview->removeEventFilter(&resizeEventHandler);
 	QMainWindow::closeEvent(event);
 }
 
@@ -927,6 +922,8 @@ void AgoraBasic::DestroyRemoteVideos()
 			if (remoteVideoInfos[i].remoteVideo) {
 				remoteVideoHLayout[row]->removeWidget(
 					remoteVideoInfos[i].remoteVideo);
+				delete remoteVideoInfos[i].remoteVideo;
+				remoteVideoInfos[i].remoteVideo = nullptr;
 			}
 		}
 	}
@@ -936,8 +933,10 @@ void AgoraBasic::DestroyRemoteVideos()
 		remoteVideoHLayout[i] = nullptr;
 	}
 
-	delete remoteVideoLayout;
-	remoteVideoLayout = nullptr;
+	if (remoteVideoLayout) {
+		delete remoteVideoLayout;
+		remoteVideoLayout = nullptr;
+	}
 }
 
 void AgoraBasic::ClearRemoteVideos()
@@ -1138,14 +1137,11 @@ void AgoraBasic::StopAgoraOutput()
 	started = false;
 }
 
-void AgoraBasic::onJoinChannelSuccess_slot(const char* channel, unsigned int uid, int elapsed)
+void AgoraBasic::joinSuccess(const char* channel, unsigned int uid, int elapsed)
 {
 	joinFailedTimer.stop();
-	uids[0] = uid;
-	local_uid = uid;
 	ui->agoraSteramButton->setText(stop_text);
 	ui->exitButton->setEnabled(false);
-	m_agoraToolSettings.uid = uid;
 	AgoraRtcEngine::GetInstance()->SetJoinChannel(true);
 	if (!m_agoraToolSettings.rtmp_url.empty()) {
 		if (m_agoraToolSettings.rtmp_width == 0
@@ -1156,6 +1152,26 @@ void AgoraBasic::onJoinChannelSuccess_slot(const char* channel, unsigned int uid
 		}
 		SetLiveTranscoding();
 		AgoraRtcEngine::GetInstance()->AddPublishStreamUrl(m_agoraToolSettings.rtmp_url.c_str(), true);
+	}
+}
+
+void AgoraBasic::onJoinChannelSuccess_slot(const char* channel, unsigned int uid, int elapsed)
+{
+	uids[0] = uid;
+	local_uid = uid;
+	m_agoraToolSettings.uid = uid;
+	if (m_agoraToolSettings.bSendObsCamera) {
+		AgoraRtcEngine::GetInstance()->joinChannel(m_agoraToolSettings.camera_token.c_str(),
+			m_agoraToolSettings.channelName.c_str(), m_agoraToolSettings.camera_uid);
+		AgoraRtcEngine::GetInstance()->setCameraEncoderConfiguration(
+			m_agoraToolSettings.plugin_camera_width,
+			m_agoraToolSettings.plugin_camera_height,
+			m_agoraToolSettings.plugin_camera_fps,
+			m_agoraToolSettings.plugin_camera_bitrate);
+
+	}
+	else {
+		joinSuccess(channel, uid, elapsed);
 	}
 }
 
@@ -1333,7 +1349,6 @@ void AgoraBasic::onConnectionStateChanged_slot(int state, int reason)
 		joinFailedTimer.stop();
 
 		QMessageBox::critical(NULL, "Error", info.c_str());
-
 		on_agoraSteramButton_clicked();
 		joinFailed = false;
 	}

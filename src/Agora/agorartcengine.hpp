@@ -111,6 +111,7 @@ public:
 	void SetJoinChannel(bool bJoin) { m_bJoinChannel = bJoin; }
 signals:
 	void onJoinChannelSuccess(const char* channel, unsigned int uid, int elapsed);
+	void onCameraJoinChannelSuccess(const char* channel, unsigned int uid, int elapsed);
 	void onLeaveChannel(const RtcStats &stats);
 	void onError(int err, const char *msg);
 	void onUserJoined(unsigned int uid, int elapsed);
