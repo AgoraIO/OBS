@@ -463,7 +463,7 @@ void AgoraRtcEngine::SetExternalVideoFrameCamera(struct obs_source_frame* frame)
 	//	|| frame->format == VIDEO_FORMAT_YVYU    //
 	else if (frame->format == VIDEO_FORMAT_UYVY) { //UYVYToARGB
 		m_externalVideoFrameCamera.format =
-			agora::media::base::VIDEO_PIXEL_RGBA;
+			agora::media::base::VIDEO_PIXEL_BGRA;
 		m_externalVideoFrameCamera.buffer = new uint8_t[m_externalVideoFrameCamera.stride * m_externalVideoFrameCamera.height * 4];
 	}
 	m_camera_format = frame->format;
