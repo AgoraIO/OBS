@@ -71,17 +71,9 @@ if(APPLE)
 			"${CMAKE_SOURCE_DIR}/deps/mac/include/QtWidgets"
 			"${CMAKE_SOURCE_DIR}/deps/libyuv/include")
 
-	find_library(AGORAAIDENOISEEXTENSION AgoraAIDenoiseExtension "${CMAKE_SOURCE_DIR}/deps/mac/libs")
-	find_library(AGORACORE AgoraCore "${CMAKE_SOURCE_DIR}/deps/mac/libs")
-	find_library(AGORAFDKAAC Agorafdkaac "${CMAKE_SOURCE_DIR}/deps/mac/libs")
-	find_library(AGORAFFMPEG Agoraffmpeg "${CMAKE_SOURCE_DIR}/deps/mac/libs")
-	find_library(AGORARTCKIT AgoraRtcKit "${CMAKE_SOURCE_DIR}/deps/mac/libs")
-	find_library(AGORASOUNDTOUCH AgoraSoundTouch "${CMAKE_SOURCE_DIR}/deps/mac/libs")
-	find_library(AV1 av1 "${CMAKE_SOURCE_DIR}/deps/mac/libs")
+	find_library(AGORAFFMPEG Agoraffmpeg "${CMAKE_SOURCE_DIR}/deps/mac_3.6.200/libs")
+	find_library(AGORARTCKIT AgoraRtcKit "${CMAKE_SOURCE_DIR}/deps/mac_3.6.200/libs")
 	find_library(YUV yuv "${CMAKE_SOURCE_DIR}/deps/mac/libs")
-	find_library(AVSE AgoraVideoSegmentationExtension "${CMAKE_SOURCE_DIR}/deps/mac/libs")
-	find_library(JND AgoraJNDExtension "${CMAKE_SOURCE_DIR}/deps/mac/libs")
-	find_library(ADV1E AgoraDav1dExtension "${CMAKE_SOURCE_DIR}/deps/mac/libs")
 
 
 	find_library(obs-frontend-api obs-frontend-api "${CMAKE_SOURCE_DIR}/deps/mac/libs")
@@ -108,22 +100,14 @@ endif()
 if(APPLE)
 	target_link_libraries(agora-tool-ui
 			libobs
-			${AGORAAIDENOISEEXTENSION}
-			${AGORACORE}
-			${AGORAFDKAAC}
 			${AGORAFFMPEG}
 			${AGORARTCKIT}
-			${AGORASOUNDTOUCH}
-			${AV1}
-			${AVSE}
-			${JND}
-			${ADV1E}
 			${YUV}
 			${obs-frontend-api}
 			${QT5CORE}
 			${QT5GUI}
 			${QT5WIDGETS}
-      ${CURL}
+      		${CURL}
 			)
 endif()
 
