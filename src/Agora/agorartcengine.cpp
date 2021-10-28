@@ -389,7 +389,6 @@ void AgoraRtcEngine::PushVideoFrame(struct video_data* frame)
 			(uint8_t*)m_externalVideoFrame.buffer,
 			m_externalVideoFrame.stride * 4,
 			ovi.output_width, ovi.output_height);
-		//copy_frame_data_plane(dst, m_externalVideoFrame.stride * 4, frame, 0, m_externalVideoFrame.height);
 		break;
 	}
 	m_externalVideoFrame.timestamp = getTickCount64();
@@ -450,7 +449,6 @@ void AgoraRtcEngine::SetExternalVideoFrameCamera(struct obs_source_frame* frame)
 		m_externalVideoFrameCamera.buffer = new uint8_t[m_externalVideoFrameCamera.stride * m_externalVideoFrameCamera.height * 4];
 
 	}
-	//	|| frame->format == VIDEO_FORMAT_YVYU    //
 	else if (frame->format == VIDEO_FORMAT_UYVY) { //UYVYToARGB
 		m_externalVideoFrameCamera.format =
 			agora::media::base::VIDEO_PIXEL_BGRA;
@@ -497,7 +495,6 @@ void AgoraRtcEngine::PushCameraVideoFrame(struct obs_source_frame* frame)
 		copy_frame_data_plane2(dst, m_externalVideoFrameCamera.stride * 4, frame, 0, m_externalVideoFrameCamera.height);
 	}
 	else if (frame->format == VIDEO_FORMAT_BGRX) {
-		//copy_frame_data_plane2(dst, m_externalVideoFrameCamera.stride * 4, frame, 0, m_externalVideoFrameCamera.height);
 		libyuv::ARGBMirror(frame->data[0], frame->linesize[0], dst, m_externalVideoFrameCamera.stride * 4
 			, m_externalVideoFrameCamera.stride, m_externalVideoFrameCamera.height);
 	}
@@ -514,13 +511,6 @@ void AgoraRtcEngine::PushCameraVideoFrame(struct obs_source_frame* frame)
 			frame->width, frame->height);
 	}
 	else if (frame->format == VIDEO_FORMAT_I422) {
-		/*m_externalVideoFrameCamera.format =
-			agora::media::base::VIDEO_PIXEL_I422;
-		copy_frame_data_plane2(dst, m_externalVideoFrameCamera.stride, frame, 0, m_externalVideoFrameCamera.height);
-		dst += m_externalVideoFrameCamera.stride * m_externalVideoFrameCamera.height;
-		copy_frame_data_plane2(dst, m_externalVideoFrameCamera.stride, frame, 1, m_externalVideoFrameCamera.height / 2);
-		dst += m_externalVideoFrameCamera.stride * m_externalVideoFrameCamera.height / 2;
-		copy_frame_data_plane2(dst, m_externalVideoFrameCamera.stride, frame, 2, m_externalVideoFrameCamera.height / 2);*/
 		libyuv::I422ToARGB(
 			frame->data[0], frame->linesize[0],
 			frame->data[1], frame->linesize[1],
@@ -905,9 +895,6 @@ void AgoraRtcEngine::enableLastmileTest(bool bEnable)
 void AgoraRtcEngine::SavePcm(bool bSave)
 {
 	savePcm = bSave;
-		//AParameter apm(*m_rtcEngine);
-		//apm->setParameters("{\"che.audio.external.to.apm\", true}");
-		//apm->setParameters("{\"che.audio.start_debug_recording\":\"all\"}");
 }
 
 void AgoraRtcEngine::SetAudioProfile(int scenario, int channels, bool bHighQuality)
@@ -943,13 +930,6 @@ std::string CurrentTimeString()
 	sprintf(buf, "obs_agora_%d-%02d-%d_%d-%d-%d"
 		, tstruct.tm_year + 1900, tstruct.tm_mon + 1, tstruct.tm_mday
 		, tstruct.tm_hour, tstruct.tm_min, tstruct.tm_sec);
-
-	//char buf[80];
-	//asctime_s(buf, &tstruct);
-	//sprintf_s(buf, 80, "obs_agora_%d-%02d-%d_%d-%d-%d"
-	//	, tstruct.tm_year + 1900, tstruct.tm_mon + 1, tstruct.tm_mday
-	//	, tstruct.tm_hour, tstruct.tm_min, tstruct.tm_sec);
-	//size_t written = strftime(buf, sizeof(buf), "%X", &tstruct);
 	return buf;
 }
 
@@ -960,7 +940,7 @@ void AgoraRtcEngine::PushAudioFrame(struct encoder_frame *frame)
 	if (count % 600 == 0) {
 		blog(LOG_ERROR, "PushAudioFrame");
 		count = count % 600;
-		blog(LOG_INFO, "agora tool audio size: %d", frame->linesize[0]);
+		//blog(LOG_INFO, "agora tool audio size: %d", frame->linesize[0]);
 	}
 
 	if (savePcm) {
@@ -968,7 +948,6 @@ void AgoraRtcEngine::PushAudioFrame(struct encoder_frame *frame)
 			std::string filePath = pcmFolder + CurrentTimeString();
 			filePath += ".pcm";
 			fpPCM = fopen(filePath.c_str(), "ab+");
-			//fopen_s(&fpPCM, filePath.c_str(), "ab+");
 		}
 
 		if (fpPCM) {
