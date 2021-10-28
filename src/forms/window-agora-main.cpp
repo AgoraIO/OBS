@@ -329,10 +329,10 @@ AgoraBasic::~AgoraBasic()
 			config_set_uint(globalAgoraConfig, "AgoraTool", "uid", m_agoraToolSettings.uid);
 		}
 		else {
-	//		config_set_uint(globalAgoraConfig, "AgoraTool", "uid", 0);
-	//		config_set_string(globalAgoraConfig, "AgoraTool", "appid", "");
-	//		config_set_string(globalAgoraConfig, "AgoraTool", "token", "");
-	//		config_set_string(globalAgoraConfig, "AgoraTool", "channelName", "");
+			config_set_uint(globalAgoraConfig, "AgoraTool", "uid", 0);
+			config_set_string(globalAgoraConfig, "AgoraTool", "appid", "");
+			config_set_string(globalAgoraConfig, "AgoraTool", "token", "");
+			config_set_string(globalAgoraConfig, "AgoraTool", "channelName", "");
 		}
 		
 		config_set_uint(globalAgoraConfig, "AgoraTool", "InformationMode", m_agoraToolSettings.info_mode);
@@ -600,7 +600,7 @@ void AgoraBasic::joinChannel(std::string token)
 		vecCameraSources_.clear();
 		obs_enum_sources(EnumSources, this);
 		RemoveVideoPluginFilters();
-
+		
 		if(!vecCameraSources_.empty())
 		    obs_source_filter_add(vecCameraSources_[0], camera_filter);
 		obs_get_video_info(&ovi);
@@ -1461,9 +1461,9 @@ void AgoraBasic::showRemote_slot()
 				break;
 			remoteVideoInfos[index].iRemoteVideoHLayout = i;
 			remoteVideoInfos[index].uid = *iter;
-			remoteVideoInfos[index].remoteVideo->show();
 			AgoraRtcEngine::GetInstance()->setupRemoteVideo(*iter, (view_t)remoteVideoInfos[index].remoteVideo->winId());
 			remoteVideoHLayout[i]->addWidget(remoteVideoInfos[index].remoteVideo);
+			remoteVideoInfos[index].remoteVideo->show();
 			++iter;
 		}
 	}

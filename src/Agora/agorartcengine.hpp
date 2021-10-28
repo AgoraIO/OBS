@@ -47,7 +47,6 @@ public:
 	int  setLocalVideoMirrorMode(VIDEO_MIRROR_MODE_TYPE mirrorMode);
 	void startPreview();
 	void stopPreview();
-	void SetRecordBoost();
 	int joinChannel(const std::string &key, const std::string &channel,
 			unsigned uid, bool enableDual, bool muteAudio = true, 
 		    bool muteVideo = true, bool loopbackRecording = false);
@@ -84,19 +83,7 @@ public:
 	int setupRemoteVideo(unsigned int uid, void* view);
 	agora::rtc::IRtcEngine* getRtcEngine() { return m_rtcEngine; }//.get();}
 
-	int agora_fps = 15;
-	int agora_out_cx = 640;
-	int agora_out_cy = 360;
-	int agora_video_bitrate = 500;
-	std::string pcmFolder = "";
-	FILE* fpPCM = nullptr;
-	bool savePcm = false;
-	void joinedChannelSuccess(const char* channel, unsigned int uid, int elapsed);
-	int audioChannel = 2;
-	int sampleRate = 44100;
-	
-	void logAudioFrameTimestamp();
-	void enableLogTimestamp(bool bEnable);
+	void joinedChannelSuccess(const char* channel, unsigned int uid, int elapsed);	
 	std::string CalculateToken(std::string appid, const std::string &key,
 				   const std::string &channel, unsigned int uid,
 				   unsigned int privilegeExpiredTs);
@@ -109,6 +96,9 @@ public:
 
 	void release();
 	void SetJoinChannel(bool bJoin) { m_bJoinChannel = bJoin; }
+
+	std::string pcmFolder = "";
+	int audioChannel = 2;
 signals:
 	void onJoinChannelSuccess(const char* channel, unsigned int uid, int elapsed);
 	void onCameraJoinChannelSuccess(const char* channel, unsigned int uid, int elapsed);
@@ -154,10 +144,30 @@ private:
 	bool m_bHighQuality = false;
 	AUDIO_SCENARIO_TYPE m_scenario = AUDIO_SCENARIO_DEFAULT;
 	AAudioDeviceManager* m_audioDeviceManager = nullptr;
-	int count = 0;
 
 	agora::rtc::RtcConnection connection;
 	std::string channelId;
 	agora::rtc::uid_t localCameraUid = 0;
+	
+	bool bFirstVideoFrame  = true;
+	bool bFirstAudioFrame  = true;
+	bool bFirstCameraVideo = true;
+	
+	uint64_t videoFrameCount_  = 0;
+	uint64_t cameraVideoCount_ = 0;
+	uint64_t audioFrameCount_  = 0;
+
+	int64_t firstVideoFrameTs_  = 0;
+	int64_t firstCameraFrameTs_ = 0;
+	int64_t firstAudioFrameTs_  = 0;
+
+	uint64_t logInterverl_  = 20;//default 20 seconds log once
+	int videoFrameRate_ = 15;
+
+	int agora_out_cx = 640;
+	int agora_out_cy = 360;
+	FILE* fpPCM = nullptr;
+	bool savePcm = false;
+	int sampleRate = 48000;
 };
 
