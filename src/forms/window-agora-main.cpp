@@ -296,6 +296,8 @@ void AgoraBasic::InitBasicConfig()
 			m_agoraToolSettings.loopback = config_get_bool(globalAgoraConfig, "AgoraTool", "loopbackRecording");
 
 		m_agoraToolSettings.obs_bitrate = config_get_int(globalAgoraConfig, "AgoraTool", "obs_bitrate");
+		m_agoraToolSettings.logInterval = config_get_int(globalAgoraConfig, "AgoraTool", "logInterval");
+		
 	}
 
 	m_agoraToolSettings.savePersistAppid = config_get_bool(globalAgoraConfig, "AgoraTool", "savePersistAppid");
@@ -338,7 +340,7 @@ AgoraBasic::~AgoraBasic()
 			config_set_string(globalAgoraConfig, "AgoraTool", "token", "");
 			config_set_string(globalAgoraConfig, "AgoraTool", "channelName", "");
 		}
-		
+		config_set_uint(globalAgoraConfig, "AgoraTool", "logInterval", m_agoraToolSettings.logInterval);
 		config_set_uint(globalAgoraConfig, "AgoraTool", "InformationMode", m_agoraToolSettings.info_mode);
 
 		config_set_string(globalAgoraConfig, "AgoraTool", "rtmp_url", m_agoraToolSettings.rtmp_url.c_str());
@@ -485,6 +487,7 @@ void AgoraBasic::on_agoraSteramButton_clicked()
 
 	if (start_text.compare(str) == 0) {		
 		//http url
+		AgoraRtcEngine::GetInstance()->SetLogInterval(m_agoraToolSettings.logInterval);
 		if (m_agoraToolSettings.info_mode == 1) {
 			ui->agoraSteramButton->setText(starting_text);
 			std::thread th([this](){

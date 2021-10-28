@@ -64,6 +64,7 @@ typedef struct tagAgoraToolSettings {
 	int info_mode = 0;//0:manually 1:http get
 	bool SavePCM = false;
 	int cpuThreshold = 95;
+	int logInterval = 20;
 	bool bDualStream = false;
 	bool bSendObsCamera = false;
 	unsigned int camera_uid = 0;

@@ -96,7 +96,7 @@ public:
 
 	void release();
 	void SetJoinChannel(bool bJoin) { m_bJoinChannel = bJoin; }
-
+	void SetLogInterval(int interval) {	logInterverl_ = interval;}
 	std::string pcmFolder = "";
 	int audioChannel = 2;
 signals:

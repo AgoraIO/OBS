@@ -80,7 +80,7 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	ui->buttonAppid->setText(tr("Agora.General.Appid.Set"));
     ui->labUrl->setText(tr("Agora.Settings.Agora.APPTOKEN.URL"));
 	ui->chkDualStream->setText(tr("Agora.Settings.DualStream"));
-	
+	ui->lineEditLogInterval->setText(tr("Plugin.Settings.Log.Interval"));
 	startTestNet = tr("Agora.Setting.TestNet.Start");
 	stopTestNet = tr("Agora.Setting.TestNet.Stop");
 	ui->chkSavePCM->setText(tr("Basic.Settings.Agora.Save.PCM"));
@@ -264,7 +264,8 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	LoadRtmpSettings();
 	//
 	HookWidget(ui->lineEditUrl, EDIT_CHANGED, GENERAL_CHANGED);
-	HookWidget(ui->lineEditAppid, EDIT_CHANGED, GENERAL_CHANGED);
+	HookWidget(ui->lineEditAppid, EDIT_CHANGED, GENERAL_CHANGED); 
+	HookWidget(ui->lineEditLogInterval, EDIT_CHANGED, GENERAL_CHANGED);
 	HookWidget(ui->lineEditToken, EDIT_CHANGED, GENERAL_CHANGED);
 	HookWidget(ui->lineEditAppCertificate, EDIT_CHANGED, GENERAL_CHANGED);
 	HookWidget(ui->lineEditExpiredTs, EDIT_CHANGED, GENERAL_CHANGED);
@@ -453,6 +454,13 @@ void AgoraSettings::SaveGeneralSettings()
 	settings.bSendObsCamera = ui->chkObsCamera->isChecked();
 	settings.camera_token = ui->lineEditCameraToken->text().toStdString();
 	settings.cpuThreshold = ui->spinCPU->value();
+
+	QString str = ui->lineEditLogInterval->text();
+	if (str.isEmpty()) {
+		ui->lineEditLogInterval->setText(QString(20));
+	}
+	settings.logInterval = strtol(str.toStdString().data(), NULL, 10);
+
 	SaveCheckBox(ui->chkPersistSaving, "AgoraSettings", "PersistSave");
 	if (settings.savePersistAppid && !strAppid.isEmpty())
 		SaveEdit(ui->lineEditAppid, "AgoraSettings", "AppId");
@@ -558,6 +566,9 @@ void AgoraSettings::LoadGeneralSettings()
 		QString strUid = QString("%1").arg(settings.uid);
 		ui->lineEditUID->setText(strUid);
 	}
+	QString str = QString("%1").arg(settings.logInterval);
+	ui->lineEditLogInterval->setText(str);
+
 	ui->cmbGetMode->setCurrentIndex(settings.info_mode);
 	if (settings.info_mode == 0) {
 		ui->labelGetInfoMode_2->hide();
@@ -727,6 +738,7 @@ void AgoraSettings::LoadAgoraSettings()
 		QString strUid = QString("%1").arg(settings.uid);
 		ui->lineEditUID->setText(strUid);
 	}
+	ui->lineEditLogInterval->setText(QString("%1").arg(settings.logInterval));
 	ui->chkPersistSaving->setChecked(settings.savePersist);
 	ui->chkPersistSaveAppid->setChecked(settings.savePersistAppid);
 	ui->chkMuteAllRemoteAV->setChecked(settings.muteAllRemoteAudioVideo);
@@ -929,6 +941,7 @@ void AgoraSettings::on_cmbGetMode_currentIndexChanged(int index)
 	ui->lineEditUID->setEnabled(index == 0);
 	ui->lineEditToken->setEnabled(index == 0);
 	ui->lineEditChannel->setEnabled(index == 0);
+	ui->lineEditLogInterval->setEnabled(index == 0);
 }
 
 void AgoraSettings::on_playoutVolumeSld_valueChanged(int value)
@@ -944,7 +957,8 @@ void AgoraSettings::showEvent(QShowEvent *event)
 	ui->lineEditAppid->setEnabled(bEnabled);
 	ui->lineEditChannel->setEnabled(bEnabled);
 	ui->lineEditExpiredTs->setEnabled(bEnabled);
-	ui->lineEditUID ->setEnabled(bEnabled);
+	ui->lineEditUID->setEnabled(bEnabled);
+	ui->lineEditLogInterval->setEnabled(bEnabled);
 	ui->chkAudioHighQuality->setEnabled(bEnabled);
 	ui->cmbRecordChannelSetup->setEnabled(bEnabled);
 	ui->cmbScenario->setEnabled(bEnabled);

@@ -81,7 +81,7 @@
      <item>
       <widget class="QStackedWidget" name="settingsPages">
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="agoraPage">
         <layout class="QVBoxLayout" name="verticalLayout_16">
@@ -114,7 +114,7 @@
               <x>0</x>
               <y>0</y>
               <width>679</width>
-              <height>480</height>
+              <height>490</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_23">
@@ -313,11 +313,29 @@
                     </widget>
                    </item>
                    <item row="16" column="1">
-                    <widget class="QSpinBox" name="spinCPU">
-                     <property name="value">
-                      <number>95</number>
-                     </property>
-                    </widget>
+                    <layout class="QHBoxLayout" name="horizontalLayout_log">
+                     <item>
+                      <widget class="QSpinBox" name="spinCPU">
+                       <property name="value">
+                        <number>95</number>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLabel" name="labelLogInterval">
+                       <property name="text">
+                        <string>Plugin.Settings.Log.Interval</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLineEdit" name="lineEditLogInterval">
+                       <property name="text">
+                        <string>20</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
                    </item>
                    <item row="18" column="0">
                     <widget class="QCheckBox" name="chkMuteAllRemoteAV">
@@ -1112,8 +1130,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>696</width>
-              <height>423</height>
+              <width>652</width>
+              <height>267</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_50">
