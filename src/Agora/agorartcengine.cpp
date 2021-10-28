@@ -708,8 +708,8 @@ void AgoraRtcEngine::PushAudioFrame(struct encoder_frame *frame)
 
 	audioFrameCount_++;
 	if (audioFrameCount_ % (logInterverl_ * 100) == 0) {
-		blog(LOG_INFO, "=====Audio PushAudioFrame===== timestamp: %llu ms, audio frame count: %llu,interval(time=%llus, count=%llus)"
-			, m_externalAudioframe.renderTimeMs, videoFrameCount_, (m_externalAudioframe.renderTimeMs - firstAudioFrameTs_), audioFrameCount_ / 100);
+		blog(LOG_INFO, "[%llu(%llu):] Audio PushAudioFrame timestamp: %llu ms, audio frame count: %llu,interval(time=%lfs)"
+			, audioFrameCount_ / 100, audioFrameCount_, m_externalAudioframe.renderTimeMs, videoFrameCount_, (m_externalAudioframe.renderTimeMs - firstAudioFrameTs_)/(double)1000);
 
 	}
 }
@@ -816,8 +816,8 @@ void AgoraRtcEngine::PushVideoFrame(struct video_data* frame)
 
 	videoFrameCount_++;
 	if (videoFrameCount_ % (logInterverl_ * videoFrameRate_) == 0) {
-		blog(LOG_INFO, "Video PushVideoFrame timestamp: %llu ms, video frame count: %llu,interval(time=%lfs, count=%llus)"
-			, m_externalVideoFrame.timestamp, videoFrameCount_, (m_externalVideoFrame.timestamp - firstVideoFrameTs_) / (double)1000, videoFrameCount_ / videoFrameRate_);
+		blog(LOG_INFO, "[%lf:(%llus)]Video PushVideoFrame timestamp: %llu ms, video frame count: %llu,interval(time=%lfs)"
+			, videoFrameCount_ / videoFrameRate_, videoFrameCount_, m_externalVideoFrame.timestamp, videoFrameCount_, (m_externalVideoFrame.timestamp - firstVideoFrameTs_) / (double)1000);
 	}
 }
 
@@ -901,7 +901,7 @@ void AgoraRtcEngine::PushCameraVideoFrame(struct obs_source_frame* frame)
              width=%d, height=%d, format = %d, external format=%d"
 			, frame->linesize[0], frame->linesize[1], frame->linesize[2]
 			, frame->width, frame->height, frame->format, m_externalVideoFrameCamera.format);
-		blog(LOG_INFO, "#####PushVideoFrame#####: connection channel=%s, uid=%d", connection.channelId, connection.localUid);
+		blog(LOG_INFO, "PushVideoFrame: connection channel=%s, uid=%d", connection.channelId, connection.localUid);
 	}
 
 	uint8_t* dst = (uint8_t*)m_externalVideoFrameCamera.buffer;
