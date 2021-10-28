@@ -139,7 +139,6 @@ private:
 	std::unique_ptr<agora::rtc::IRtcEngineEventHandler> m_eventHandlerCamera;
 	bool m_bJoinChannel = false;
 	bool m_bInitialize = false;
-	bool logFirstPushVideo = false;
 	bool bInit = false;
 
 	agora::media::IMediaEngine* m_pMediaEngine = nullptr;

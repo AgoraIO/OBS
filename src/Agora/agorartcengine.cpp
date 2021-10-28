@@ -211,7 +211,6 @@ void AgoraRtcEngine::ReleaseInstance()
 AgoraRtcEngine::AgoraRtcEngine()
 	: m_eventHandler(new AgoraRtcEngineEvent(*this))
 	, m_eventHandlerCamera(new CameraRtcEngineEvent(this))
-	, logFirstPushVideo(false)
 	, sampleRate(48000)
 	, audioChannel(2)
 	, m_externalAudioFrameSize(480 * 2 * 2)
@@ -612,8 +611,6 @@ void *AgoraRtcEngine::AgoraAudioObserver_Create()
 
 void AgoraRtcEngine::AgoraAudioObserver_Destroy()
 {
-	logFirstPushVideo = false;
-
 	if (m_pMediaEngine == nullptr)
 		return;
 
@@ -984,7 +981,7 @@ void AgoraRtcEngine::PushAudioFrame(struct encoder_frame *frame)
 
 	count++;
 
-	m_externalAudioframe.renderTimeMs = GetTickCount64();
+	m_externalAudioframe.renderTimeMs = getTickCount64();
 	memcpy_s(m_externalAudioframe.buffer, frame->linesize[0],
 		frame->data[0], frame->linesize[0]);
 	
