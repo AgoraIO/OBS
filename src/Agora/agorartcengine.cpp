@@ -421,7 +421,7 @@ int AgoraRtcEngine::joinChannel(const std::string &key, const std::string &chann
 		m_rtcEngine->enableDualStreamMode(true);
 	blog(LOG_INFO, "joinChannel: channel=%s, uid=%u", channel.c_str(), uid);
 	m_rtcEngine->enableLoopbackRecording(loopbackRecording);
-	int r = m_rtcEngine->joinChannel(key.data(), channel.data(), uid, options);//joinChannel(key.data(), channel.data(), "", uid, options);//
+	int r = m_rtcEngine->joinChannel(key.c_str(), channel.c_str(), uid, options);//joinChannel(key.data(), channel.data(), "", uid, options);//
 	return r;
 }
 
