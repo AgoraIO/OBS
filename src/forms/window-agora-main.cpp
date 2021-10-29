@@ -297,6 +297,8 @@ void AgoraBasic::InitBasicConfig()
 
 		m_agoraToolSettings.obs_bitrate = config_get_int(globalAgoraConfig, "AgoraTool", "obs_bitrate");
 		m_agoraToolSettings.logInterval = config_get_int(globalAgoraConfig, "AgoraTool", "logInterval");
+		if (m_agoraToolSettings.logInterval == 0)
+			m_agoraToolSettings.logInterval = 20;
 		
 	}
 

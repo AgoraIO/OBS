@@ -57,6 +57,7 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	EnableApplyButton(false);
 	ui->label_5->hide();
 	ui->cmbAgoraVideoDevice->hide();
+	ui->labelLogInterval->setText(QString("20"));
 	//load text
 	obs_frontend_push_ui_translation(obs_module_get_string);
 	
@@ -457,6 +458,7 @@ void AgoraSettings::SaveGeneralSettings()
 
 	QString str = ui->lineEditLogInterval->text();
 	if (str.isEmpty()) {
+		str = QString("20");
 		ui->lineEditLogInterval->setText(QString(20));
 	}
 	settings.logInterval = strtol(str.toStdString().data(), NULL, 10);
@@ -793,11 +795,12 @@ void AgoraSettings::on_buttonAppid_clicked()
 void AgoraSettings::on_buttonBox_clicked(QAbstractButton *button)
 {
 	QDialogButtonBox::ButtonRole val = ui->buttonBox->buttonRole(button);
+	if (AgoraRtcEngine::GetInstance()->IsJoinChannel()) {
+		AgoraRtcEngine::GetInstance()->SavePcm(ui->chkSavePCM->isChecked());
+	}
 	if (val == QDialogButtonBox::ApplyRole ||
 		val == QDialogButtonBox::AcceptRole) {
-		if (ui->chkSavePCM->isChecked()) {
-
-		}
+		
 		if (!checkTestNetwork())
 			return;
 

@@ -337,7 +337,7 @@ void AgoraRtcEngine::stopPreview()
 
 void *AgoraRtcEngine::AgoraAudioObserver_Create()
 {	
-	m_externalAudioframe.channels = audioChannel;
+	m_externalAudioframe.channels = 2;
 	m_externalAudioframe.samplesPerChannel = 480;
 	m_externalAudioframe.samplesPerSec = 48000;//sampleRate;
 	m_externalAudioframe.bytesPerSample = TWO_BYTES_PER_SAMPLE;
@@ -694,22 +694,23 @@ void AgoraRtcEngine::PushAudioFrame(struct encoder_frame *frame)
 			blog(LOG_INFO, "agora tool pcm save failed");
 	}
 
-	m_externalAudioframe.renderTimeMs = getTickCount64();
+	int renderTimeMs = getTickCount64();
+	m_externalAudioframe.renderTimeMs = 0;// getTickCount64();
 	memcpy_s(m_externalAudioframe.buffer, frame->linesize[0],
 		frame->data[0], frame->linesize[0]);
 	
 	int ret = m_pMediaEngine->pushAudioFrame(AUDIO_RECORDING_SOURCE,
 		&m_externalAudioframe, false);
 	if (bFirstAudioFrame) {
-		blog(LOG_INFO, "Agora First PushAudioFrame timestamp: %llu ms(system time)", m_externalAudioframe.renderTimeMs);
+		blog(LOG_INFO, "Agora First PushAudioFrame timestamp: %llu ms(system time)", renderTimeMs);
 		bFirstAudioFrame = false;
-		firstAudioFrameTs_ = m_externalAudioframe.renderTimeMs;
+		firstAudioFrameTs_ = renderTimeMs;
 	}
 
 	audioFrameCount_++;
 	if (audioFrameCount_ % (logInterverl_ * 100) == 0) {
 		blog(LOG_INFO, "[%llu:] Audio PushAudioFrame timestamp: %llu ms, audio frame count: %llu,interval(time=%lfs)"
-			, audioFrameCount_ / 100, m_externalAudioframe.renderTimeMs, audioFrameCount_, (m_externalAudioframe.renderTimeMs - firstAudioFrameTs_)/(double)1000);
+			, audioFrameCount_ / 100, renderTimeMs, audioFrameCount_, (renderTimeMs - firstAudioFrameTs_)/(double)1000);
 
 	}
 }
