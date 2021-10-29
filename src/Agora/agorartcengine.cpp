@@ -337,7 +337,7 @@ void AgoraRtcEngine::stopPreview()
 
 void *AgoraRtcEngine::AgoraAudioObserver_Create()
 {	
-	m_externalAudioframe.channels = 2;
+	m_externalAudioframe.channels = audioChannel;
 	m_externalAudioframe.samplesPerChannel = 480;
 	m_externalAudioframe.samplesPerSec = 48000;//sampleRate;
 	m_externalAudioframe.bytesPerSample = TWO_BYTES_PER_SAMPLE;
@@ -708,8 +708,8 @@ void AgoraRtcEngine::PushAudioFrame(struct encoder_frame *frame)
 
 	audioFrameCount_++;
 	if (audioFrameCount_ % (logInterverl_ * 100) == 0) {
-		blog(LOG_INFO, "[%llu(%llu):] Audio PushAudioFrame timestamp: %llu ms, audio frame count: %llu,interval(time=%lfs)"
-			, audioFrameCount_ / 100, audioFrameCount_, m_externalAudioframe.renderTimeMs, videoFrameCount_, (m_externalAudioframe.renderTimeMs - firstAudioFrameTs_)/(double)1000);
+		blog(LOG_INFO, "[%llu:] Audio PushAudioFrame timestamp: %llu ms, audio frame count: %llu,interval(time=%lfs)"
+			, audioFrameCount_ / 100, m_externalAudioframe.renderTimeMs, audioFrameCount_, (m_externalAudioframe.renderTimeMs - firstAudioFrameTs_)/(double)1000);
 
 	}
 }
@@ -816,8 +816,8 @@ void AgoraRtcEngine::PushVideoFrame(struct video_data* frame)
 
 	videoFrameCount_++;
 	if (videoFrameCount_ % (logInterverl_ * videoFrameRate_) == 0) {
-		blog(LOG_INFO, "[%lf:(%llus)]Video PushVideoFrame timestamp: %llu ms, video frame count: %llu,interval(time=%lfs)"
-			, videoFrameCount_ / videoFrameRate_, videoFrameCount_, m_externalVideoFrame.timestamp, videoFrameCount_, (m_externalVideoFrame.timestamp - firstVideoFrameTs_) / (double)1000);
+		blog(LOG_INFO, "[%llu:]Video PushVideoFrame timestamp: %llu ms, video frame count: %llu,interval(time=%lfs)"
+			, videoFrameCount_ / videoFrameRate_, m_externalVideoFrame.timestamp, videoFrameCount_, (m_externalVideoFrame.timestamp - firstVideoFrameTs_) / (double)1000);
 	}
 }
 
