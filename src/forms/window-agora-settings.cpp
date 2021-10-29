@@ -944,7 +944,6 @@ void AgoraSettings::on_cmbGetMode_currentIndexChanged(int index)
 	ui->lineEditUID->setEnabled(index == 0);
 	ui->lineEditToken->setEnabled(index == 0);
 	ui->lineEditChannel->setEnabled(index == 0);
-	ui->lineEditLogInterval->setEnabled(index == 0);
 }
 
 void AgoraSettings::on_playoutVolumeSld_valueChanged(int value)
@@ -974,6 +973,8 @@ void AgoraSettings::showEvent(QShowEvent *event)
 	ui->lineEditCameraToken->setEnabled(bEnabled);
 	ui->lineEditUrl->setEnabled(bEnabled);
 	ui->buttonAppid->setEnabled(AgoraRtcEngine::GetInstance()->IsInitialize());
+	ui->lineEditLogInterval->setEnabled(bEnabled);
+	ui->cmbGetMode->setEnabled(bEnabled);
 	on_chkObsCamera_check(ui->chkObsCamera->isChecked());
 }
 
