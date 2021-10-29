@@ -456,7 +456,7 @@ bool AgoraBasic::EnumSources(void* data, obs_source_t* source)
 	const char* name = obs_source_get_name(source);
 	const char* id = obs_source_get_id(source);
 
-	if (strcmp(id, "dshow_input") == 0) {
+	if (strcmp(id, "dshow_input") == 0 || strcmp(id, "av_capture_input") == 0) {
 		obs_data_t* settings = obs_source_get_settings(source);
 		std::string video_device_id = obs_data_get_string(settings, "video_device_id");
 		window->vecCameraSources_.push_back(source);
@@ -1301,6 +1301,7 @@ void AgoraBasic::onUserOffline_slot(uid_t uid, int reason)
 
 void AgoraBasic::onFirstRemoteVideoDecoded_slot(uid_t uid, int width, int height, int elapsed)
 {
+  blog(LOG_INFO, "onFirstRemoteVideoDecoded_slot = %d",uid);
 	m_lstRemoteVideoUids.push_back(uid);
 	int count = m_lstRemoteVideoUids.size();
 	count = count > REMOTE_VIDEO_COUNT ? REMOTE_VIDEO_COUNT : count;
@@ -1312,7 +1313,7 @@ void AgoraBasic::onFirstRemoteVideoDecoded_slot(uid_t uid, int width, int height
 
 	if (count > REMOTE_VIDEO_COUNT)
 		return;
-
+  qDebug()<<"onFirstRemoteVideoDecoded_slot" << uid;
 	showRemoteTimer.stop();
 	showRemoteTimer.start(1000);
 	
