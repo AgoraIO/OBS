@@ -111,10 +111,10 @@
            <widget class="QWidget" name="scrollAreaWidgetContents">
             <property name="geometry">
              <rect>
-              <x>0</x>
-              <y>0</y>
-              <width>679</width>
-              <height>490</height>
+              <x>-137</x>
+              <y>-190</y>
+              <width>816</width>
+              <height>559</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_23">
@@ -224,6 +224,12 @@
                      </item>
                      <item>
                       <widget class="QPushButton" name="buttonAppid">
+                       <property name="maximumSize">
+                        <size>
+                         <width>150</width>
+                         <height>16777215</height>
+                        </size>
+                       </property>
                        <property name="text">
                         <string>Agora.General.Appid.Set</string>
                        </property>
@@ -358,27 +364,6 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="19" column="1">
-                    <widget class="QCheckBox" name="chkPersistSaveAppid">
-                     <property name="text">
-                      <string>Basic.Settings.Agora.PersistSaveAppid</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="21" column="0">
-                    <widget class="QCheckBox" name="chkDualStream">
-                     <property name="text">
-                      <string>Agora.Settings.DualStream</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="21" column="1">
-                    <widget class="QCheckBox" name="chkAutoLoadConfig">
-                     <property name="text">
-                      <string>Basic.Agora.AutoLoadConfig</string>
-                     </property>
-                    </widget>
-                   </item>
                    <item row="15" column="1">
                     <layout class="QHBoxLayout" name="horizontalLayout_Camera">
                      <item>
@@ -395,6 +380,27 @@
                       <widget class="QLineEdit" name="lineEditCameraToken"/>
                      </item>
                     </layout>
+                   </item>
+                   <item row="20" column="1">
+                    <widget class="QCheckBox" name="chkPersistSaveAppid">
+                     <property name="text">
+                      <string>Basic.Settings.Agora.PersistSaveAppid</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="19" column="1">
+                    <widget class="QCheckBox" name="chkDualStream">
+                     <property name="text">
+                      <string>Agora.Settings.DualStream</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="20" column="0">
+                    <widget class="QCheckBox" name="chkAutoLoadConfig">
+                     <property name="text">
+                      <string>Basic.Agora.AutoLoadConfig</string>
+                     </property>
+                    </widget>
                    </item>
                   </layout>
                  </widget>
@@ -1130,8 +1136,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>652</width>
-              <height>267</height>
+              <width>943</width>
+              <height>313</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_50">

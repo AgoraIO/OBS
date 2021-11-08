@@ -675,8 +675,8 @@ std::string CurrentTimeString()
 	return buf;
 }
 
-void AgoraRtcEngine::PushAudioFrame(struct encoder_frame *frame)
-{ 
+void AgoraRtcEngine::PushAudioFrame(struct encoder_frame* frame)
+{
 	if (!m_bInitialize || !m_bJoinChannel)
 		return;
 
@@ -694,18 +694,21 @@ void AgoraRtcEngine::PushAudioFrame(struct encoder_frame *frame)
 			blog(LOG_INFO, "agora tool pcm save failed");
 	}
 
-	int renderTimeMs = getTickCount64();
-	m_externalAudioframe.renderTimeMs = 0;// getTickCount64();
-	memcpy_s(m_externalAudioframe.buffer, frame->linesize[0],
-		frame->data[0], frame->linesize[0]);
-	
-	int ret = m_pMediaEngine->pushAudioFrame(AUDIO_RECORDING_SOURCE,
-		&m_externalAudioframe, false);
+	int64_t renderTimeMs = getTickCount64();
 	if (bFirstAudioFrame) {
 		blog(LOG_INFO, "Agora First PushAudioFrame timestamp: %llu ms(system time)", renderTimeMs);
 		bFirstAudioFrame = false;
 		firstAudioFrameTs_ = renderTimeMs;
 	}
+
+	m_externalAudioframe.renderTimeMs = 0;// getTickCount64();
+	memcpy_s(m_externalAudioframe.buffer, frame->linesize[0],
+		frame->data[0], frame->linesize[0]);
+	bool bPush = false;
+	int delta = renderTimeMs - firstAudioFrameTs_;
+	int ret = m_pMediaEngine->pushAudioFrame(AUDIO_RECORDING_SOURCE,
+		&m_externalAudioframe, false);
+
 
 	audioFrameCount_++;
 	if (audioFrameCount_ % (logInterverl_ * 100) == 0) {

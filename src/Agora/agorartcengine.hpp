@@ -152,7 +152,6 @@ private:
 	bool bFirstVideoFrame  = true;
 	bool bFirstAudioFrame  = true;
 	bool bFirstCameraVideo = true;
-	
 	uint64_t videoFrameCount_  = 0;
 	uint64_t cameraVideoCount_ = 0;
 	uint64_t audioFrameCount_  = 0;
@@ -169,5 +168,6 @@ private:
 	FILE* fpPCM = nullptr;
 	bool savePcm = false;
 	int sampleRate = 48000;
+	
 };
 

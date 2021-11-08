@@ -341,6 +341,8 @@ AgoraBasic::~AgoraBasic()
 			config_set_string(globalAgoraConfig, "AgoraTool", "appid", "");
 			config_set_string(globalAgoraConfig, "AgoraTool", "token", "");
 			config_set_string(globalAgoraConfig, "AgoraTool", "channelName", "");
+			config_set_string(globalAgoraConfig, "AgoraTool", "CameraToken", "");
+			config_set_string(globalAgoraConfig, "AgoraTool", "CameraUID", "");
 		}
 		config_set_uint(globalAgoraConfig, "AgoraTool", "logInterval", m_agoraToolSettings.logInterval);
 		config_set_uint(globalAgoraConfig, "AgoraTool", "InformationMode", m_agoraToolSettings.info_mode);
