@@ -342,7 +342,7 @@ AgoraBasic::~AgoraBasic()
 			config_set_string(globalAgoraConfig, "AgoraTool", "token", "");
 			config_set_string(globalAgoraConfig, "AgoraTool", "channelName", "");
 			config_set_string(globalAgoraConfig, "AgoraTool", "CameraToken", "");
-			config_set_string(globalAgoraConfig, "AgoraTool", "CameraUID", "");
+			config_set_uint(globalAgoraConfig, "AgoraTool", "CameraUID", 0);
 		}
 		config_set_uint(globalAgoraConfig, "AgoraTool", "logInterval", m_agoraToolSettings.logInterval);
 		config_set_uint(globalAgoraConfig, "AgoraTool", "InformationMode", m_agoraToolSettings.info_mode);
@@ -373,8 +373,6 @@ AgoraBasic::~AgoraBasic()
 		config_set_string(globalAgoraConfig, "AgoraTool", "InformationUrl", m_agoraToolSettings.information_url.c_str());
 
 		config_set_bool(globalAgoraConfig, "AgoraTool", "SendOBSCamera", m_agoraToolSettings.bSendObsCamera);
-		config_set_uint(globalAgoraConfig, "AgoraTool", "CameraUID", m_agoraToolSettings.camera_uid);
-		config_set_string(globalAgoraConfig, "AgoraTool", "CameraToken", m_agoraToolSettings.camera_token.c_str());
 		config_set_int(globalAgoraConfig, "AgoraTool", "CameraEncWidth", m_agoraToolSettings.plugin_camera_width);
 		config_set_int(globalAgoraConfig, "AgoraTool", "CameraEncHeight", m_agoraToolSettings.plugin_camera_height);
 		config_set_int(globalAgoraConfig, "AgoraTool", "CameraEncFPS", m_agoraToolSettings.plugin_camera_fps);
@@ -562,7 +560,7 @@ void AgoraBasic::on_agoraSteramButton_clicked()
 				}
 			}
 			vecCameraSources_.clear();
-		}
+		} 
 		StopAgoraOutput();
 		AgoraRtcEngine::GetInstance()->stopPreview();
 

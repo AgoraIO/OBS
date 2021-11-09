@@ -419,7 +419,7 @@ void AgoraSettings::SaveGeneralSettings()
 	main->GetAgoraSetting(settings);
 	QString strAppid = ui->lineEditAppid->text();
 	strAppid = strAppid.trimmed();
-	if (AgoraRtcEngine::GetInstance()->IsInitialize()
+	if (AgoraRtcEngine::GetInstance()->IsInitialize() && ui->cmbGetMode->currentIndex() == 0
 		&& !settings.appid.empty() && settings.appid.compare(strAppid.toStdString()) != 0)
 		appid_changed = true;
 	settings.appid = strAppid.toStdString();
@@ -451,7 +451,9 @@ void AgoraSettings::SaveGeneralSettings()
 	settings.bDualStream = ui->chkDualStream->isChecked();
 	QString strCameraUid = ui->lineEditCameraUID->text();
 	if (strCameraUid.length() > 0)
-		settings.camera_uid = strtoul(strCameraUid.toStdString().data(), NULL, 10);
+  		settings.camera_uid = strtoul(strCameraUid.toStdString().data(), NULL, 10);
+	else
+		settings.camera_uid = 0;
 	settings.bSendObsCamera = ui->chkObsCamera->isChecked();
 	settings.camera_token = ui->lineEditCameraToken->text().toStdString();
 	settings.cpuThreshold = ui->spinCPU->value();
@@ -572,12 +574,6 @@ void AgoraSettings::LoadGeneralSettings()
 	ui->lineEditLogInterval->setText(str);
 
 	ui->cmbGetMode->setCurrentIndex(settings.info_mode);
-	if (settings.info_mode == 0) {
-		ui->labelGetInfoMode_2->hide();
-		ui->labUrl->hide();
-		ui->lineEditUrl->hide();
-	}
-
 	ui->chkPersistSaving->setChecked(settings.savePersist);
 	ui->chkPersistSaveAppid->setChecked(settings.savePersistAppid);
 	ui->chkMuteAllRemoteAV->setChecked(settings.muteAllRemoteAudioVideo);
@@ -733,13 +729,20 @@ void AgoraSettings::LoadAgoraSettings()
 
 	ui->lineEditAppid->setText(QString::fromUtf8(settings.appid.data()));
 	ui->lineEditToken->setText(QString::fromUtf8(settings.token.data()));
-	ui->lineEditAppCertificate->setText(QString::fromUtf8(settings.appCerf.data()));
+	ui->lineEditCameraToken->setText(QString::fromUtf8(settings.token.data()));
+
 	ui->lineEditChannel->setText(
 		QString::fromUtf8(settings.channelName.data()));
 	if (settings.uid > 0) {
 		QString strUid = QString("%1").arg(settings.uid);
 		ui->lineEditUID->setText(strUid);
 	}
+
+	if (settings.camera_uid > 0) {
+		QString strUid = QString("%1").arg(settings.camera_uid);
+		ui->lineEditCameraUID->setText(strUid);
+	}
+
 	ui->lineEditLogInterval->setText(QString("%1").arg(settings.logInterval));
 	ui->chkPersistSaving->setChecked(settings.savePersist);
 	ui->chkPersistSaveAppid->setChecked(settings.savePersistAppid);
@@ -747,7 +750,7 @@ void AgoraSettings::LoadAgoraSettings()
 	ui->chkDualStream->setChecked(settings.bDualStream);
 	QString strExpired = QString("%1").arg(settings.expiredTime);
 	ui->lineEditExpiredTs->setText(strExpired);
-	ui->lineEditCameraToken->setText(QString::fromUtf8(settings.token.data()));
+	
 	loading = false;
 }
 
@@ -927,7 +930,7 @@ void AgoraSettings::on_cmbVideoEncoder_currentIndexChanged(int index)
 	}
 }
 
-void AgoraSettings::on_cmbGetMode_currentIndexChanged(int index)
+void AgoraSettings::ShowControlByMode(int index)
 {
 	if (index == 0) {
 		ui->labelGetInfoMode_2->hide();
@@ -940,6 +943,9 @@ void AgoraSettings::on_cmbGetMode_currentIndexChanged(int index)
 		ui->labelCameraToken->show();
 		ui->lineEditCameraToken->show();
 		ui->chkPersistSaveAppid->show();
+		ui->buttonAppid->show();
+		ui->labUrl->hide();
+		ui->lineEditUrl->hide();
 	}
 	else {
 		ui->labelGetInfoMode_2->show();
@@ -952,12 +958,8 @@ void AgoraSettings::on_cmbGetMode_currentIndexChanged(int index)
 		ui->labelCameraToken->hide();
 		ui->lineEditCameraToken->hide();
 		ui->chkPersistSaveAppid->hide();
-		ui->lineEditAppid->setText("");
-		ui->lineEditToken->setText("");
-		ui->lineEditUID->setText("");
-		ui->lineEditCameraUID->setText("");
-		ui->lineEditCameraToken->setText("");
-		ui->lineEditChannel->setText("");
+		ui->buttonAppid->hide();
+		
 	}
 	ui->lineEditAppid->setEnabled(index == 0);
 	ui->lineEditCameraUID->setEnabled(index == 0);
@@ -965,6 +967,24 @@ void AgoraSettings::on_cmbGetMode_currentIndexChanged(int index)
 	ui->lineEditUID->setEnabled(index == 0);
 	ui->lineEditToken->setEnabled(index == 0);
 	ui->lineEditChannel->setEnabled(index == 0);
+}
+
+void AgoraSettings::ClearChannelInfo()
+{
+	ui->lineEditAppid->setText("");
+	ui->lineEditToken->setText("");
+	ui->lineEditCameraToken->setText("");
+	ui->lineEditUID->setText("");
+	ui->lineEditCameraUID->setText("");
+	ui->lineEditChannel->setText("");
+}
+
+void AgoraSettings::on_cmbGetMode_currentIndexChanged(int index)
+{
+	ShowControlByMode(index);
+	
+	if (isVisible())
+		ClearChannelInfo();
 }
 
 void AgoraSettings::on_playoutVolumeSld_valueChanged(int value)
@@ -975,13 +995,10 @@ void AgoraSettings::on_playoutVolumeSld_valueChanged(int value)
 void AgoraSettings::showEvent(QShowEvent *event)
 {
 	bool bEnabled = !AgoraRtcEngine::GetInstance()->IsJoinChannel();
+	
 	ui->loadConfigButton->setEnabled(bEnabled);
 	ui->lineEditAppCertificate->setEnabled(bEnabled);
-	ui->lineEditAppid->setEnabled(bEnabled);
-	ui->lineEditChannel->setEnabled(bEnabled);
 	ui->lineEditExpiredTs->setEnabled(bEnabled);
-	ui->lineEditUID->setEnabled(bEnabled);
-	ui->lineEditLogInterval->setEnabled(bEnabled);
 	ui->chkAudioHighQuality->setEnabled(bEnabled);
 	ui->cmbRecordChannelSetup->setEnabled(bEnabled);
 	ui->cmbScenario->setEnabled(bEnabled);
@@ -989,15 +1006,17 @@ void AgoraSettings::showEvent(QShowEvent *event)
 	ui->cmbAgoraBitrate->setEnabled(bEnabled);
 	ui->cmbVideoEncoder->setEnabled(bEnabled);
 	ui->btnNetworkTest->setEnabled(bEnabled);
-
+	ui->lineEditUrl->setEnabled(bEnabled);
+	ui->buttonAppid->setEnabled(!AgoraRtcEngine::GetInstance()->IsInitialize());
+	on_chkObsCamera_check(ui->chkObsCamera->isChecked());
+	ShowControlByMode(ui->cmbGetMode->currentIndex());
+	ui->cmbGetMode->setEnabled(bEnabled);
+	ui->lineEditAppid->setEnabled(bEnabled);
+	ui->lineEditChannel->setEnabled(bEnabled);
+	ui->lineEditToken->setEnabled(bEnabled);
+	ui->lineEditUID->setEnabled(bEnabled);
 	ui->lineEditCameraUID->setEnabled(bEnabled);
 	ui->lineEditCameraToken->setEnabled(bEnabled);
-	ui->lineEditUrl->setEnabled(bEnabled);
-	ui->lineEditToken->setEnabled(bEnabled);
-	ui->buttonAppid->setEnabled(!AgoraRtcEngine::GetInstance()->IsInitialize());
-	ui->lineEditLogInterval->setEnabled(bEnabled);
-	ui->cmbGetMode->setEnabled(bEnabled);
-	on_chkObsCamera_check(ui->chkObsCamera->isChecked());
 }
 
 /*typedef void(*obs_source_audio_capture_t)(void *param, obs_source_t *source,
@@ -1102,8 +1121,11 @@ void AgoraSettings::on_chkObsCamera_check(bool check)
 {
 	ui->labeCameraUID->setVisible(check);
 	ui->lineEditCameraUID->setVisible(check);
-	ui->lineEditCameraToken->setVisible(check);
-	ui->labelCameraToken->setVisible(check);
+	if (ui->cmbGetMode->currentIndex() == 0) {
+		ui->lineEditCameraToken->setVisible(check);
+		ui->labelCameraToken->setVisible(check);
+	}
+	
 	ui->labCameraEncoderBitrate->setVisible(check);
 	ui->cmbCameraBitrate->setVisible(check);
 	ui->labCameraEncoderFPS->setVisible(check);

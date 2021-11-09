@@ -95,6 +95,9 @@ private:
 	bool checkTestNetwork();
 
 	virtual void closeEvent(QCloseEvent *event)override;
+
+	void ShowControlByMode(int index);
+	void ClearChannelInfo();
 public:
 	AgoraSettings(QWidget *parent);
 	~AgoraSettings();
