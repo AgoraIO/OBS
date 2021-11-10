@@ -940,8 +940,7 @@ void AgoraSettings::ShowControlByMode(int index)
 		ui->lineEditToken->show();
 		ui->labelToken->show();
 		ui->label_appid->show();
-		ui->labelCameraToken->show();
-		ui->lineEditCameraToken->show();
+
 		ui->chkPersistSaveAppid->show();
 		ui->buttonAppid->show();
 		ui->labUrl->hide();
@@ -959,8 +958,9 @@ void AgoraSettings::ShowControlByMode(int index)
 		ui->lineEditCameraToken->hide();
 		ui->chkPersistSaveAppid->hide();
 		ui->buttonAppid->hide();
-		
 	}
+	ui->labelCameraToken->setVisible(ui->chkObsCamera->isChecked());
+	ui->lineEditCameraToken->setVisible(ui->chkObsCamera->isChecked());
 	ui->lineEditAppid->setEnabled(index == 0);
 	ui->lineEditCameraUID->setEnabled(index == 0);
 	ui->lineEditCameraToken->setEnabled(index == 0);
