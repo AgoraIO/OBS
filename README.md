@@ -82,7 +82,6 @@ For example, obs source code path is obs-studio, build path is obs-studio/build6
 
 Click configure on cmake-gui, then you get a variable LibObs_DIR. Make sure the value is obs-studio/build/libobs.
 
-
 ## Run RTC Tool
 
 1 Startup obs
