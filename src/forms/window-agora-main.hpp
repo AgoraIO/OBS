@@ -10,6 +10,7 @@
 #include <util/util.hpp>
 #include <QTimer>
 #include "obs.hpp"
+
 #if WIN32
 #include "curl.h"
 #else
@@ -110,7 +111,7 @@ private:
 	QString cpuInformation = "";
 	QString emptyCameraToken = "";
 	QString invalidCameraToken = "";
-	AgoraToolSettings m_agoraToolSettings;
+	AgoraToolSettings m_settings;
 	//show remote video
 	QVBoxLayout *remoteVideoLayout;
 	QHBoxLayout *remoteVideoHLayout[REMOTE_VIDEO_ROW]; //4*4
@@ -127,8 +128,7 @@ private:
 
 	void SetLiveTranscoding();
 
-	obs_source_t *current_source;
-
+	OBSSource current_source;
 	video_t *video_queue;
 
 	obs_video_info ovi;
@@ -151,9 +151,8 @@ private:
 
 	std::vector<int> first2MinCpu;
 	std::vector<int> lastMinCpu;
-
-	std::vector<obs_source*> vecCameraSources_;
-	obs_source_t *camera_filter;
+	std::vector<OBSSource> vecCameraSources_;
+	OBSSource camera_filter;
 	ConfigFile globalConfig;
 	ConfigFile basicConfig;
 	ConfigFile globalAgoraConfig;
@@ -181,13 +180,12 @@ private:
 	
 	static void OBSEvent(obs_frontend_event event, void *);
 public slots:
-	void on_agoraSteramButton_clicked();
+	void on_streamButton_clicked();
 	void on_settingsButton_clicked();
 	void on_exitButton_clicked();
-	
 	// rtc envetn handler slot
 	void onJoinChannelSuccess_slot(const char* channel, unsigned int uid, int elapsed);
-	void joinSuccess(const char* channel, unsigned int uid, int elapsed);
+	void onBothJoinSuccess(const char* channel, unsigned int uid, int elapsed);
 	void onLeaveChannel_slot(const RtcStats &stats);
 	void onError_slot(int err, const char *msg);
 	void onUserJoined_slot(uid_t uid, int elapsed);
@@ -203,14 +201,15 @@ public slots:
 	void joinFailed_slot();
 	void reuquestToken_slot(QString json, int err);
 	void onSystemCPU_slot(int cpuUsage);
+	void onSceneChangedEvent();
 public:
 	void ToggleAgoraDialog();
 	AgoraBasic(QMainWindow *parent);
 	virtual ~AgoraBasic();
-	void GetAgoraSetting(AgoraToolSettings& setting) {setting = m_agoraToolSettings;};
+	void GetAgoraSetting(AgoraToolSettings& setting) {setting = m_settings;};
 	void SetAgoraSetting(AgoraToolSettings setting) 
 	{
-		m_agoraToolSettings = setting; 
+		m_settings = setting; 
 	}
 
 	void resizeEvent(QResizeEvent *event) override;
@@ -221,4 +220,5 @@ public:
 signals:
 	void DisplayCreated(AgoraBasic* agora);
 	void requestTokenSignal(QString, int err);
+	void SceneChanged();
 };

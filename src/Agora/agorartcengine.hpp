@@ -37,6 +37,8 @@ public:
 	static void ReleaseInstance();
 	bool IsInitialize() { return m_bInitialize; }
 	bool IsJoinChannel() { return m_bJoinChannel; }
+	bool IsCameraJoinChannel() { return m_bCameraJoinChannel; }
+
 	bool InitEngine(std::string appid);
 
 	BOOL setLogPath(std::string path);
@@ -128,6 +130,7 @@ private:
 	std::unique_ptr<agora::rtc::IRtcEngineEventHandler> m_eventHandler;
 	std::unique_ptr<agora::rtc::IRtcEngineEventHandler> m_eventHandlerCamera;
 	bool m_bJoinChannel = false;
+	bool m_bCameraJoinChannel = false;
 	bool m_bInitialize = false;
 	bool bInit = false;
 

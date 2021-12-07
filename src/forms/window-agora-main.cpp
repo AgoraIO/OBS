@@ -42,6 +42,7 @@ AgoraBasic::AgoraBasic(QMainWindow *parent)
 
 	blog(LOG_INFO, "agora tool version: Agora RTC Tool ( %s )", AGORA_TOOL_VERSION);
 	setAttribute(Qt::WA_QuitOnClose, false);
+	
 	curl = curl_easy_init();
 	obs_frontend_push_ui_translation(obs_module_get_string);
 	control_text  = tr("Agora.Main.Controls");
@@ -70,10 +71,10 @@ AgoraBasic::AgoraBasic(QMainWindow *parent)
 	obs_frontend_pop_ui_translation();
 
 	ui->controlsDock->setWindowTitle(control_text);
-	ui->agoraSteramButton->setText(start_text);
+	ui->streamButton->setText(start_text);
 	
 	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onJoinChannelSuccess, this, &AgoraBasic::onJoinChannelSuccess_slot);
-	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onCameraJoinChannelSuccess, this, &AgoraBasic::joinSuccess);
+	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onCameraJoinChannelSuccess, this, &AgoraBasic::onBothJoinSuccess);
 	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onLeaveChannel, this, &AgoraBasic::onLeaveChannel_slot);
 	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onError, this, &AgoraBasic::onError_slot);
 	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onUserJoined, this, &AgoraBasic::onUserJoined_slot);
@@ -97,6 +98,7 @@ AgoraBasic::AgoraBasic(QMainWindow *parent)
 			AgoraBasic::DrawPreview, this);
 	};
 	connect(this, &AgoraBasic::DisplayCreated,addDrawCallback);
+	connect(this, &AgoraBasic::SceneChanged, &AgoraBasic::onSceneChangedEvent);
 	auto displayResize = [this]() {
 		struct obs_video_info ovi;
 
@@ -240,88 +242,89 @@ void AgoraBasic::InitBasicConfig()
 				"Basic", "Profile");
 	}
 
-	m_agoraToolSettings.savePersist = config_get_bool(globalAgoraConfig, "AgoraTool", "savePersist");
+	m_settings.savePersist = config_get_bool(globalAgoraConfig, "AgoraTool", "savePersist");
 
-	if (m_agoraToolSettings.savePersist) {
+	if (m_settings.savePersist) {
 		if (config_has_user_value(globalAgoraConfig, "AgoraTool", "token"))
-			m_agoraToolSettings.token = config_get_string(globalAgoraConfig, "AgoraTool", "token");
+			m_settings.token = config_get_string(globalAgoraConfig, "AgoraTool", "token");
 		if (config_has_user_value(globalAgoraConfig, "AgoraTool", "rtmp_url"))
-			m_agoraToolSettings.rtmp_url = config_get_string(globalAgoraConfig, "AgoraTool", "rtmp_url");
+			m_settings.rtmp_url = config_get_string(globalAgoraConfig, "AgoraTool", "rtmp_url");
 		if (config_has_user_value(globalAgoraConfig, "AgoraTool", "channelName"))
-			m_agoraToolSettings.channelName = config_get_string(globalAgoraConfig, "AgoraTool", "channelName");
-		m_agoraToolSettings.uid = config_get_uint(globalAgoraConfig, "AgoraTool", "uid");
+			m_settings.channelName = config_get_string(globalAgoraConfig, "AgoraTool", "channelName");
+		m_settings.uid = config_get_uint(globalAgoraConfig, "AgoraTool", "uid");
 		
-		m_agoraToolSettings.agora_fps = config_get_int(globalAgoraConfig, "AgoraTool", "agora_fps");
-		m_agoraToolSettings.agora_bitrate = config_get_int(globalAgoraConfig, "AgoraTool", "agora_bitrate");
-		m_agoraToolSettings.agora_width = config_get_int(globalAgoraConfig, "AgoraTool", "agora_width");
-		m_agoraToolSettings.agora_height = config_get_int(globalAgoraConfig, "AgoraTool", "agora_height");
+		m_settings.agora_fps = config_get_int(globalAgoraConfig, "AgoraTool", "agora_fps");
+		m_settings.agora_bitrate = config_get_int(globalAgoraConfig, "AgoraTool", "agora_bitrate");
+		m_settings.agora_width = config_get_int(globalAgoraConfig, "AgoraTool", "agora_width");
+		m_settings.agora_height = config_get_int(globalAgoraConfig, "AgoraTool", "agora_height");
 
-		m_agoraToolSettings.rtmp_fps     = config_get_int(globalAgoraConfig, "AgoraTool", "rtmp_fps");
-		m_agoraToolSettings.rtmp_bitrate = config_get_int(globalAgoraConfig, "AgoraTool", "rtmp_bitrate");
-		m_agoraToolSettings.rtmp_width   = config_get_int(globalAgoraConfig, "AgoraTool", "rtmp_width");
-		m_agoraToolSettings.rtmp_height  = config_get_int(globalAgoraConfig, "AgoraTool", "rtmp_height");
+		m_settings.rtmp_fps     = config_get_int(globalAgoraConfig, "AgoraTool", "rtmp_fps");
+		m_settings.rtmp_bitrate = config_get_int(globalAgoraConfig, "AgoraTool", "rtmp_bitrate");
+		m_settings.rtmp_width   = config_get_int(globalAgoraConfig, "AgoraTool", "rtmp_width");
+		m_settings.rtmp_height  = config_get_int(globalAgoraConfig, "AgoraTool", "rtmp_height");
 
-		m_agoraToolSettings.audioChannel = config_get_int(globalAgoraConfig, "AgoraTool", "audioChannel");
-		m_agoraToolSettings.scenario     = config_get_int(globalAgoraConfig, "AgoraTool", "scenario");
-		m_agoraToolSettings.obs_bitrate  = config_get_int(globalAgoraConfig, "AgoraTool", "obs_bitrate");
-		m_agoraToolSettings.videoEncoder = config_get_int(globalAgoraConfig, "AgoraTool", "videoEncoder");
-		m_agoraToolSettings.muteAllRemoteAudioVideo = config_get_bool(globalAgoraConfig, "AgoraTool", "muteAllRemoteAudioVideo");
-		m_agoraToolSettings.bDualStream = config_get_bool(globalAgoraConfig, "AgoraTool", "DualStream");
-		m_agoraToolSettings.bHighQuality = config_get_bool(globalAgoraConfig, "AgoraTool", "bHighQuality");
+		m_settings.audioChannel = config_get_int(globalAgoraConfig, "AgoraTool", "audioChannel");
+		m_settings.scenario     = config_get_int(globalAgoraConfig, "AgoraTool", "scenario");
+		m_settings.obs_bitrate  = config_get_int(globalAgoraConfig, "AgoraTool", "obs_bitrate");
+		m_settings.videoEncoder = config_get_int(globalAgoraConfig, "AgoraTool", "videoEncoder");
+		m_settings.muteAllRemoteAudioVideo = config_get_bool(globalAgoraConfig, "AgoraTool", "muteAllRemoteAudioVideo");
+		m_settings.bDualStream = config_get_bool(globalAgoraConfig, "AgoraTool", "DualStream");
+		m_settings.bHighQuality = config_get_bool(globalAgoraConfig, "AgoraTool", "bHighQuality");
 		if (config_has_user_value(globalAgoraConfig, "AgoraTool", "InformationMode"))
-			m_agoraToolSettings.info_mode = config_get_int(globalAgoraConfig, "AgoraTool", "InformationMode");
+			m_settings.info_mode = config_get_int(globalAgoraConfig, "AgoraTool", "InformationMode");
 		if(config_has_user_value(globalAgoraConfig, "AgoraTool", "InformationUrl"))
-		   m_agoraToolSettings.information_url = config_get_string(globalAgoraConfig, "AgoraTool", "InformationUrl");
+		   m_settings.information_url = config_get_string(globalAgoraConfig, "AgoraTool", "InformationUrl");
 
 		if (config_has_user_value(globalAgoraConfig, "AgoraTool", "CPUThreshold"))
-			m_agoraToolSettings.cpuThreshold = config_get_int(globalAgoraConfig, "AgoraTool", "CPUThreshold");
+			m_settings.cpuThreshold = config_get_int(globalAgoraConfig, "AgoraTool", "CPUThreshold");
 
 		if (config_has_user_value(globalAgoraConfig, "AgoraTool", "CameraUID"))
-			m_agoraToolSettings.camera_uid = config_get_uint(globalAgoraConfig, "AgoraTool", "CameraUID");
+			m_settings.camera_uid = config_get_uint(globalAgoraConfig, "AgoraTool", "CameraUID");
 		if (config_has_user_value(globalAgoraConfig, "AgoraTool", "CameraToken"))
-			m_agoraToolSettings.camera_token = config_get_string(globalAgoraConfig, "AgoraTool", "CameraToken");
+			m_settings.camera_token = config_get_string(globalAgoraConfig, "AgoraTool", "CameraToken");
 
 		if (config_has_user_value(globalAgoraConfig, "AgoraTool", "SendOBSCamera"))
-			m_agoraToolSettings.bSendObsCamera = config_get_bool(globalAgoraConfig, "AgoraTool", "SendOBSCamera");
+			m_settings.bSendObsCamera = config_get_bool(globalAgoraConfig, "AgoraTool", "SendOBSCamera");
 		if (config_has_user_value(globalAgoraConfig, "AgoraTool", "CameraEncWidth"))
-			m_agoraToolSettings.plugin_camera_width = config_get_int(globalAgoraConfig, "AgoraTool", "CameraEncWidth");
+			m_settings.plugin_camera_width = config_get_int(globalAgoraConfig, "AgoraTool", "CameraEncWidth");
 		if (config_has_user_value(globalAgoraConfig, "AgoraTool", "CameraEncHeight"))
-			m_agoraToolSettings.plugin_camera_height = config_get_int(globalAgoraConfig, "AgoraTool", "CameraEncHeight");
+			m_settings.plugin_camera_height = config_get_int(globalAgoraConfig, "AgoraTool", "CameraEncHeight");
 		if (config_has_user_value(globalAgoraConfig, "AgoraTool", "CameraEncFPS"))
-			m_agoraToolSettings.plugin_camera_fps = config_get_int(globalAgoraConfig, "AgoraTool", "CameraEncFPS");
+			m_settings.plugin_camera_fps = config_get_int(globalAgoraConfig, "AgoraTool", "CameraEncFPS");
 		if (config_has_user_value(globalAgoraConfig, "AgoraTool", "CameraEncBitrate"))
-			m_agoraToolSettings.plugin_camera_bitrate = config_get_int(globalAgoraConfig, "AgoraTool", "CameraEncBitrate");
+			m_settings.plugin_camera_bitrate = config_get_int(globalAgoraConfig, "AgoraTool", "CameraEncBitrate");
 
 		if (config_has_user_value(globalAgoraConfig, "AgoraTool", "loopbackRecording"))
-			m_agoraToolSettings.loopback = config_get_bool(globalAgoraConfig, "AgoraTool", "loopbackRecording");
+			m_settings.loopback = config_get_bool(globalAgoraConfig, "AgoraTool", "loopbackRecording");
 
-		m_agoraToolSettings.obs_bitrate = config_get_int(globalAgoraConfig, "AgoraTool", "obs_bitrate");
-		m_agoraToolSettings.logInterval = config_get_int(globalAgoraConfig, "AgoraTool", "logInterval");
-		if (m_agoraToolSettings.logInterval == 0)
-			m_agoraToolSettings.logInterval = 20;
+		m_settings.obs_bitrate = config_get_int(globalAgoraConfig, "AgoraTool", "obs_bitrate");
+		m_settings.logInterval = config_get_int(globalAgoraConfig, "AgoraTool", "logInterval");
+		if (m_settings.logInterval == 0)
+			m_settings.logInterval = 20;
 		
 	}
 
-	m_agoraToolSettings.savePersistAppid = config_get_bool(globalAgoraConfig, "AgoraTool", "savePersistAppid");
-	if(m_agoraToolSettings.savePersistAppid	&& m_agoraToolSettings.info_mode == 0)
-		m_agoraToolSettings.appid = config_get_string(globalAgoraConfig, "AgoraTool", "appid");
+	m_settings.savePersistAppid = config_get_bool(globalAgoraConfig, "AgoraTool", "savePersistAppid");
+	if(m_settings.savePersistAppid	&& m_settings.info_mode == 0)
+		m_settings.appid = config_get_string(globalAgoraConfig, "AgoraTool", "appid");
 }
 
 AgoraBasic::~AgoraBasic()
 {
+	obs_frontend_remove_event_callback(OBSEvent, nullptr);
 	DestroyRemoteVideos();
-	if (current_source)
-		obs_source_release(current_source);
-
-	if (output)
+	if (output) {
 		obs_output_release(output);
+		output = nullptr;
+	}
 
-	if (audio_encoder)
+	if (audio_encoder) {
 		obs_encoder_release(audio_encoder);
+		audio_encoder = nullptr;
+	}
 
-	if (camera_filter) 
+	if (camera_filter)
 		obs_source_release(camera_filter);
-	
 
 	if (curl) {
 		curl_easy_cleanup(curl);
@@ -329,12 +332,14 @@ AgoraBasic::~AgoraBasic()
 
 	AgoraRtcEngine::GetInstance()->ReleaseInstance();
 
-	if (m_agoraToolSettings.savePersist) {
-		if (m_agoraToolSettings.info_mode == 0) {//manually
-			config_set_string(globalAgoraConfig, "AgoraTool", "appid", m_agoraToolSettings.appid.c_str());
-			config_set_string(globalAgoraConfig, "AgoraTool", "token", m_agoraToolSettings.token.c_str());
-			config_set_string(globalAgoraConfig, "AgoraTool", "channelName", m_agoraToolSettings.channelName.c_str());
-			config_set_uint(globalAgoraConfig, "AgoraTool", "uid", m_agoraToolSettings.uid);
+	if (m_settings.savePersist) {
+		if (m_settings.info_mode == 0) {//manually
+			config_set_string(globalAgoraConfig, "AgoraTool", "appid", m_settings.appid.c_str());
+			config_set_string(globalAgoraConfig, "AgoraTool", "token", m_settings.token.c_str());
+			config_set_string(globalAgoraConfig, "AgoraTool", "channelName", m_settings.channelName.c_str());
+			config_set_uint(globalAgoraConfig, "AgoraTool", "uid", m_settings.uid);
+			config_set_string(globalAgoraConfig, "AgoraTool", "CameraToken", m_settings.camera_token.c_str());
+			config_set_uint(globalAgoraConfig, "AgoraTool", "CameraUID", m_settings.camera_uid);
 		}
 		else {
 			config_set_uint(globalAgoraConfig, "AgoraTool", "uid", 0);
@@ -344,40 +349,40 @@ AgoraBasic::~AgoraBasic()
 			config_set_string(globalAgoraConfig, "AgoraTool", "CameraToken", "");
 			config_set_uint(globalAgoraConfig, "AgoraTool", "CameraUID", 0);
 		}
-		config_set_uint(globalAgoraConfig, "AgoraTool", "logInterval", m_agoraToolSettings.logInterval);
-		config_set_uint(globalAgoraConfig, "AgoraTool", "InformationMode", m_agoraToolSettings.info_mode);
+		config_set_uint(globalAgoraConfig, "AgoraTool", "logInterval", m_settings.logInterval);
+		config_set_uint(globalAgoraConfig, "AgoraTool", "InformationMode", m_settings.info_mode);
 
-		config_set_string(globalAgoraConfig, "AgoraTool", "rtmp_url", m_agoraToolSettings.rtmp_url.c_str());
-		config_set_int(globalAgoraConfig, "AgoraTool", "agora_fps", m_agoraToolSettings.agora_fps);
-		config_set_int(globalAgoraConfig, "AgoraTool", "agora_bitrate", m_agoraToolSettings.agora_bitrate);
-		config_set_int(globalAgoraConfig, "AgoraTool", "agora_width", m_agoraToolSettings.agora_width);
-		config_set_int(globalAgoraConfig, "AgoraTool", "agora_height", m_agoraToolSettings.agora_height);
+		config_set_string(globalAgoraConfig, "AgoraTool", "rtmp_url", m_settings.rtmp_url.c_str());
+		config_set_int(globalAgoraConfig, "AgoraTool", "agora_fps", m_settings.agora_fps);
+		config_set_int(globalAgoraConfig, "AgoraTool", "agora_bitrate", m_settings.agora_bitrate);
+		config_set_int(globalAgoraConfig, "AgoraTool", "agora_width", m_settings.agora_width);
+		config_set_int(globalAgoraConfig, "AgoraTool", "agora_height", m_settings.agora_height);
 
-		config_set_int(globalAgoraConfig, "AgoraTool", "rtmp_fps", m_agoraToolSettings.rtmp_fps);
-		config_set_int(globalAgoraConfig, "AgoraTool", "rtmp_bitrate", m_agoraToolSettings.rtmp_bitrate);
-		config_set_int(globalAgoraConfig, "AgoraTool", "rtmp_width", m_agoraToolSettings.rtmp_width);
-		config_set_int(globalAgoraConfig, "AgoraTool", "rtmp_height", m_agoraToolSettings.rtmp_height);
+		config_set_int(globalAgoraConfig, "AgoraTool", "rtmp_fps", m_settings.rtmp_fps);
+		config_set_int(globalAgoraConfig, "AgoraTool", "rtmp_bitrate", m_settings.rtmp_bitrate);
+		config_set_int(globalAgoraConfig, "AgoraTool", "rtmp_width", m_settings.rtmp_width);
+		config_set_int(globalAgoraConfig, "AgoraTool", "rtmp_height", m_settings.rtmp_height);
 
-		config_set_int(globalAgoraConfig, "AgoraTool", "audioChannel", m_agoraToolSettings.audioChannel);
-		config_set_int(globalAgoraConfig, "AgoraTool", "scenario", m_agoraToolSettings.scenario);
-		config_set_int(globalAgoraConfig, "AgoraTool", "obs_bitrate", m_agoraToolSettings.obs_bitrate);
-		config_set_int(globalAgoraConfig, "AgoraTool", "videoEncoder", m_agoraToolSettings.videoEncoder);
+		config_set_int(globalAgoraConfig, "AgoraTool", "audioChannel", m_settings.audioChannel);
+		config_set_int(globalAgoraConfig, "AgoraTool", "scenario", m_settings.scenario);
+		config_set_int(globalAgoraConfig, "AgoraTool", "obs_bitrate", m_settings.obs_bitrate);
+		config_set_int(globalAgoraConfig, "AgoraTool", "videoEncoder", m_settings.videoEncoder);
 
-		config_set_int(globalAgoraConfig, "AgoraTool", "CPUThreshold", m_agoraToolSettings.cpuThreshold);
+		config_set_int(globalAgoraConfig, "AgoraTool", "CPUThreshold", m_settings.cpuThreshold);
 
-		config_set_bool(globalAgoraConfig, "AgoraTool", "muteAllRemoteAudioVideo", m_agoraToolSettings.muteAllRemoteAudioVideo);
-		config_set_bool(globalAgoraConfig, "AgoraTool", "DualStream", m_agoraToolSettings.bDualStream);
+		config_set_bool(globalAgoraConfig, "AgoraTool", "muteAllRemoteAudioVideo", m_settings.muteAllRemoteAudioVideo);
+		config_set_bool(globalAgoraConfig, "AgoraTool", "DualStream", m_settings.bDualStream);
 
-		config_set_bool(globalAgoraConfig, "AgoraTool", "bHighQuality", m_agoraToolSettings.bHighQuality);
-		config_set_bool(globalAgoraConfig, "AgoraTool", "savePersist", m_agoraToolSettings.savePersist);
-		config_set_string(globalAgoraConfig, "AgoraTool", "InformationUrl", m_agoraToolSettings.information_url.c_str());
+		config_set_bool(globalAgoraConfig, "AgoraTool", "bHighQuality", m_settings.bHighQuality);
+		config_set_bool(globalAgoraConfig, "AgoraTool", "savePersist", m_settings.savePersist);
+		config_set_string(globalAgoraConfig, "AgoraTool", "InformationUrl", m_settings.information_url.c_str());
 
-		config_set_bool(globalAgoraConfig, "AgoraTool", "SendOBSCamera", m_agoraToolSettings.bSendObsCamera);
-		config_set_int(globalAgoraConfig, "AgoraTool", "CameraEncWidth", m_agoraToolSettings.plugin_camera_width);
-		config_set_int(globalAgoraConfig, "AgoraTool", "CameraEncHeight", m_agoraToolSettings.plugin_camera_height);
-		config_set_int(globalAgoraConfig, "AgoraTool", "CameraEncFPS", m_agoraToolSettings.plugin_camera_fps);
-		config_set_int(globalAgoraConfig, "AgoraTool", "CameraEncBitrate", m_agoraToolSettings.plugin_camera_bitrate);
-		config_set_bool(globalAgoraConfig, "AgoraTool", "loopbackRecording", m_agoraToolSettings.loopback);
+		config_set_bool(globalAgoraConfig, "AgoraTool", "SendOBSCamera", m_settings.bSendObsCamera);
+		config_set_int(globalAgoraConfig, "AgoraTool", "CameraEncWidth", m_settings.plugin_camera_width);
+		config_set_int(globalAgoraConfig, "AgoraTool", "CameraEncHeight", m_settings.plugin_camera_height);
+		config_set_int(globalAgoraConfig, "AgoraTool", "CameraEncFPS", m_settings.plugin_camera_fps);
+		config_set_int(globalAgoraConfig, "AgoraTool", "CameraEncBitrate", m_settings.plugin_camera_bitrate);
+		config_set_bool(globalAgoraConfig, "AgoraTool", "loopbackRecording", m_settings.loopback);
 	}
 	else {
 		config_set_uint(globalAgoraConfig, "AgoraTool", "InformationMode", 0);
@@ -414,11 +419,11 @@ AgoraBasic::~AgoraBasic()
 		config_set_bool(globalAgoraConfig, "AgoraTool", "SendOBSCamera", false);
 	}
 	
-	if(m_agoraToolSettings.savePersistAppid && m_agoraToolSettings.info_mode == 0)//manually
-		config_set_string(globalAgoraConfig, "AgoraTool", "appid", m_agoraToolSettings.appid.c_str());
+	if(m_settings.savePersistAppid && m_settings.info_mode == 0)//manually
+		config_set_string(globalAgoraConfig, "AgoraTool", "appid", m_settings.appid.c_str());
 	else
 		config_set_string(globalAgoraConfig, "AgoraTool", "appid", "");
-	config_set_bool(globalAgoraConfig, "AgoraTool", "savePersistAppid", m_agoraToolSettings.savePersistAppid);
+	config_set_bool(globalAgoraConfig, "AgoraTool", "savePersistAppid", m_settings.savePersistAppid);
 
 	globalAgoraConfig.Save();
 }
@@ -464,6 +469,7 @@ bool AgoraBasic::EnumSources(void* data, obs_source_t* source)
 		obs_data_t* settings = obs_source_get_settings(source);
 		std::string video_device_id = obs_data_get_string(settings, "video_device_id");
 		window->vecCameraSources_.push_back(source);
+		obs_data_release(settings);
 	}
 	return true;
 }
@@ -471,16 +477,17 @@ bool AgoraBasic::EnumSources(void* data, obs_source_t* source)
 void AgoraBasic::RemoveVideoPluginFilters()
 {
 	for (int i = 0; i < vecCameraSources_.size(); ++i) {
-		obs_source_t* filter = nullptr;
+		OBSSource filter = nullptr;
 		while (filter = obs_source_get_filter_by_name(vecCameraSources_[i], "VideoPluginFilter")) {
 			obs_source_filter_remove(vecCameraSources_[i], filter);
+			obs_source_release(filter);
 		}
 	}
 }
 
-void AgoraBasic::on_agoraSteramButton_clicked()
+void AgoraBasic::on_streamButton_clicked()
 {
-	QString str = ui->agoraSteramButton->text();
+	QString str = ui->streamButton->text();
   
 	if (!joinFailed && (starting_text.compare(str) == 0 ||
 		stopping_text.compare(str) == 0)) {
@@ -489,9 +496,9 @@ void AgoraBasic::on_agoraSteramButton_clicked()
 
 	if (start_text.compare(str) == 0) {		
 		//http url
-		AgoraRtcEngine::GetInstance()->SetLogInterval(m_agoraToolSettings.logInterval);
-		if (m_agoraToolSettings.info_mode == 1) {
-			ui->agoraSteramButton->setText(starting_text);
+		AgoraRtcEngine::GetInstance()->SetLogInterval(m_settings.logInterval);
+		if (m_settings.info_mode == 1) {
+			ui->streamButton->setText(starting_text);
 			std::thread th([this](){
 
 				//connect timeout
@@ -517,13 +524,13 @@ void AgoraBasic::on_agoraSteramButton_clicked()
 				
 				//set POST data 
 				//char szUrl[1024] = { 0 };
-				//sprintf_s(szUrl, 1024, "%s?appid=%s&&uid=%u&channelName=%s", m_agoraToolSettings.information_url.c_str()
-				//	,m_agoraToolSettings.appid.c_str(), m_agoraToolSettings.uid, m_agoraToolSettings.channelName.c_str());
+				//sprintf_s(szUrl, 1024, "%s?appid=%s&&uid=%u&channelName=%s", m_settings.information_url.c_str()
+				//	,m_settings.appid.c_str(), m_settings.uid, m_settings.channelName.c_str());
 
-				curl_easy_setopt(curl, CURLOPT_URL, m_agoraToolSettings.information_url.c_str());
-				blog(LOG_INFO, "agora token url:%s", m_agoraToolSettings.information_url.c_str());
+				curl_easy_setopt(curl, CURLOPT_URL, m_settings.information_url.c_str());
+				blog(LOG_INFO, "agora token url:%s", m_settings.information_url.c_str());
 				//curl_easy_setopt(curl, CURLOPT_POSTFIELDS, szPostData);
-				//blog(LOG_INFO, "agora tokenurl:%s, post data=%s", m_agoraToolSettings.information_url.c_str(), szPostData);
+				//blog(LOG_INFO, "agora tokenurl:%s, post data=%s", m_settings.information_url.c_str(), szPostData);
 
 				int res = curl_easy_perform(curl);
 				blog(LOG_INFO, "agora request url res:%d", res);
@@ -542,14 +549,16 @@ void AgoraBasic::on_agoraSteramButton_clicked()
 		}
 		else 
 		{
-			joinChannel(m_agoraToolSettings.token);
+			joinChannel(m_settings.token);
 		}		
 	}
 	else {
 		obs_remove_raw_video_callback(RawVideoCallback, this);
 		if (!vecCameraSources_.empty()) {
-			obs_source* currentCameraSource = vecCameraSources_[0];
+			OBSSource currentCameraSource = vecCameraSources_[0];
+			obs_source_get_name(currentCameraSource);
 			vecCameraSources_.clear();
+			
 			obs_enum_sources(EnumSources, this);
 			for (int i = 0; i < vecCameraSources_.size(); ++i) {
 				if (currentCameraSource == vecCameraSources_[i]) {
@@ -564,16 +573,16 @@ void AgoraBasic::on_agoraSteramButton_clicked()
 		StopAgoraOutput();
 		AgoraRtcEngine::GetInstance()->stopPreview();
 
-		if (joinFailed)
-			AgoraRtcEngine::GetInstance()->SetJoinChannel(true);
 		AgoraRtcEngine::GetInstance()->leaveChannel();
-		if (m_agoraToolSettings.bSendObsCamera)
+		if (joinFailed)
+			AgoraRtcEngine::GetInstance()->SetJoinChannel(false);
+		if (m_settings.bSendObsCamera) 
 			AgoraRtcEngine::GetInstance()->leaveChannelCamera();
 		
-		if (!m_agoraToolSettings.agora_url.empty())
-			AgoraRtcEngine::GetInstance()->RemovePublishStreamUrl(m_agoraToolSettings.agora_url.c_str());
+		if (!m_settings.agora_url.empty())
+			AgoraRtcEngine::GetInstance()->RemovePublishStreamUrl(m_settings.agora_url.c_str());
 		if (starting_text.compare(str) != 0) {
-			ui->agoraSteramButton->setText(stopping_text);
+			ui->streamButton->setText(stopping_text);
 		}
 		
 		ClearRemoteVideos();
@@ -584,34 +593,34 @@ void AgoraBasic::on_agoraSteramButton_clicked()
 
 void AgoraBasic::joinChannel(std::string token)
 {
-	if (m_agoraToolSettings.appid.empty()) {
+	if (m_settings.appid.empty()) {
 		QMessageBox::about(nullptr, settings_title, empty_appid_info);
 		return;
 	}
-	if (m_agoraToolSettings.channelName.empty()) {
+	if (m_settings.channelName.empty()) {
 		QMessageBox::about(nullptr, settings_title, empty_channel);
 		return;
 	}
 
-	if (!m_agoraToolSettings.appCerf.empty() &&
-		m_agoraToolSettings.uid == 0) {
+	if (!m_settings.appCerf.empty() &&
+		m_settings.uid == 0) {
 		QMessageBox::information(NULL, QString(""), empty_uid);
 		return;
 	}
+
+	if (m_settings.bSendObsCamera && m_settings.camera_uid == 0) {
+		QMessageBox::information(NULL, QString(""), QString("empty camera uid"));
+		return;
+	}
+
 	if (!AgoraRtcEngine::GetInstance()->IsInitialize()) {
-		if (!AgoraRtcEngine::GetInstance()->InitEngine(m_agoraToolSettings.appid)) {
+		if (!AgoraRtcEngine::GetInstance()->InitEngine(m_settings.appid)) {
 			QMessageBox::information(NULL, QString(""), init_failed_info);
 			return;
 		}
 	}
 
 	if (current_source) {
-		vecCameraSources_.clear();
-		obs_enum_sources(EnumSources, this);
-		RemoveVideoPluginFilters();
-		
-		if(!vecCameraSources_.empty())
-		    obs_source_filter_add(vecCameraSources_[0], camera_filter);
 		obs_get_video_info(&ovi);
 		video_scale_info info;
 		info.width = ovi.output_width;
@@ -636,35 +645,35 @@ void AgoraBasic::joinChannel(std::string token)
 	}
 
 	//dump pcm
-	AgoraRtcEngine::GetInstance()->SavePcm(m_agoraToolSettings.SavePCM);
+	AgoraRtcEngine::GetInstance()->SavePcm(m_settings.SavePCM);
 
-	if (m_agoraToolSettings.videoEncoder == 0) {//Agora 
+	if (m_settings.videoEncoder == 0) {//Agora 
 		AgoraRtcEngine::GetInstance()->setVideoProfileEx(
 			output_width,
 			output_height,
 			(float)ovi.fps_num / (float)ovi.fps_den,
-			m_agoraToolSettings.agora_bitrate, true);
+			m_settings.agora_bitrate, true);
 	}
 	else {//obs 
-		m_agoraToolSettings.obs_bitrate = GetOBSBitrate();
+		m_settings.obs_bitrate = GetOBSBitrate();
 		AgoraRtcEngine::GetInstance()->setVideoProfileEx(
 			output_width,
 			output_height,
 			(float)ovi.fps_num / (float)ovi.fps_den,
-			m_agoraToolSettings.obs_bitrate);
+			m_settings.obs_bitrate);
 	}
 
-	AgoraRtcEngine::GetInstance()->setConnection(m_agoraToolSettings.channelName, m_agoraToolSettings.camera_uid);
+	AgoraRtcEngine::GetInstance()->setConnection(m_settings.channelName, m_settings.camera_uid);
 	
 	joinFailedTimer.stop();
 	joinFailedTimer.start(10000);
-	blog(LOG_INFO, "agora token:%s", m_agoraToolSettings.token.c_str());
+	blog(LOG_INFO, "agora token:%s", m_settings.token.c_str());
 	
-	AgoraRtcEngine::GetInstance()->joinChannel(m_agoraToolSettings.token.c_str()
-		, m_agoraToolSettings.channelName.c_str(), m_agoraToolSettings.uid, m_agoraToolSettings.bDualStream,
-		!m_agoraToolSettings.muteAllRemoteAudioVideo, !m_agoraToolSettings.muteAllRemoteAudioVideo, 
-		m_agoraToolSettings.loopback);
-	ui->agoraSteramButton->setText(starting_text);
+	AgoraRtcEngine::GetInstance()->joinChannel(m_settings.token.c_str()
+		, m_settings.channelName.c_str(), m_settings.uid, m_settings.bDualStream,
+		!m_settings.muteAllRemoteAudioVideo, !m_settings.muteAllRemoteAudioVideo, 
+		m_settings.loopback);
+	ui->streamButton->setText(starting_text);
 }
 
 void AgoraBasic::reuquestToken_slot(QString json, int err)
@@ -676,7 +685,7 @@ void AgoraBasic::reuquestToken_slot(QString json, int err)
 		if (doc.isNull() || !doc.isObject()) {
 			QMessageBox::information(NULL, QString(""), requertTokenError);
 			blog(LOG_INFO, "request token result is null or not json");
-			ui->agoraSteramButton->setText(start_text);
+			ui->streamButton->setText(start_text);
 			return;
 		}
 
@@ -684,43 +693,44 @@ void AgoraBasic::reuquestToken_slot(QString json, int err)
 		int code = jsonObject["code"].toInt();
 		if (code != 0) {
 			QMessageBox::information(NULL, QString(""), requertTokenError);
-			ui->agoraSteramButton->setText(start_text);
+			ui->streamButton->setText(start_text);
 			return;
 		}
 
 		QJsonObject jsData = jsonObject["data"].toObject();
 		if (doc.isNull() || !doc.isObject()) {
 			blog(LOG_INFO, "http request error");
-			ui->agoraSteramButton->setText(start_text);
+			ui->streamButton->setText(start_text);
 			return;
 		}
 #if _WIN32
-		m_agoraToolSettings.appid = jsData["appID"].toString().toUtf8();
-		m_agoraToolSettings.channelName = jsData["channelName"].toString().toUtf8();
-		m_agoraToolSettings.token = jsData["token"].toString().toUtf8();
+		m_settings.appid = jsData["appID"].toString().toUtf8();
+		m_settings.channelName = jsData["channelName"].toString().toUtf8();
+		m_settings.token = jsData["token"].toString().toUtf8();
 #else
-		m_agoraToolSettings.appid = jsData["appID"].toString().toStdString();
-		m_agoraToolSettings.channelName = jsData["channelName"].toString().toStdString();
-		m_agoraToolSettings.token = jsData["token"].toString().toStdString();
+		m_settings.appid = jsData["appID"].toString().toStdString();
+		m_settings.channelName = jsData["channelName"].toString().toStdString();
+		m_settings.token = jsData["token"].toString().toStdString();
 #endif
-		m_agoraToolSettings.camera_token = jsData["cameraToken"].toString().toStdString();
-		m_agoraToolSettings.uid = strtoul(jsData["uid"].toString().toStdString().data(), nullptr, 10);
-		m_agoraToolSettings.camera_uid = strtoul(jsData["cameraUid"].toString().toStdString().data(), nullptr, 10);
-		joinChannel(m_agoraToolSettings.token);
+		m_settings.camera_token = jsData["cameraToken"].toString().toStdString();
+		m_settings.uid = strtoul(jsData["uid"].toString().toStdString().data(), nullptr, 10);
+		m_settings.camera_uid = strtoul(jsData["cameraUid"].toString().toStdString().data(), nullptr, 10);
+		joinChannel(m_settings.token);
 		return;
 	}
 	else if(err == -1){
 		QMessageBox::information(NULL, QString(""), requertTokenError);
 	}
 
-	ui->agoraSteramButton->setText(start_text);
+	ui->streamButton->setText(start_text);
 }
 
 void AgoraBasic::showEvent(QShowEvent *event)
 {
-	if (!current_source)
+	if (!current_source) {
 		current_source = obs_frontend_get_current_scene();
-
+		obs_source_release(current_source);
+	}
 	QMainWindow::showEvent(event);
 }
 
@@ -731,9 +741,9 @@ void AgoraBasic::hideEvent(QHideEvent *event)
 
 void AgoraBasic::closeEvent(QCloseEvent *event)
 {
-	QString str = ui->agoraSteramButton->text();
+	QString str = ui->streamButton->text();
 	if (stop_text.compare(str) == 0) {
-		on_agoraSteramButton_clicked();
+		on_streamButton_clicked();
 	}
 	ui->preview->removeEventFilter(&resizeEventHandler);
 	QMainWindow::closeEvent(event);
@@ -743,7 +753,7 @@ void AgoraBasic::ToggleAgoraDialog() {
 	if (!isVisible()) {
 		
 		ResetBasicConfig();
-		m_agoraToolSettings.obs_bitrate = GetOBSBitrate();
+		m_settings.obs_bitrate = GetOBSBitrate();
 		setVisible(true);
 		blog(LOG_INFO, "show dialog");
 	}
@@ -761,13 +771,13 @@ void AgoraBasic::on_settingsButton_clicked()
 
 	if (ret == QDialog::Accepted) {
 		if (AgoraRtcEngine::GetInstance()->IsJoinChannel()) {
-			AgoraRtcEngine::GetInstance()->MuteAllRemoteAudio(m_agoraToolSettings.muteAllRemoteAudioVideo);
-			AgoraRtcEngine::GetInstance()->MuteAllRemoteVideo(m_agoraToolSettings.muteAllRemoteAudioVideo);
+			AgoraRtcEngine::GetInstance()->MuteAllRemoteAudio(m_settings.muteAllRemoteAudioVideo);
+			AgoraRtcEngine::GetInstance()->MuteAllRemoteVideo(m_settings.muteAllRemoteAudioVideo);
 
-			if (m_lstRemoteVideoUids.size() > 0 && m_agoraToolSettings.muteAllRemoteAudioVideo) {
+			if (m_lstRemoteVideoUids.size() > 0 && m_settings.muteAllRemoteAudioVideo) {
 				ClearRemoteVideos();
 				m_lstRemoteVideoUids.clear();
-				if (!m_agoraToolSettings.rtmp_url.empty())
+				if (!m_settings.rtmp_url.empty())
 					SetLiveTranscoding();
 			}
 		}
@@ -776,7 +786,7 @@ void AgoraBasic::on_settingsButton_clicked()
 
 void AgoraBasic::on_exitButton_clicked()
 {
-	QString str = ui->agoraSteramButton->text();
+	QString str = ui->streamButton->text();
 	if (stop_text.compare(str) != 0) {
 		return;
 	}
@@ -784,7 +794,7 @@ void AgoraBasic::on_exitButton_clicked()
 
 void AgoraBasic::SetLiveTranscoding()
 {
-	if (m_agoraToolSettings.rtmp_url.empty())
+	if (m_settings.rtmp_url.empty())
 		return;
 	int count = m_lstRemoteVideoUids.size();
 	count = count > REMOTE_VIDEO_COUNT ? REMOTE_VIDEO_COUNT : count;
@@ -792,10 +802,10 @@ void AgoraBasic::SetLiveTranscoding()
 	LiveTranscoding config;
 	config.audioSampleRate = AUDIO_SAMPLE_RATE_48000;
 	config.audioChannels = 2;
-	config.width = m_agoraToolSettings.rtmp_width;   //;
-	config.height = m_agoraToolSettings.rtmp_height; //;
-	config.videoFramerate = m_agoraToolSettings.rtmp_fps;
-	config.videoBitrate = m_agoraToolSettings.rtmp_height;
+	config.width = m_settings.rtmp_width;   //;
+	config.height = m_settings.rtmp_height; //;
+	config.videoFramerate = m_settings.rtmp_fps;
+	config.videoBitrate = m_settings.rtmp_height;
 	config.videoGop = config.videoFramerate;
 	config.userCount = count + 1;
 	config.watermark = nullptr;
@@ -834,15 +844,15 @@ void AgoraBasic::SetLiveTranscoding()
 	if (count == 0) {
 		config.transcodingUsers[0].x = 0;
 		config.transcodingUsers[0].y = 0;
-		config.transcodingUsers[0].width = m_agoraToolSettings.rtmp_width;
-		config.transcodingUsers[0].height = m_agoraToolSettings.rtmp_height;
+		config.transcodingUsers[0].width = m_settings.rtmp_width;
+		config.transcodingUsers[0].height = m_settings.rtmp_height;
 		config.transcodingUsers[0].zOrder = 1;
 		config.transcodingUsers[0].uid = local_uid;
 		
 	}
 	else {
-		int width = m_agoraToolSettings.rtmp_width / 2;
-		int height = m_agoraToolSettings.rtmp_height;
+		int width = m_settings.rtmp_width / 2;
+		int height = m_settings.rtmp_height;
 
 		config.transcodingUsers[0].x = 0;
 		config.transcodingUsers[0].y = 0;
@@ -1056,7 +1066,6 @@ void AgoraBasic::DrawPreview(void *data, uint32_t cx, uint32_t cy)
 
 	if (!window->current_source)
 		return;
-
 	uint32_t sourceCX = max(obs_source_get_width(window->current_source), 1u);
 	uint32_t sourceCY = max(obs_source_get_height(window->current_source), 1u);
 
@@ -1139,21 +1148,20 @@ void AgoraBasic::StopAgoraOutput()
 	started = false;
 }
 
-void AgoraBasic::joinSuccess(const char* channel, unsigned int uid, int elapsed)
+void AgoraBasic::onBothJoinSuccess(const char* channel, unsigned int uid, int elapsed)
 {
 	joinFailedTimer.stop();
-	ui->agoraSteramButton->setText(stop_text);
+	ui->streamButton->setText(stop_text);
 	ui->exitButton->setEnabled(false);
-	AgoraRtcEngine::GetInstance()->SetJoinChannel(true);
-	if (!m_agoraToolSettings.rtmp_url.empty()) {
-		if (m_agoraToolSettings.rtmp_width == 0
-			|| m_agoraToolSettings.rtmp_height == 0
-			|| m_agoraToolSettings.rtmp_bitrate == 0
-			|| m_agoraToolSettings.rtmp_fps == 0) {
+	if (!m_settings.rtmp_url.empty()) {
+		if (m_settings.rtmp_width == 0
+			|| m_settings.rtmp_height == 0
+			|| m_settings.rtmp_bitrate == 0
+			|| m_settings.rtmp_fps == 0) {
 			return;
 		}
 		SetLiveTranscoding();
-		AgoraRtcEngine::GetInstance()->AddPublishStreamUrl(m_agoraToolSettings.rtmp_url.c_str(), true);
+		AgoraRtcEngine::GetInstance()->AddPublishStreamUrl(m_settings.rtmp_url.c_str(), true);
 	}
 }
 
@@ -1161,25 +1169,34 @@ void AgoraBasic::onJoinChannelSuccess_slot(const char* channel, unsigned int uid
 {
 	uids[0] = uid;
 	local_uid = uid;
-	m_agoraToolSettings.uid = uid;
-	if (m_agoraToolSettings.bSendObsCamera) {
-		AgoraRtcEngine::GetInstance()->joinChannel(m_agoraToolSettings.camera_token.c_str(),
-			m_agoraToolSettings.channelName.c_str(), m_agoraToolSettings.camera_uid);
+	m_settings.uid = uid;
+	AgoraRtcEngine::GetInstance()->SetJoinChannel(true);
+	if (m_settings.bSendObsCamera) {
+		vecCameraSources_.clear();
+		obs_enum_sources(EnumSources, this);
+		RemoveVideoPluginFilters();
+
+		if (!vecCameraSources_.empty()) {
+			obs_source_filter_add(vecCameraSources_[0], camera_filter);
+		}
+
+		AgoraRtcEngine::GetInstance()->joinChannel(m_settings.camera_token.c_str(),
+			m_settings.channelName.c_str(), m_settings.camera_uid);
 		AgoraRtcEngine::GetInstance()->setCameraEncoderConfiguration(
-			m_agoraToolSettings.plugin_camera_width,
-			m_agoraToolSettings.plugin_camera_height,
-			m_agoraToolSettings.plugin_camera_fps,
-			m_agoraToolSettings.plugin_camera_bitrate);
+			m_settings.plugin_camera_width,
+			m_settings.plugin_camera_height,
+			m_settings.plugin_camera_fps,
+			m_settings.plugin_camera_bitrate);
 
 	}
 	else {
-		joinSuccess(channel, uid, elapsed);
+		onBothJoinSuccess(channel, uid, elapsed);
 	}
 }
 
 void AgoraBasic::onLeaveChannel_slot(const RtcStats &stats)
 {
-	ui->agoraSteramButton->setText(start_text);
+	ui->streamButton->setText(start_text);
 	ui->exitButton->setEnabled(true);
 	blog(LOG_INFO, "onLeaveChannel");
 }
@@ -1191,9 +1208,9 @@ void AgoraBasic::onError_slot(int err, const char *msg)
 
 void AgoraBasic::onUserJoined_slot(uid_t uid, int elapsed)
 {
-	if (uid == m_agoraToolSettings.camera_uid) {
-		if (m_agoraToolSettings.bSendObsCamera)
-			AgoraRtcEngine::GetInstance()->MuteRemoteVideo(m_agoraToolSettings.camera_uid, true);
+	if (uid == m_settings.camera_uid) {
+		if (m_settings.bSendObsCamera)
+			AgoraRtcEngine::GetInstance()->MuteRemoteVideo(m_settings.camera_uid, true);
 		return;
 	}
 	m_lstUids.push_back(uid);
@@ -1352,7 +1369,7 @@ void AgoraBasic::onConnectionStateChanged_slot(int state, int reason)
 		joinFailedTimer.stop();
 
 		QMessageBox::critical(NULL, "Error", info.c_str());
-		on_agoraSteramButton_clicked();
+		on_streamButton_clicked();
 		joinFailed = false;
 	}
 }
@@ -1368,7 +1385,7 @@ void AgoraBasic::onCameraConnectionStateChanged_slot(int state, int reason)
 		{
 		case 8: //CONNECTION_CHANGED_INVALID_TOKEN
 		case 10: //CONNECTION_CHANGED_REJECTED_BY_SERVER
-			if (m_agoraToolSettings.camera_token.empty()) {
+			if (m_settings.camera_token.empty()) {
 				info = emptyCameraToken.toStdString();
 			}
 			else {
@@ -1391,14 +1408,14 @@ void AgoraBasic::onCameraConnectionStateChanged_slot(int state, int reason)
 
 		QMessageBox::critical(NULL, "Error", info.c_str());
 
-		on_agoraSteramButton_clicked();
+		on_streamButton_clicked();
 		joinFailed = false;
 	}
 }
 
 void AgoraBasic::onRemoteVideoStateChanged_slot(unsigned int uid, int state, int reason, int elapsed)
 {
-	if (uid == m_agoraToolSettings.camera_uid)
+	if (uid == m_settings.camera_uid)
 		return;
 
 	if (state == REMOTE_VIDEO_STATE_DECODING
@@ -1502,28 +1519,13 @@ void AgoraBasic::joinFailed_slot()
 	joinFailed = true;
 	QMessageBox::critical(NULL, "Error", joinFailedInfo.toStdString().c_str());
 	joinFailedTimer.stop();
-	on_agoraSteramButton_clicked();
+	on_streamButton_clicked();
 	joinFailed = false;
 }
 
 void AgoraBasic::onClientRoleChanged_slot(int oldRole, int newRole)
 {
 	blog(LOG_INFO, "oldRole:%d, newRole:%d", oldRole, newRole);
-}
-
-void AgoraBasic::OBSEvent(enum obs_frontend_event event, void * data)
-{
-	if (event == OBS_FRONTEND_EVENT_EXIT) {
-		AgoraBasic* basic = (AgoraBasic*)data;
-
-		obs_display_remove_draw_callback(basic->display, DrawPreview, basic);
-		QString str = basic->ui->agoraSteramButton->text();
-		if (basic->stop_text.compare(str) == 0) {
-			basic->on_agoraSteramButton_clicked();
-		}
-		obs_frontend_save();
-
-	}
 }
 
 void AgoraBasic::onSystemCPU_slot(int cpuUsage)
@@ -1548,7 +1550,7 @@ void AgoraBasic::onSystemCPU_slot(int cpuUsage)
             snprintf(szInfo, 10, "%d ", cpu);
 #endif
 			info += szInfo;
-			if (cpu > m_agoraToolSettings.cpuThreshold) {
+			if (cpu > m_settings.cpuThreshold) {
 				count1++;
 			}
 		}
@@ -1563,7 +1565,7 @@ void AgoraBasic::onSystemCPU_slot(int cpuUsage)
             snprintf(szInfo, 10, "%d ", cpu);
 #endif
 			lastInfo += szInfo;
-			if (cpu > m_agoraToolSettings.cpuThreshold) {
+			if (cpu > m_settings.cpuThreshold) {
 				count2++;
 			}
 		}
@@ -1574,6 +1576,62 @@ void AgoraBasic::onSystemCPU_slot(int cpuUsage)
 			blog(LOG_INFO, "Agora System CPU Information(first 2 minutes):%s", info.c_str());
 			blog(LOG_INFO, "Agora System CPU Information(last minute):%s", lastInfo.c_str());
 			QMessageBox::information(this, QString(""), cpuInformation);
+		}
+	}
+}
+
+void AgoraBasic::OBSEvent(enum obs_frontend_event event, void* data)
+{
+	AgoraBasic* basic = (AgoraBasic*)data;
+	if (event == OBS_FRONTEND_EVENT_SCRIPTING_SHUTDOWN) {
+		QString str = basic->ui->streamButton->text();
+		if (basic->stop_text.compare(str) == 0) {
+			basic->on_streamButton_clicked();
+		}
+		else {
+			obs_display_remove_draw_callback(basic->display, DrawPreview, basic);
+		}
+		obs_frontend_save();
+	}
+	else if (event == OBS_FRONTEND_EVENT_EXIT) {
+		
+	}
+	else if (event == OBS_FRONTEND_EVENT_SCENE_LIST_CHANGED) {
+
+	}
+	else if (event == OBS_FRONTEND_EVENT_SCENE_CHANGED) {//already switched scene
+		emit basic->SceneChanged();
+	}
+	else if (event == OBS_FRONTEND_EVENT_PREVIEW_SCENE_CHANGED) {//switch scene
+	}
+}
+
+void AgoraBasic::onSceneChangedEvent()
+{
+	if (AgoraRtcEngine::GetInstance()->IsCameraJoinChannel()
+		&& m_settings.bSendObsCamera) {
+		current_source = obs_frontend_get_current_scene();
+		obs_source_release(current_source);
+		if (!current_source)
+			return;
+
+		OBSScene scene = obs_scene_from_source(current_source);
+		RemoveVideoPluginFilters();
+
+		vecCameraSources_.clear();
+		obs_enum_sources(EnumSources, this);
+
+		if (!vecCameraSources_.empty()) {
+			//add filter to first source on current scene
+			for (int i = 0; i < vecCameraSources_.size(); ++i) {
+				OBSSceneItem item = obs_scene_sceneitem_from_source(scene, vecCameraSources_[i]);
+				if (item) {
+					obs_source_filter_add(vecCameraSources_[i], camera_filter);
+					obs_sceneitem_release(item);
+					break;
+				}
+				obs_sceneitem_release(item);
+			}
 		}
 	}
 }

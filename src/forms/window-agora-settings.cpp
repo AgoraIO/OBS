@@ -424,10 +424,10 @@ void AgoraSettings::SaveGeneralSettings()
 		appid_changed = true;
 	settings.appid = strAppid.toStdString();
 
-	settings.appCerf = ui->lineEditAppCertificate->text().toStdString();
-	settings.token = ui->lineEditToken->text().toStdString();
-	settings.channelName = ui->lineEditChannel->text().toStdString();
-	settings.information_url = ui->lineEditUrl->text().toStdString();
+	settings.appCerf = ui->lineEditAppCertificate->text().trimmed().toStdString();
+	settings.token = ui->lineEditToken->text().trimmed().toStdString();
+	settings.channelName = ui->lineEditChannel->text().trimmed().toStdString();
+	settings.information_url = ui->lineEditUrl->text().trimmed().toStdString();
 	settings.info_mode = ui->cmbGetMode->currentIndex();
 	if (!strAppid.isEmpty())
 		settings.appid = strAppid.toStdString();
@@ -775,13 +775,14 @@ void AgoraSettings::on_buttonAppid_clicked()
 	if (AgoraRtcEngine::GetInstance()->IsInitialize())
 		return;
 	QString appid = ui->lineEditAppid->text();
+	appid.trimmed();
 	if (appid.isEmpty()){
 		QMessageBox::about(nullptr, title, empty_appid_info);
 		return;
 	}
 
 	if (!AgoraRtcEngine::GetInstance()->InitEngine(appid.toUtf8().toStdString())) {
-		QMessageBox::about(nullptr, title, init_failed_info + appid);
+		QMessageBox::about(nullptr, title, init_failed_info);
 		return;
 	}
 	

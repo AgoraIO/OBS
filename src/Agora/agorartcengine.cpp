@@ -131,6 +131,11 @@ public:
 	{
 		emit m_engine->onCameraJoinChannelSuccess(channel, uid, elapsed);
 	}
+
+	virtual void onError(int err, const char* msg)
+	{
+
+	}
 };
 
 AgoraRtcEngine *AgoraRtcEngine::m_agoraEngine = nullptr;
@@ -438,6 +443,7 @@ int AgoraRtcEngine::joinChannel(const std::string & key, const std::string & cha
 	options.channelProfile = CHANNEL_PROFILE_LIVE_BROADCASTING;
 	blog(LOG_INFO, "joinChannelEx: connection channel=%s, uid=%d", connection.channelId, connection.localUid);
 	int r = m_rtcEngine->joinChannelEx(key.c_str(), connection, options, m_eventHandlerCamera.get());//joinChannel(key.data(), channel.data(), "", uid, options);//
+	m_bCameraJoinChannel = true;
 	return r;
 }
 
@@ -460,6 +466,7 @@ int AgoraRtcEngine::leaveChannel()
 
 int AgoraRtcEngine::leaveChannelCamera()
 {
+	m_bCameraJoinChannel = false;
 	return m_rtcEngine->leaveChannelEx(connection);
 }
 
@@ -890,7 +897,7 @@ void AgoraRtcEngine::SetExternalVideoFrameCamera(struct obs_source_frame* frame)
 
 void AgoraRtcEngine::PushCameraVideoFrame(struct obs_source_frame* frame)
 {
-	if (!m_bJoinChannel)
+	if (!m_bCameraJoinChannel)
 		return;
 
 	if (m_externalVideoFrameCamera.stride != frame->width

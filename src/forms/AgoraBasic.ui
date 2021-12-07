@@ -56,28 +56,28 @@
         <property name="spacing">
          <number>2</number>
         </property>
-         <item>
-          <widget class="QWidget" name="preview" native="true">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>32</width>
-               <height>32</height>
-             </size>
-            </property>
-            <property name="focusPolicy">
-             <enum>Qt::ClickFocus</enum>
-            </property>
-            <property name="contextMenuPolicy">
-             <enum>Qt::CustomContextMenu</enum>
-            </property>
-          </widget>
-         </item> 
+        <item>
+         <widget class="QWidget" name="preview" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::ClickFocus</enum>
+          </property>
+          <property name="contextMenuPolicy">
+           <enum>Qt::CustomContextMenu</enum>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
      </layout>
@@ -132,7 +132,7 @@
         <number>10</number>
        </property>
        <item>
-        <widget class="QPushButton" name="agoraSteramButton">
+        <widget class="QPushButton" name="streamButton">
          <property name="enabled">
           <bool>true</bool>
          </property>
@@ -218,7 +218,7 @@
      <x>0</x>
      <y>0</y>
      <width>749</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
