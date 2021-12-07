@@ -338,17 +338,24 @@ AgoraBasic::~AgoraBasic()
 			config_set_string(globalAgoraConfig, "AgoraTool", "token", m_settings.token.c_str());
 			config_set_string(globalAgoraConfig, "AgoraTool", "channelName", m_settings.channelName.c_str());
 			config_set_uint(globalAgoraConfig, "AgoraTool", "uid", m_settings.uid);
-			config_set_string(globalAgoraConfig, "AgoraTool", "CameraToken", m_settings.camera_token.c_str());
-			config_set_uint(globalAgoraConfig, "AgoraTool", "CameraUID", m_settings.camera_uid);
 		}
 		else {
 			config_set_uint(globalAgoraConfig, "AgoraTool", "uid", 0);
 			config_set_string(globalAgoraConfig, "AgoraTool", "appid", "");
 			config_set_string(globalAgoraConfig, "AgoraTool", "token", "");
 			config_set_string(globalAgoraConfig, "AgoraTool", "channelName", "");
+			
+		}
+
+		if (m_settings.info_mode == 0 && m_settings.bSendObsCamera) {
+			config_set_string(globalAgoraConfig, "AgoraTool", "CameraToken", m_settings.camera_token.c_str());
+			config_set_uint(globalAgoraConfig, "AgoraTool", "CameraUID", m_settings.camera_uid);
+		}
+		else {
 			config_set_string(globalAgoraConfig, "AgoraTool", "CameraToken", "");
 			config_set_uint(globalAgoraConfig, "AgoraTool", "CameraUID", 0);
 		}
+
 		config_set_uint(globalAgoraConfig, "AgoraTool", "logInterval", m_settings.logInterval);
 		config_set_uint(globalAgoraConfig, "AgoraTool", "InformationMode", m_settings.info_mode);
 
