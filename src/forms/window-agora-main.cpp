@@ -15,7 +15,7 @@
 #if !defined(WIN32)
 #include <dispatch/dispatch.h>
 #endif
-#define AGORA_TOOL_VERSION "21.10.27.23.00"
+#define AGORA_TOOL_VERSION "21.12.07.19.00"
 using namespace std;
 
 bool DisplayResizeEvent::eventFilter(QObject *obj, QEvent *event)
