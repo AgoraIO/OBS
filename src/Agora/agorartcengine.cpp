@@ -76,11 +76,6 @@ public:
 		emit m_engine.onRtmpStreamingStateChanged(url,  state, errCode);
 	}
 
-	virtual void onClientRoleChanged(CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole) override
-	{
-		emit m_engine.onClientRoleChanged(oldRole, newRole);
-	}
-
 	virtual void onRtcStats(const RtcStats &stats) override
 	{
 		emit m_engine.onSystemCPU(stats.cpuTotalUsage);

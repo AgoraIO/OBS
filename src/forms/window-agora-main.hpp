@@ -127,8 +127,6 @@ private:
 	uint32_t uid = 0;
 	std::string channel;
 
-	void SetLiveTranscoding();
-
 	OBSSource current_source;
 	video_t *video_queue;
 
@@ -158,17 +156,19 @@ private:
 	ConfigFile globalConfig;
 	ConfigFile basicConfig;
 	ConfigFile globalAgoraConfig;
+	
+	static bool EnumSources(void* data, obs_source_t* source);
+private:
+	virtual void showEvent(QShowEvent* event)override;
+	virtual void hideEvent(QHideEvent* event)override;
+	virtual void closeEvent(QCloseEvent* event)override;
+	virtual void resizeEvent(QResizeEvent* event) override;
+	virtual void paintEvent(QPaintEvent* event) override;
 	void InitGlobalConfig();
 	void InitBasicConfig();
 	void ResetBasicConfig();
-	int GetOBSBitrate();
-	int GetProfilePath(char *path, size_t size, const char *file);
-	//HANDLE stopSignal = NULL;
-	virtual void showEvent(QShowEvent *event)override;
-	virtual void hideEvent(QHideEvent *event)override;
-	virtual void closeEvent(QCloseEvent *event)override;
-	static bool EnumSources(void* data, obs_source_t* source);
-private:
+	int  GetOBSBitrate();
+	int  GetProfilePath(char* path, size_t size, const char* file);
 	void CreateRemoteVideos();
 	void DestroyRemoteVideos();
 	void ClearRemoteVideos();
@@ -178,8 +178,9 @@ private:
 	bool StartAgoraOutput();
 	void StopAgoraOutput();
 	void JoinChannel(std::string token);
-	void RemoveVideoPluginFilters();
+	void SetLiveTranscoding();
 	void AddFilterCurrentScene();
+	void RemoveVideoPluginFilters();
 	
 	static void OBSEvent(obs_frontend_event event, void *);
 public slots:
@@ -200,7 +201,6 @@ public slots:
 	void onFirstRemoteVideoFrame_slot(unsigned uid, int width, int height, int elapsed);
 	void transcoding_slot();
 	void showRemote_slot();
-	void onClientRoleChanged_slot(int oldRole, int newRole);
 	void joinFailed_slot();
 	void reuquestToken_slot(QString json, int err);
 	void onSystemCPU_slot(int cpuUsage);
@@ -209,14 +209,9 @@ public:
 	void ToggleAgoraDialog();
 	AgoraBasic(QMainWindow *parent);
 	virtual ~AgoraBasic();
-	void GetAgoraSetting(AgoraToolSettings& setting) {setting = m_settings;};
-	void SetAgoraSetting(AgoraToolSettings setting) 
-	{
-		m_settings = setting; 
-	}
+	void GetAgoraSetting(AgoraToolSettings& setting) {setting = m_settings;}
+	void SetAgoraSetting(AgoraToolSettings setting) {m_settings = setting; }
 
-	void resizeEvent(QResizeEvent *event) override;
-	void paintEvent(QPaintEvent *event) override;
 	static void DrawPreview(void *data, uint32_t cx, uint32_t cy);
 	static void RawVideoCallback(void *param, struct video_data *frame);
 	
