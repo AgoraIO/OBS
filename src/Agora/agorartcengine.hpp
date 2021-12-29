@@ -3,18 +3,21 @@
 #include <QObject>
 #include <memory>
 #ifdef _WIN32
+#include <AgoraBase.h>
 #include <IAgoraRtcEngine.h>
 #include <IAgoraMediaEngine.h>
 #else
 #include <AgoraRtcKit/IAgoraRtcEngine.h>
 #include <AgoraRtcKit/IAgoraMediaEngine.h>
+#include <AgoraRtcKit/AgoraBase.h>
 typedef const char * LPCSTR;
-#define TRUE true
-#define FALSE false
+#define true true
+#define false false
 #endif
 #include <string>
 #include "obs.h"
 #include <mutex>
+#include <map>
 
 using namespace agora;
 using namespace agora::rtc;
@@ -35,72 +38,56 @@ public:
 	~AgoraRtcEngine();
 	static AgoraRtcEngine* GetInstance();
 	static void ReleaseInstance();
-	bool IsInitialize() { return m_bInitialize; }
-	bool IsJoinChannel() { return m_bJoinChannel; }
-	bool IsCameraJoinChannel() { return m_bCameraJoinChannel; }
-
 	bool InitEngine(std::string appid);
+	void Release();
+	bool SetClientRole(CLIENT_ROLE_TYPE role, LPCSTR lpPermissionKey = NULL);
+	int  SetChannelProfile(CHANNEL_PROFILE_TYPE profile);
+	int  EnableVideo(bool enabled);
+	int  SetupRemoteVideo(unsigned int uid, void* view);
 
-	BOOL setLogPath(std::string path);
-	BOOL setClientRole(CLIENT_ROLE_TYPE role, LPCSTR lpPermissionKey = NULL);
-	int  setChannelProfile(CHANNEL_PROFILE_TYPE profile);
+	int  JoinChannel(const std::string& key, const std::string& channel,
+		 unsigned uid, bool enableDual, bool muteAudio = true,
+		 bool muteVideo = true, bool loopbackRecording = false); 
 
-	int enableVideo(bool enabled);
-	int  setLocalVideoMirrorMode(VIDEO_MIRROR_MODE_TYPE mirrorMode);
-	void startPreview();
-	void stopPreview();
-	int joinChannel(const std::string &key, const std::string &channel,
-			unsigned uid, bool enableDual, bool muteAudio = true, 
-		    bool muteVideo = true, bool loopbackRecording = false);
+	int  JoinChannel(const std::string& key, const std::string& channel, unsigned uid);
+	int  LeaveChannel();
+	int  LeaveChannelCamera();
+	void SetConnection(const std::string& channel, unsigned uid);
 
-	int joinChannel(const std::string& key, const std::string& channel, unsigned uid);
-	int leaveChannel();
-	int leaveChannelCamera();
-	bool keepPreRotation(bool bRotate);
-	bool setVideoProfileEx(int nWidth, int nHeight, int nFrameRate, int nBitRate, bool Agora = false);
-	bool setCameraEncoderConfiguration(int w, int h, int fps, int bitrate);
-	void setConnection(const std::string& channel, unsigned uid);
-	void enableLastmileTest(bool bEnable);
+	bool SetVideoEncoder(int nWidth, int nHeight, int nFrameRate, int nBitRate, bool Agora = false);
+	bool SetCameraEncoderConfiguration(int w, int h, int fps, int bitrate);
+	void SetAudioProfile(int scenario, int channels, bool bHighQuality);
+
+	void EnableLastmileTest(bool bEnable);
+	
+	int  AddPublishStreamUrl(const char *url, bool transcodingEnabled);
+	int  RemovePublishStreamUrl(const char *url);
+	int  SetLiveTranscoding(const LiveTranscoding &transcoding);
+	
+	int  GetPalyoutDeviceVolume();
+	int  SetPalyoutDeviceVolume(int volume);
+	bool GetPlayoutDevices(std::vector<DEVICEINFO>& devices);
+	void SetPlayoutDevice(const char* id);
 	
 	void* AgoraAudioObserver_Create();
-	void  AgoraAudioObserver_Destroy();
-	
-	int AddPublishStreamUrl(const char *url, bool transcodingEnabled);
-	int RemovePublishStreamUrl(const char *url);
-	int SetLiveTranscoding(const LiveTranscoding &transcoding);
-
-	int EnableWebSdkInteroperability(bool enabled);
-	//playout device
-	int  getPalyoutDeviceVolume();
-	int  setPalyoutDeviceVolume(int volume);
-	bool getPlayoutDevices(std::vector<DEVICEINFO>& devices);
-	void SetPlayoutDevice(const char* id);
-	int  testSpeaker(bool start);
-	void EnableAgoraCaptureMicAudio(bool bCapture);
+	void AgoraAudioObserver_Destroy();
 	void PushCameraVideoFrame(struct obs_source_frame* frame);
 	void PushVideoFrame(struct video_data *frame);
-	void PushAudioFrame(struct encoder_frame *frame);
-	void SavePcm(bool bSave);
-	
-	int setupRemoteVideo(unsigned int uid, void* view);
-	agora::rtc::IRtcEngine* getRtcEngine() { return m_rtcEngine; }//.get();}
-
-	void joinedChannelSuccess(const char* channel, unsigned int uid, int elapsed);	
-	std::string CalculateToken(std::string appid, const std::string &key,
-				   const std::string &channel, unsigned int uid,
-				   unsigned int privilegeExpiredTs);
-
-	void SetAudioProfile(int scenario, int channels, bool bHighQuality);
+	void PushAudioFrame(struct encoder_frame* frame);
 
 	void MuteAllRemoteVideo(bool bMute);
 	void MuteAllRemoteAudio(bool bMute);
 	void MuteRemoteVideo(unsigned int uid, bool bMute);
 
-	void release();
-	void SetJoinChannel(bool bJoin) { m_bJoinChannel = bJoin; }
-	void SetLogInterval(int interval) {	logInterverl_ = interval;}
-	std::string pcmFolder = "";
-	int audioChannel = 2;
+	bool IsInitialize() { return m_initialize; }
+	bool IsJoined() { return m_joined; }
+	bool IsCameraJoined() { return m_cameraJoined; }
+	void SetJoinFlag(bool b) { m_joined = b; }
+	void SetLogInterval(int interval) {	m_logInterval = interval;}
+    void SetPcmInfo(bool b, std::string path) {
+		m_savePcm = b; m_pcmPath = path;
+	}
+	agora::rtc::IRtcEngine* getRtcEngine() { return m_rtcEngine; }
 signals:
 	void onJoinChannelSuccess(const char* channel, unsigned int uid, int elapsed);
 	void onCameraJoinChannelSuccess(const char* channel, unsigned int uid, int elapsed);
@@ -125,52 +112,58 @@ private:
 	void SetExternalVideoFrameCamera(struct obs_source_frame* frame);
 private:
 	
-	agora::rtc::IRtcEngineEx* m_rtcEngine = nullptr;
 	static AgoraRtcEngine* m_agoraEngine;
+	agora::rtc::IRtcEngineEx* m_rtcEngine = nullptr;
+	agora::media::IMediaEngine* m_pMediaEngine = nullptr;
 	std::unique_ptr<agora::rtc::IRtcEngineEventHandler> m_eventHandler;
 	std::unique_ptr<agora::rtc::IRtcEngineEventHandler> m_eventHandlerCamera;
-	bool m_bJoinChannel = false;
-	bool m_bCameraJoinChannel = false;
-	bool m_bInitialize = false;
-	bool bInit = false;
-
-	agora::media::IMediaEngine* m_pMediaEngine = nullptr;
+	bool m_joined = false;
+	bool m_cameraJoined = false;
+	bool m_initialize = false;
 	
+	// external video
 	int m_externalVideoFrameSize;
 	enum video_format m_format;
 	enum video_format m_camera_format;
 	agora::media::base::ExternalVideoFrame m_externalVideoFrame;
 	agora::media::base::ExternalVideoFrame m_externalVideoFrameCamera;
+
+	//external audio
 	int m_externalAudioFrameSize;
-	static agora::media::IAudioFrameObserver::AudioFrame m_externalAudioframe;
-	
 	bool m_bHighQuality = false;
 	AUDIO_SCENARIO_TYPE m_scenario = AUDIO_SCENARIO_DEFAULT;
 	AAudioDeviceManager* m_audioDeviceManager = nullptr;
+	static agora::media::IAudioFrameObserver::AudioFrame m_externalAudioframe;
 
-	agora::rtc::RtcConnection connection;
-	std::string channelId;
-	agora::rtc::uid_t localCameraUid = 0;
+	// camera
+	agora::rtc::RtcConnection m_connection;
+	std::string m_channelId;
+	agora::rtc::uid_t m_localCameraUID = 0;
 	
-	bool bFirstVideoFrame  = true;
-	bool bFirstAudioFrame  = true;
-	bool bFirstCameraVideo = true;
-	uint64_t videoFrameCount_  = 0;
-	uint64_t cameraVideoCount_ = 0;
-	uint64_t audioFrameCount_  = 0;
+	bool m_firstVideoFrame  = true;
+	bool m_firstAudioFrame  = true;
+	bool m_firstCameraVideo = true;
+	uint64_t m_videoFrameCount  = 0;
+	uint64_t m_cameraVideoCount = 0;
+	uint64_t m_audioFrameCount  = 0;
 
-	int64_t firstVideoFrameTs_  = 0;
-	int64_t firstCameraFrameTs_ = 0;
-	int64_t firstAudioFrameTs_  = 0;
+	int64_t m_firstVideoFrameTs  = 0;
+	int64_t m_firstCameraFrameTs = 0;
+	int64_t m_firstAudioFrameTs  = 0;
 
-	uint64_t logInterverl_  = 20;//default 20 seconds log once
-	int videoFrameRate_ = 15;
+	uint64_t m_logInterval  = 20;//default 20 seconds log once
 
-	int agora_out_cx = 640;
-	int agora_out_cy = 360;
-	FILE* fpPCM = nullptr;
-	bool savePcm = false;
-	int sampleRate = 48000;
+	int m_videoFrameRate = 15;
+	int m_agoraOutCX = 640;
+	int m_agoraOutCY = 360;
+	FILE* m_pcm = nullptr;
+	bool m_savePcm = false;
+	std::string m_pcmPath = "";
+	int m_sampleRate = 48000;
+	int m_audioChannel = 2;
 	
+	std::map<video_format, std::string> mapOBSVideoFormat;
+	std::map<agora::media::base::VIDEO_PIXEL_FORMAT, std::string> mapVideoFormat;
 };
+#define rtcEngine AgoraRtcEngine::GetInstance() 
 

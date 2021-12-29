@@ -127,7 +127,10 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	index = 0;
 	ui->cmbRecordChannelSetup->setItemText(0, tr("Mono"));
 	ui->cmbRecordChannelSetup->setItemText(1, tr("Stereo"));
-	if (AgoraRtcEngine::GetInstance()->audioChannel == 2)
+
+	AgoraToolSettings settings;
+	main->GetAgoraSetting(settings);
+	if (settings.audioChannel == 2)
 		ui->cmbRecordChannelSetup->setCurrentIndex(1);
 	else
 		ui->cmbRecordChannelSetup->setCurrentIndex(0);
@@ -310,7 +313,7 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 
 	connect(ui->chkPersistSaveAppid, &QCheckBox::toggled, this, &AgoraSettings::onChkSaveAppidSettings);
 	connect(ui->chkObsCamera, &QCheckBox::toggled, this, &AgoraSettings::on_chkObsCamera_check);
-	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onLastmileQuality, this, &AgoraSettings::OnLastmileTest);
+	connect(rtcEngine, &AgoraRtcEngine::onLastmileQuality, this, &AgoraSettings::OnLastmileTest);
 }
 
 AgoraSettings::~AgoraSettings()
@@ -372,13 +375,13 @@ void AgoraSettings::ClearChanged()
 void AgoraSettings::SaveAudioSettings()
 {
 	std::vector<DEVICEINFO> playoutDevices, recordDevices;
-	AgoraRtcEngine::GetInstance()->getPlayoutDevices(playoutDevices);
+	rtcEngine->GetPlayoutDevices(playoutDevices);
 	
 	QString name = ui->playoutDevices->currentText();
 	if (!name.isEmpty()) {
 		for (int i = 0; i < playoutDevices.size(); ++i) {
 			if (playoutDevices[i].name.compare(name.toUtf8().toStdString()) == 0) {
-				AgoraRtcEngine::GetInstance()->SetPlayoutDevice(playoutDevices[i].id.c_str());
+				rtcEngine->SetPlayoutDevice(playoutDevices[i].id.c_str());
 				break;
 			}
 		}
@@ -389,10 +392,10 @@ void AgoraSettings::SaveAudioSettings()
 	settings.bHighQuality = ui->chkAudioHighQuality->isChecked();
 	settings.scenario     = ui->cmbScenario->currentIndex();
 	settings.audioChannel = ui->cmbRecordChannelSetup->currentIndex() + 1;
-	settings.SavePCM = ui->chkSavePCM->isChecked();
+	settings.savePcm = ui->chkSavePCM->isChecked();
 	settings.loopback = ui->chkLoopback->isChecked();
 	main->SetAgoraSetting(settings);
-	AgoraRtcEngine::GetInstance()->SetAudioProfile(settings.scenario, settings.audioChannel, settings.bHighQuality);
+	rtcEngine->SetAudioProfile(settings.scenario, settings.audioChannel, settings.bHighQuality);
 }
 
 void AgoraSettings::SaveVideoSettings()
@@ -419,7 +422,7 @@ void AgoraSettings::SaveGeneralSettings()
 	main->GetAgoraSetting(settings);
 	QString strAppid = ui->lineEditAppid->text();
 	strAppid = strAppid.trimmed();
-	if (AgoraRtcEngine::GetInstance()->IsInitialize() && ui->cmbGetMode->currentIndex() == 0
+	if (rtcEngine->IsInitialize() && ui->cmbGetMode->currentIndex() == 0
 		&& !settings.appid.empty() && settings.appid.compare(strAppid.toStdString()) != 0)
 		appid_changed = true;
 	settings.appid = strAppid.toStdString();
@@ -607,7 +610,7 @@ void AgoraSettings::LoadAudioDevice()
 {
 	ui->playoutDevices->clear();
 	std::vector<DEVICEINFO> playoutDevices;
-	AgoraRtcEngine::GetInstance()->getPlayoutDevices(playoutDevices);
+	rtcEngine->GetPlayoutDevices(playoutDevices);
 	for (int i = 0; i < playoutDevices.size(); ++i) {
 		ui->playoutDevices->insertItem(i, QString::fromUtf8(playoutDevices[i].name.c_str()));
 	}
@@ -624,7 +627,7 @@ void AgoraSettings::LoadAudioSettings()
 	ui->chkAudioHighQuality->setChecked(settings.bHighQuality);
 	
 	ui->cmbScenario->setCurrentIndex(settings.scenario);
-	ui->chkSavePCM->setChecked(settings.SavePCM);
+	ui->chkSavePCM->setChecked(settings.savePcm);
 	ui->chkLoopback->setChecked(settings.loopback);
 	ui->cmbRecordChannelSetup->setCurrentIndex(settings.audioChannel - 1);
 	loading = false;
@@ -772,7 +775,7 @@ void AgoraSettings::SaveSettings()
 void AgoraSettings::on_buttonAppid_clicked()
 {
 
-	if (AgoraRtcEngine::GetInstance()->IsInitialize())
+	if (rtcEngine->IsInitialize())
 		return;
 	QString appid = ui->lineEditAppid->text();
 	appid.trimmed();
@@ -781,7 +784,7 @@ void AgoraSettings::on_buttonAppid_clicked()
 		return;
 	}
 
-	if (!AgoraRtcEngine::GetInstance()->InitEngine(appid.toUtf8().toStdString())) {
+	if (!rtcEngine->InitEngine(appid.toUtf8().toStdString())) {
 		QMessageBox::about(nullptr, title, init_failed_info);
 		return;
 	}
@@ -799,8 +802,10 @@ void AgoraSettings::on_buttonAppid_clicked()
 void AgoraSettings::on_buttonBox_clicked(QAbstractButton *button)
 {
 	QDialogButtonBox::ButtonRole val = ui->buttonBox->buttonRole(button);
-	if (AgoraRtcEngine::GetInstance()->IsJoinChannel()) {
-		AgoraRtcEngine::GetInstance()->SavePcm(ui->chkSavePCM->isChecked());
+	if (rtcEngine->IsJoined()) {
+		AgoraToolSettings settings;
+		main->GetAgoraSetting(settings);
+		rtcEngine->SetPcmInfo(ui->chkSavePCM->isChecked(), settings.pcmFolder);
 	}
 	if (val == QDialogButtonBox::ApplyRole ||
 		val == QDialogButtonBox::AcceptRole) {
@@ -834,8 +839,8 @@ void AgoraSettings::on_buttonBox_clicked(QAbstractButton *button)
 	if (val == QDialogButtonBox::AcceptRole ||
 		val == QDialogButtonBox::RejectRole) {
 		ClearChanged();
-		if (appid_changed && AgoraRtcEngine::GetInstance()->IsInitialize()) {
-			AgoraRtcEngine::GetInstance()->release();
+		if (appid_changed && rtcEngine->IsInitialize()) {
+			rtcEngine->Release();
 		}
 		accept();
 		//close();
@@ -916,7 +921,7 @@ void AgoraSettings::on_loadConfigButton_clicked()
 
 void AgoraSettings::on_recordVolumeSld_valueChanged(int value)
 {
-	//AgoraRtcEngine::GetInstance()->setRecordingDeviceVolume(value);
+	//rtcEngine->setRecordingDeviceVolume(value);
 }
 
 void AgoraSettings::on_cmbVideoEncoder_currentIndexChanged(int index)
@@ -990,12 +995,12 @@ void AgoraSettings::on_cmbGetMode_currentIndexChanged(int index)
 
 void AgoraSettings::on_playoutVolumeSld_valueChanged(int value)
 {
-	AgoraRtcEngine::GetInstance()->setPalyoutDeviceVolume(value);
+	rtcEngine->SetPalyoutDeviceVolume(value);
 }
 
 void AgoraSettings::showEvent(QShowEvent *event)
 {
-	bool bEnabled = !AgoraRtcEngine::GetInstance()->IsJoinChannel();
+	bool bEnabled = !rtcEngine->IsJoined();
 	
 	ui->loadConfigButton->setEnabled(bEnabled);
 	ui->lineEditAppCertificate->setEnabled(bEnabled);
@@ -1008,7 +1013,7 @@ void AgoraSettings::showEvent(QShowEvent *event)
 	ui->cmbVideoEncoder->setEnabled(bEnabled);
 	ui->btnNetworkTest->setEnabled(bEnabled);
 	ui->lineEditUrl->setEnabled(bEnabled);
-	ui->buttonAppid->setEnabled(!AgoraRtcEngine::GetInstance()->IsInitialize());
+	ui->buttonAppid->setEnabled(!rtcEngine->IsInitialize());
 	on_chkObsCamera_check(ui->chkObsCamera->isChecked());
 	ShowControlByMode(ui->cmbGetMode->currentIndex());
 	ui->cmbGetMode->setEnabled(bEnabled);
@@ -1043,9 +1048,9 @@ void AgoraSettings::onChkSaveAppidSettings(bool bCheck)
 
 void AgoraSettings::on_btnNetworkTest_clicked()
 {
-	if (!AgoraRtcEngine::GetInstance()->IsInitialize()) {
+	if (!rtcEngine->IsInitialize()) {
 		on_buttonAppid_clicked();
-		if (!AgoraRtcEngine::GetInstance()->IsInitialize())
+		if (!rtcEngine->IsInitialize())
 			return;
 	}
 	
@@ -1055,7 +1060,7 @@ void AgoraSettings::on_btnNetworkTest_clicked()
 		ui->labelTestNetWork->setText("");
 
 	ui->btnNetworkTest->setText(networkTest ? startTestNet : stopTestNet);
-	AgoraRtcEngine::GetInstance()->enableLastmileTest(!networkTest);
+	rtcEngine->EnableLastmileTest(!networkTest);
 	networkTest = !networkTest;
 }
 

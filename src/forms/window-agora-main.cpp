@@ -73,24 +73,24 @@ AgoraBasic::AgoraBasic(QMainWindow *parent)
 	ui->controlsDock->setWindowTitle(control_text);
 	ui->streamButton->setText(start_text);
 	
-	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onJoinChannelSuccess, this, &AgoraBasic::onJoinChannelSuccess_slot);
-	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onCameraJoinChannelSuccess, this, &AgoraBasic::onBothJoinSuccess);
-	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onLeaveChannel, this, &AgoraBasic::onLeaveChannel_slot);
-	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onError, this, &AgoraBasic::onError_slot);
-	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onUserJoined, this, &AgoraBasic::onUserJoined_slot);
-	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onUserOffline, this, &AgoraBasic::onUserOffline_slot);
-	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onFirstRemoteVideoDecoded, this, &AgoraBasic::onFirstRemoteVideoDecoded_slot);
-	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onConnectionStateChanged, this, &AgoraBasic::onConnectionStateChanged_slot);
-	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onCameraConnectionStateChanged, this, &AgoraBasic::onCameraConnectionStateChanged_slot);
+	connect(rtcEngine, &AgoraRtcEngine::onJoinChannelSuccess, this, &AgoraBasic::onJoinChannelSuccess_slot);
+	connect(rtcEngine, &AgoraRtcEngine::onCameraJoinChannelSuccess, this, &AgoraBasic::onBothJoinSuccess);
+	connect(rtcEngine, &AgoraRtcEngine::onLeaveChannel, this, &AgoraBasic::onLeaveChannel_slot);
+	connect(rtcEngine, &AgoraRtcEngine::onError, this, &AgoraBasic::onError_slot);
+	connect(rtcEngine, &AgoraRtcEngine::onUserJoined, this, &AgoraBasic::onUserJoined_slot);
+	connect(rtcEngine, &AgoraRtcEngine::onUserOffline, this, &AgoraBasic::onUserOffline_slot);
+	connect(rtcEngine, &AgoraRtcEngine::onFirstRemoteVideoDecoded, this, &AgoraBasic::onFirstRemoteVideoDecoded_slot);
+	connect(rtcEngine, &AgoraRtcEngine::onConnectionStateChanged, this, &AgoraBasic::onConnectionStateChanged_slot);
+	connect(rtcEngine, &AgoraRtcEngine::onCameraConnectionStateChanged, this, &AgoraBasic::onCameraConnectionStateChanged_slot);
 	
-	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onRemoteVideoStateChanged, this, &AgoraBasic::onRemoteVideoStateChanged_slot);
-	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onFirstRemoteVideoFrame, this, &AgoraBasic::onFirstRemoteVideoFrame_slot);
+	connect(rtcEngine, &AgoraRtcEngine::onRemoteVideoStateChanged, this, &AgoraBasic::onRemoteVideoStateChanged_slot);
+	connect(rtcEngine, &AgoraRtcEngine::onFirstRemoteVideoFrame, this, &AgoraBasic::onFirstRemoteVideoFrame_slot);
 	connect(&transcodingTimer, &QTimer::timeout, this, &AgoraBasic::transcoding_slot);
 	connect(&showRemoteTimer, &QTimer::timeout, this, &AgoraBasic::showRemote_slot);
-	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onClientRoleChanged, this, &AgoraBasic::onClientRoleChanged_slot);
+	connect(rtcEngine, &AgoraRtcEngine::onClientRoleChanged, this, &AgoraBasic::onClientRoleChanged_slot);
 	connect(&joinFailedTimer, &QTimer::timeout, this, &AgoraBasic::joinFailed_slot);
 	connect(this, &AgoraBasic::requestTokenSignal, this, &AgoraBasic::reuquestToken_slot);
-	connect(AgoraRtcEngine::GetInstance(), &AgoraRtcEngine::onSystemCPU, this, &AgoraBasic::onSystemCPU_slot);
+	connect(rtcEngine, &AgoraRtcEngine::onSystemCPU, this, &AgoraBasic::onSystemCPU_slot);
 
 	CreateRemoteVideos();
 	auto addDrawCallback = [this]() {
@@ -128,7 +128,7 @@ AgoraBasic::AgoraBasic(QMainWindow *parent)
 
 	char path[512];
 	int len = os_get_config_path(path, sizeof(path), "obs-studio\\logs\\");
-	AgoraRtcEngine::GetInstance()->pcmFolder = path;
+	m_settings.savePcm = path;
 	InitGlobalConfig();
 	InitBasicConfig();
 
@@ -330,7 +330,7 @@ AgoraBasic::~AgoraBasic()
 		curl_easy_cleanup(curl);
 	}
 
-	AgoraRtcEngine::GetInstance()->ReleaseInstance();
+	rtcEngine->ReleaseInstance();
 
 	if (m_settings.savePersist) {
 		if (m_settings.info_mode == 0) {//manually
@@ -503,7 +503,7 @@ void AgoraBasic::on_streamButton_clicked()
 
 	if (start_text.compare(str) == 0) {		
 		//http url
-		AgoraRtcEngine::GetInstance()->SetLogInterval(m_settings.logInterval);
+		rtcEngine->SetLogInterval(m_settings.logInterval);
 		if (m_settings.info_mode == 1) {
 			ui->streamButton->setText(starting_text);
 			std::thread th([this](){
@@ -515,7 +515,7 @@ void AgoraBasic::on_streamButton_clicked()
 
 				//cancel verify
 				curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0);
-				curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+				curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
 				curl_slist* header_list = NULL;
 				header_list = curl_slist_append(header_list, "Content-Type:application/json;charset=UTF-8");
 				/*header_list = curl_slist_append(header_list, auth_info.c_str());*/
@@ -533,11 +533,12 @@ void AgoraBasic::on_streamButton_clicked()
 				//char szUrl[1024] = { 0 };
 				//sprintf_s(szUrl, 1024, "%s?appid=%s&&uid=%u&channelName=%s", m_settings.information_url.c_str()
 				//	,m_settings.appid.c_str(), m_settings.uid, m_settings.channelName.c_str());
+				//curl_easy_setopt(curl, CURLOPT_POSTFIELDS, szPostData);
+				//blog(LOG_INFO, "agora tokenurl:%s, post data=%s", m_settings.information_url.c_str(), szPostData);
 
 				curl_easy_setopt(curl, CURLOPT_URL, m_settings.information_url.c_str());
 				blog(LOG_INFO, "agora token url:%s", m_settings.information_url.c_str());
-				//curl_easy_setopt(curl, CURLOPT_POSTFIELDS, szPostData);
-				//blog(LOG_INFO, "agora tokenurl:%s, post data=%s", m_settings.information_url.c_str(), szPostData);
+				
 
 				int res = curl_easy_perform(curl);
 				blog(LOG_INFO, "agora request url res:%d", res);
@@ -556,7 +557,7 @@ void AgoraBasic::on_streamButton_clicked()
 		}
 		else 
 		{
-			joinChannel(m_settings.token);
+			JoinChannel(m_settings.token);
 		}		
 	}
 	else {
@@ -578,16 +579,15 @@ void AgoraBasic::on_streamButton_clicked()
 			vecCameraSources_.clear();
 		} 
 		StopAgoraOutput();
-		AgoraRtcEngine::GetInstance()->stopPreview();
-
-		AgoraRtcEngine::GetInstance()->leaveChannel();
+		
+		rtcEngine->LeaveChannel();
 		if (joinFailed)
-			AgoraRtcEngine::GetInstance()->SetJoinChannel(false);
+			rtcEngine->SetJoinFlag(false);
 		if (m_settings.bSendObsCamera) 
-			AgoraRtcEngine::GetInstance()->leaveChannelCamera();
+			rtcEngine->LeaveChannelCamera();
 		
 		if (!m_settings.agora_url.empty())
-			AgoraRtcEngine::GetInstance()->RemovePublishStreamUrl(m_settings.agora_url.c_str());
+			rtcEngine->RemovePublishStreamUrl(m_settings.agora_url.c_str());
 		if (starting_text.compare(str) != 0) {
 			ui->streamButton->setText(stopping_text);
 		}
@@ -598,7 +598,7 @@ void AgoraBasic::on_streamButton_clicked()
 	}
 }
 
-void AgoraBasic::joinChannel(std::string token)
+void AgoraBasic::JoinChannel(std::string token)
 {
 	if (m_settings.appid.empty()) {
 		QMessageBox::about(nullptr, settings_title, empty_appid_info);
@@ -620,8 +620,8 @@ void AgoraBasic::joinChannel(std::string token)
 		return;
 	}
 
-	if (!AgoraRtcEngine::GetInstance()->IsInitialize()) {
-		if (!AgoraRtcEngine::GetInstance()->InitEngine(m_settings.appid)) {
+	if (!rtcEngine->IsInitialize()) {
+		if (!rtcEngine->InitEngine(m_settings.appid)) {
 			QMessageBox::information(NULL, QString(""), init_failed_info);
 			return;
 		}
@@ -652,10 +652,10 @@ void AgoraBasic::joinChannel(std::string token)
 	}
 
 	//dump pcm
-	AgoraRtcEngine::GetInstance()->SavePcm(m_settings.SavePCM);
+	rtcEngine->SetPcmInfo( m_settings.savePcm, m_settings.pcmFolder);
 
 	if (m_settings.videoEncoder == 0) {//Agora 
-		AgoraRtcEngine::GetInstance()->setVideoProfileEx(
+		rtcEngine->SetVideoEncoder(
 			output_width,
 			output_height,
 			(float)ovi.fps_num / (float)ovi.fps_den,
@@ -663,20 +663,20 @@ void AgoraBasic::joinChannel(std::string token)
 	}
 	else {//obs 
 		m_settings.obs_bitrate = GetOBSBitrate();
-		AgoraRtcEngine::GetInstance()->setVideoProfileEx(
+		rtcEngine->SetVideoEncoder(
 			output_width,
 			output_height,
 			(float)ovi.fps_num / (float)ovi.fps_den,
 			m_settings.obs_bitrate);
 	}
 
-	AgoraRtcEngine::GetInstance()->setConnection(m_settings.channelName, m_settings.camera_uid);
+	rtcEngine->SetConnection(m_settings.channelName, m_settings.camera_uid);
 	
 	joinFailedTimer.stop();
 	joinFailedTimer.start(10000);
 	blog(LOG_INFO, "agora token:%s", m_settings.token.c_str());
 	
-	AgoraRtcEngine::GetInstance()->joinChannel(m_settings.token.c_str()
+	rtcEngine->JoinChannel(m_settings.token.c_str()
 		, m_settings.channelName.c_str(), m_settings.uid, m_settings.bDualStream,
 		!m_settings.muteAllRemoteAudioVideo, !m_settings.muteAllRemoteAudioVideo, 
 		m_settings.loopback);
@@ -722,7 +722,7 @@ void AgoraBasic::reuquestToken_slot(QString json, int err)
 		m_settings.camera_token = jsData["cameraToken"].toString().toStdString();
 		m_settings.uid = strtoul(jsData["uid"].toString().toStdString().data(), nullptr, 10);
 		m_settings.camera_uid = strtoul(jsData["cameraUid"].toString().toStdString().data(), nullptr, 10);
-		joinChannel(m_settings.token);
+		JoinChannel(m_settings.token);
 		return;
 	}
 	else if(err == -1){
@@ -777,9 +777,9 @@ void AgoraBasic::on_settingsButton_clicked()
 	int ret= settings.exec();
 
 	if (ret == QDialog::Accepted) {
-		if (AgoraRtcEngine::GetInstance()->IsJoinChannel()) {
-			AgoraRtcEngine::GetInstance()->MuteAllRemoteAudio(m_settings.muteAllRemoteAudioVideo);
-			AgoraRtcEngine::GetInstance()->MuteAllRemoteVideo(m_settings.muteAllRemoteAudioVideo);
+		if (rtcEngine->IsJoined()) {
+			rtcEngine->MuteAllRemoteAudio(m_settings.muteAllRemoteAudioVideo);
+			rtcEngine->MuteAllRemoteVideo(m_settings.muteAllRemoteAudioVideo);
 
 			if (m_lstRemoteVideoUids.size() > 0 && m_settings.muteAllRemoteAudioVideo) {
 				ClearRemoteVideos();
@@ -907,7 +907,7 @@ void AgoraBasic::SetLiveTranscoding()
 		blog(LOG_INFO, "uid:%u, index:%d, x:%d, y:%d, w:%d, h:%d", config.transcodingUsers[i].uid, i, config.transcodingUsers[i].x, config.transcodingUsers[i].y, config.transcodingUsers[i].width, config.transcodingUsers[i].height);
 	}
 	blog(LOG_INFO, "SetLiveTranscoding end");
-	AgoraRtcEngine::GetInstance()->SetLiveTranscoding(config);
+	rtcEngine->SetLiveTranscoding(config);
 
 	delete[] config.transcodingUsers;
 	config.transcodingUsers = NULL;
@@ -978,7 +978,7 @@ void AgoraBasic::ClearRemoteVideos()
 void AgoraBasic::ResetRemoteVideoWidget(int index)
 {
 	remoteVideoHLayout[remoteVideoInfos[index].iRemoteVideoHLayout]->removeWidget(remoteVideoInfos[index].remoteVideo);
-	AgoraRtcEngine::GetInstance()->setupRemoteVideo(remoteVideoInfos[index].uid, nullptr);
+	rtcEngine->SetupRemoteVideo(remoteVideoInfos[index].uid, nullptr);
 	delete remoteVideoInfos[index].remoteVideo;
 	remoteVideoInfos[index].remoteVideo = new QWidget;
 	remoteVideoInfos[index].remoteVideo->setSizePolicy(
@@ -1100,7 +1100,7 @@ void AgoraBasic::RawVideoCallback (void *param, struct video_data *frame)
 	AgoraBasic* basic = (AgoraBasic*)param;
 	
 	if (obs_get_video_info(&ovi) && basic->started) {
-		AgoraRtcEngine::GetInstance()->PushVideoFrame(frame);
+		rtcEngine->PushVideoFrame(frame);
 	}
 }
 
@@ -1168,7 +1168,7 @@ void AgoraBasic::onBothJoinSuccess(const char* channel, unsigned int uid, int el
 			return;
 		}
 		SetLiveTranscoding();
-		AgoraRtcEngine::GetInstance()->AddPublishStreamUrl(m_settings.rtmp_url.c_str(), true);
+		rtcEngine->AddPublishStreamUrl(m_settings.rtmp_url.c_str(), true);
 	}
 }
 
@@ -1177,19 +1177,15 @@ void AgoraBasic::onJoinChannelSuccess_slot(const char* channel, unsigned int uid
 	uids[0] = uid;
 	local_uid = uid;
 	m_settings.uid = uid;
-	AgoraRtcEngine::GetInstance()->SetJoinChannel(true);
+	rtcEngine->SetJoinFlag(true);
 	if (m_settings.bSendObsCamera) {
 		vecCameraSources_.clear();
 		obs_enum_sources(EnumSources, this);
 		RemoveVideoPluginFilters();
-
-		if (!vecCameraSources_.empty()) {
-			obs_source_filter_add(vecCameraSources_[0], camera_filter);
-		}
-
-		AgoraRtcEngine::GetInstance()->joinChannel(m_settings.camera_token.c_str(),
+		AddFilterCurrentScene();
+		rtcEngine->JoinChannel(m_settings.camera_token.c_str(),
 			m_settings.channelName.c_str(), m_settings.camera_uid);
-		AgoraRtcEngine::GetInstance()->setCameraEncoderConfiguration(
+		rtcEngine->SetCameraEncoderConfiguration(
 			m_settings.plugin_camera_width,
 			m_settings.plugin_camera_height,
 			m_settings.plugin_camera_fps,
@@ -1217,7 +1213,7 @@ void AgoraBasic::onUserJoined_slot(uid_t uid, int elapsed)
 {
 	if (uid == m_settings.camera_uid) {
 		if (m_settings.bSendObsCamera)
-			AgoraRtcEngine::GetInstance()->MuteRemoteVideo(m_settings.camera_uid, true);
+			rtcEngine->MuteRemoteVideo(m_settings.camera_uid, true);
 		return;
 	}
 	m_lstUids.push_back(uid);
@@ -1273,7 +1269,7 @@ void AgoraBasic::onUserOffline_slot(uid_t uid, int reason)
 		: m_lstRemoteVideoUids.size();
 	if (count == 0) {
 
-		AgoraRtcEngine::GetInstance()->setupRemoteVideo(remoteVideoInfos[count].uid, nullptr);
+		rtcEngine->SetupRemoteVideo(remoteVideoInfos[count].uid, nullptr);
 		ResetRemoteVideoWidget(count);
 		return;
 	}
@@ -1318,7 +1314,7 @@ void AgoraBasic::onUserOffline_slot(uid_t uid, int reason)
 
 			remoteVideoInfos[index].iRemoteVideoHLayout = i;
 			remoteVideoInfos[index].uid = *iter;
-			AgoraRtcEngine::GetInstance()->setupRemoteVideo(*iter,
+			rtcEngine->SetupRemoteVideo(*iter,
 				(view_t)remoteVideoInfos[index].remoteVideo->winId());
 
 			remoteVideoHLayout[i]->addWidget(
@@ -1330,7 +1326,7 @@ void AgoraBasic::onUserOffline_slot(uid_t uid, int reason)
 
 void AgoraBasic::onFirstRemoteVideoDecoded_slot(uid_t uid, int width, int height, int elapsed)
 {
-  blog(LOG_INFO, "onFirstRemoteVideoDecoded_slot = %d",uid);
+    blog(LOG_INFO, "onFirstRemoteVideoDecoded_slot = %d",uid);
 	m_lstRemoteVideoUids.push_back(uid);
 	int count = m_lstRemoteVideoUids.size();
 	count = count > REMOTE_VIDEO_COUNT ? REMOTE_VIDEO_COUNT : count;
@@ -1342,10 +1338,9 @@ void AgoraBasic::onFirstRemoteVideoDecoded_slot(uid_t uid, int width, int height
 
 	if (count > REMOTE_VIDEO_COUNT)
 		return;
-  qDebug()<<"onFirstRemoteVideoDecoded_slot" << uid;
+
 	showRemoteTimer.stop();
 	showRemoteTimer.start(1000);
-	
 }
 
 void AgoraBasic::onConnectionStateChanged_slot(int state, int reason)
@@ -1495,7 +1490,7 @@ void AgoraBasic::showRemote_slot()
 				break;
 			remoteVideoInfos[index].iRemoteVideoHLayout = i;
 			remoteVideoInfos[index].uid = *iter;
-			AgoraRtcEngine::GetInstance()->setupRemoteVideo(*iter, (view_t)remoteVideoInfos[index].remoteVideo->winId());
+			rtcEngine->SetupRemoteVideo(*iter, (view_t)remoteVideoInfos[index].remoteVideo->winId());
 			remoteVideoHLayout[i]->addWidget(remoteVideoInfos[index].remoteVideo);
 			remoteVideoInfos[index].remoteVideo->show();
 			++iter;
@@ -1613,32 +1608,41 @@ void AgoraBasic::OBSEvent(enum obs_frontend_event event, void* data)
 	}
 }
 
+void AgoraBasic::AddFilterCurrentScene()
+{
+	if (!vecCameraSources_.empty()) {
+		OBSScene scene = obs_scene_from_source(current_source);
+		bool find = false;
+		//add filter to first source on current scene
+		for (int i = 0; i < vecCameraSources_.size(); ++i) {
+			OBSSceneItem item = obs_scene_sceneitem_from_source(scene, vecCameraSources_[i]);
+			if (item) {
+				blog(LOG_INFO, "add video plugin filter");
+				obs_source_filter_add(vecCameraSources_[i], camera_filter);
+				obs_sceneitem_release(item);
+				find = true;
+				break;
+			}
+			obs_sceneitem_release(item);
+		}
+		if (!find) blog(LOG_INFO, "no camera source in current scene");
+	}
+}
+
 void AgoraBasic::onSceneChangedEvent()
 {
-	if (AgoraRtcEngine::GetInstance()->IsCameraJoinChannel()
+	current_source = obs_frontend_get_current_scene();
+	obs_source_release(current_source);
+	if (rtcEngine->IsCameraJoined()
 		&& m_settings.bSendObsCamera) {
-		current_source = obs_frontend_get_current_scene();
-		obs_source_release(current_source);
 		if (!current_source)
 			return;
 
-		OBSScene scene = obs_scene_from_source(current_source);
 		RemoveVideoPluginFilters();
 
 		vecCameraSources_.clear();
 		obs_enum_sources(EnumSources, this);
-
-		if (!vecCameraSources_.empty()) {
-			//add filter to first source on current scene
-			for (int i = 0; i < vecCameraSources_.size(); ++i) {
-				OBSSceneItem item = obs_scene_sceneitem_from_source(scene, vecCameraSources_[i]);
-				if (item) {
-					obs_source_filter_add(vecCameraSources_[i], camera_filter);
-					obs_sceneitem_release(item);
-					break;
-				}
-				obs_sceneitem_release(item);
-			}
-		}
+		
+		AddFilterCurrentScene();
 	}
 }

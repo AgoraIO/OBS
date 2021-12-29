@@ -123,7 +123,7 @@ video_plugin_filter_video(void *data, struct obs_source_frame *frame)
 	if (!filter->video_delay_reached)
 		filter->video_delay_reached = true;*/
 
-	AgoraRtcEngine::GetInstance()->PushCameraVideoFrame(frame);
+	rtcEngine->PushCameraVideoFrame(frame);
 
 	return frame;
 }

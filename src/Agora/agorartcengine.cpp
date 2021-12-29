@@ -1,42 +1,13 @@
 #include "agorartcengine.hpp"
-#if _WIN32
-#include "AgoraBase.h"
-#else
-#include <AgoraRtcKit/AgoraBase.h>
-#include <thread>
-#define DEFINE_MEMCPY_S(func)                                     \
-      int func(void *det, size_t detSize, const void * src, size_t srcSize)                                            \
-      {                                                        \
-        uint8_t errorcode = 0;                                 \
-        if (srcSize > detSize || src == NULL || det == NULL)   \
-        {                                                       \
-          if (srcSize > detSize)                                \
-            errorcode = 1;                                       \
-          else if (src == NULL)                                  \
-            errorcode = 2;                                      \
-          else if (det == NULL)                                  \
-            errorcode = 3;                                       \
-          fflush(stdout);                                         \
-          return -1;                                              \
-        }                                                           \
-        else                                                          \
-          memcpy(det, src, srcSize);                                  \
-                                                                        \
-        return 1;                                                      \
-      }
 
-
-DEFINE_MEMCPY_S(memcpy_s)
-#endif
 #include <chrono>
 #include "obs.h"
 #include <libyuv.h>
 
-//#include "RtcTokenBuilder.h"
 using namespace agora::rtc;
 using namespace agora;
 
-int64_t getTickCount64()
+int64_t get_time_stamp()
 {
 	std::chrono::system_clock::duration d = std::chrono::system_clock::now().time_since_epoch();
 	std::chrono::milliseconds mic = std::chrono::duration_cast<std::chrono::milliseconds>(d);
@@ -216,25 +187,87 @@ void AgoraRtcEngine::ReleaseInstance()
 AgoraRtcEngine::AgoraRtcEngine()
 	: m_eventHandler(new AgoraRtcEngineEvent(*this))
 	, m_eventHandlerCamera(new CameraRtcEngineEvent(this))
-	, sampleRate(48000)
-	, audioChannel(2)
+	, m_sampleRate(48000)
+	, m_audioChannel(2)
 	, m_externalAudioFrameSize(480 * 2 * 2)
 	, m_externalVideoFrameSize(640 * 480 * 3 / 2)
 	, m_audioDeviceManager(nullptr)
-	, m_bInitialize(false)
-	, m_bJoinChannel(false)
+	, m_initialize(false)
+	, m_joined(false)
 {
 	m_externalAudioframe.buffer = NULL;
 	m_externalVideoFrame.buffer = NULL;
 	qRegisterMetaType<RtcStats>();
+	mapOBSVideoFormat.insert(std::make_pair(VIDEO_FORMAT_I420, "VIDEO_FORMAT_I420"));
+	mapOBSVideoFormat.insert(std::make_pair(VIDEO_FORMAT_NV12, "VIDEO_FORMAT_NV12"));
+	mapOBSVideoFormat.insert(std::make_pair(VIDEO_FORMAT_YVYU, "VIDEO_FORMAT_YVYU"));
+	mapOBSVideoFormat.insert(std::make_pair(VIDEO_FORMAT_YUY2, "VIDEO_FORMAT_YUY2"));
+	mapOBSVideoFormat.insert(std::make_pair(VIDEO_FORMAT_UYVY, "VIDEO_FORMAT_UYVY"));
+	mapOBSVideoFormat.insert(std::make_pair(VIDEO_FORMAT_RGBA, "VIDEO_FORMAT_RGBA"));
+	mapOBSVideoFormat.insert(std::make_pair(VIDEO_FORMAT_BGRA, "VIDEO_FORMAT_BGRA"));
+	mapOBSVideoFormat.insert(std::make_pair(VIDEO_FORMAT_BGRX, "VIDEO_FORMAT_BGRX"));
+	mapOBSVideoFormat.insert(std::make_pair(VIDEO_FORMAT_Y800, "VIDEO_FORMAT_Y800"));
+	mapOBSVideoFormat.insert(std::make_pair(VIDEO_FORMAT_I444, "VIDEO_FORMAT_I444"));
+	mapOBSVideoFormat.insert(std::make_pair(VIDEO_FORMAT_BGR3, "VIDEO_FORMAT_BGR3"));
+	mapOBSVideoFormat.insert(std::make_pair(VIDEO_FORMAT_I422, "VIDEO_FORMAT_I422"));
+	mapOBSVideoFormat.insert(std::make_pair(VIDEO_FORMAT_I40A, "VIDEO_FORMAT_I40A"));
+	mapOBSVideoFormat.insert(std::make_pair(VIDEO_FORMAT_I42A, "VIDEO_FORMAT_I42A"));
+	mapOBSVideoFormat.insert(std::make_pair(VIDEO_FORMAT_YUVA, "VIDEO_FORMAT_YUVA"));
+	mapOBSVideoFormat.insert(std::make_pair(VIDEO_FORMAT_AYUV, "VIDEO_FORMAT_AYUV"));
+
+	mapVideoFormat.insert(std::make_pair(agora::media::base::VIDEO_PIXEL_I420, "VIDEO_PIXEL_I420"));
+	mapVideoFormat.insert(std::make_pair(agora::media::base::VIDEO_PIXEL_BGRA, "VIDEO_PIXEL_BGRA"));
+	mapVideoFormat.insert(std::make_pair(agora::media::base::VIDEO_PIXEL_NV21, "VIDEO_PIXEL_NV21"));
+	mapVideoFormat.insert(std::make_pair(agora::media::base::VIDEO_PIXEL_RGBA, "VIDEO_PIXEL_RGBA"));
+	mapVideoFormat.insert(std::make_pair(agora::media::base::VIDEO_PIXEL_NV12, "VIDEO_PIXEL_NV12"));
+	mapVideoFormat.insert(std::make_pair(agora::media::base::VIDEO_TEXTURE_2D, "VIDEO_TEXTURE_2D"));
+	mapVideoFormat.insert(std::make_pair(agora::media::base::VIDEO_TEXTURE_OES, "VIDEO_TEXTURE_OES"));
+	mapVideoFormat.insert(std::make_pair(agora::media::base::VIDEO_PIXEL_I422, "VIDEO_PIXEL_I422"));
 }
 
 AgoraRtcEngine::~AgoraRtcEngine()
 {
-	release();
+	Release();
 }
 
-void AgoraRtcEngine::release()
+bool AgoraRtcEngine::InitEngine(std::string appid)
+{
+	agora::rtc::RtcEngineContext context;
+	context.eventHandler = m_eventHandler.get();
+	context.appId = appid.c_str();
+	struct calldata params;
+	calldata_init(&params);
+
+	if (*context.appId == '\0') {
+		calldata_set_int(&params, "error", -1);
+		return false;
+	}
+
+	if (!m_rtcEngine)
+		m_rtcEngine = (agora::rtc::IRtcEngineEx*)createAgoraRtcEngine();
+
+	int ret = m_rtcEngine->initialize(context);
+	if (0 != ret) {
+		blog(LOG_ERROR, "rtc engine initialize failed");
+		return false;
+	}
+
+	SetExternalVideoFrame();
+
+	m_rtcEngine->queryInterface(agora::rtc::AGORA_IID_MEDIA_ENGINE,
+		(void**)&m_pMediaEngine);
+	m_rtcEngine->setChannelProfile(CHANNEL_PROFILE_LIVE_BROADCASTING);
+	m_rtcEngine->enableVideo();
+	m_rtcEngine->setClientRole(CLIENT_ROLE_BROADCASTER);
+	m_pMediaEngine->setExternalVideoSource(true, false);
+	m_rtcEngine->setExternalAudioSource(true, 48000, 2);
+
+	m_audioDeviceManager = new AAudioDeviceManager(m_rtcEngine);
+	m_initialize = true;
+	return true;
+}
+
+void AgoraRtcEngine::Release()
 {
 	if (m_pMediaEngine)
 		m_pMediaEngine->release();
@@ -264,155 +297,39 @@ void AgoraRtcEngine::release()
 		m_rtcEngine = NULL;
 	}
 
-	m_bInitialize = false;
+	m_initialize = false;
 }
 
-bool AgoraRtcEngine::InitEngine(std::string appid)
-{
-	agora::rtc::RtcEngineContext context;
-	context.eventHandler = m_eventHandler.get();
-	context.appId = appid.c_str();
-	struct calldata params;
-	calldata_init(&params);
-
-	if (*context.appId == '\0') {
-		calldata_set_int(&params, "error", -1); //
-		return false;
-	}
-
-	if (!m_rtcEngine)
-		m_rtcEngine = (agora::rtc::IRtcEngineEx*)createAgoraRtcEngine();
-
-	int ret = m_rtcEngine->initialize(context);
-	if (0 != ret) {
-		return false;
-	}
-
-	m_rtcEngine->queryInterface(agora::rtc::AGORA_IID_MEDIA_ENGINE,
-				    (void **)&m_pMediaEngine);
-
-	SetExternalVideoFrame();
-	
-	m_rtcEngine->setChannelProfile(CHANNEL_PROFILE_LIVE_BROADCASTING);
-	m_rtcEngine->enableVideo();
-	AgoraRtcEngine::GetInstance()->setClientRole(CLIENT_ROLE_BROADCASTER);
-	m_pMediaEngine->setExternalVideoSource(true, false);
-	m_rtcEngine->setExternalAudioSource(true, 48000, 2);
-	
-	m_audioDeviceManager = new AAudioDeviceManager(m_rtcEngine);
-	m_bInitialize = true;
-	return true;
-}
-
-BOOL AgoraRtcEngine::setLogPath(std::string path)
-{
-
-	int ret = m_rtcEngine->setLogFile(path.c_str());
-	return ret == 0 ? TRUE : FALSE;
-}
-
-BOOL AgoraRtcEngine::setClientRole(agora::rtc::CLIENT_ROLE_TYPE role,
+bool AgoraRtcEngine::SetClientRole(agora::rtc::CLIENT_ROLE_TYPE role,
 				   LPCSTR lpPermissionKey)
 {
-	int nRet = m_rtcEngine->setClientRole(role);
-
-	return nRet == 0 ? TRUE : FALSE;
+	return m_rtcEngine->setClientRole(role) == 0;
 }
 
-int AgoraRtcEngine::setChannelProfile(CHANNEL_PROFILE_TYPE profile)
+int AgoraRtcEngine::SetChannelProfile(CHANNEL_PROFILE_TYPE profile)
 {
-	return m_rtcEngine->setChannelProfile(
-		CHANNEL_PROFILE_LIVE_BROADCASTING);
+	return m_rtcEngine->setChannelProfile(CHANNEL_PROFILE_LIVE_BROADCASTING) == 0;
 }
 
-int AgoraRtcEngine::setLocalVideoMirrorMode(VIDEO_MIRROR_MODE_TYPE mirrorMode)
-{
-	return m_rtcEngine->setLocalVideoMirrorMode(mirrorMode);
-}
-
-void AgoraRtcEngine::startPreview()
-{
-	m_rtcEngine->startPreview();
-}
-
-void AgoraRtcEngine::stopPreview()
-{
-	m_rtcEngine->stopPreview();
-}
-
-void *AgoraRtcEngine::AgoraAudioObserver_Create()
-{	
-	m_externalAudioframe.channels = 2;
-	m_externalAudioframe.samplesPerChannel = 480;
-	m_externalAudioframe.samplesPerSec = 48000;//sampleRate;
-	m_externalAudioframe.bytesPerSample = TWO_BYTES_PER_SAMPLE;
-	m_externalAudioframe.type =
-		agora::media::IAudioFrameObserver::FRAME_TYPE_PCM16;
-	m_externalAudioframe.buffer =
-		new uint8_t[m_externalAudioframe.samplesPerChannel * 2 * 2];
-	memset(m_externalAudioframe.buffer, 0, m_externalAudioframe.samplesPerChannel * 2 * 2);
-	m_externalAudioframe.avsync_type = 0;
-	m_externalAudioframe.renderTimeMs = 0;
-
-	m_externalAudioFrameSize = m_externalAudioframe.samplesPerChannel * 2 * 2;
-	return &m_externalAudioframe;
-}
-
-void AgoraRtcEngine::AgoraAudioObserver_Destroy()
-{
-	if (m_pMediaEngine == nullptr)
-		return;
-
-	if (m_externalAudioframe.buffer) {
-		delete[] m_externalAudioframe.buffer;
-		m_externalAudioframe.buffer = nullptr;
-	}
-}
-
-std::string AgoraRtcEngine::CalculateToken(std::string appid,
-					   const std::string &appcertificate,
-					   const std::string &channel,
-					   unsigned int uid,
-					   unsigned int privilegeExpiredTs)
-{
-	return "";
-/*	std::string str;
-	if (uid != 0) {
-		str = std::to_string(uid);
-	}
-	return agora::tools::RtcTokenBuilder::buildTokenWithUserAccount(
-		appid.c_str(), appcertificate.c_str(), channel.c_str(),
-		str.c_str(), agora::tools::Role_Publisher, privilegeExpiredTs);*/
-}
-
-void AgoraRtcEngine::MuteRemoteVideo(unsigned int uid, bool bMute)
-{
-	m_rtcEngine->muteRemoteVideoStream(uid, bMute);
-}
-
-int AgoraRtcEngine::joinChannel(const std::string &key, const std::string &channel, 
+int AgoraRtcEngine::JoinChannel(const std::string &key, const std::string &channel, 
 	unsigned int uid, bool enableDual, bool muteAudio , bool muteVideo, bool loopbackRecording)
 {
-	if (m_bJoinChannel)
+	if (m_joined)
 		return 0;
 	agora::rtc::AUDIO_PROFILE_TYPE profile = agora::rtc::AUDIO_PROFILE_MUSIC_STANDARD;
-	if (audioChannel == 1 && !m_bHighQuality) {
+	if (m_audioChannel == 1 && !m_bHighQuality) {
 		profile = AUDIO_PROFILE_MUSIC_STANDARD;
 	}
-	else if (audioChannel == 2 && !m_bHighQuality) {
+	else if (m_audioChannel == 2 && !m_bHighQuality) {
 		profile = AUDIO_PROFILE_MUSIC_STANDARD_STEREO;
 	}
-	else if (audioChannel == 1 && m_bHighQuality) {
+	else if (m_audioChannel == 1 && m_bHighQuality) {
 		profile = AUDIO_PROFILE_MUSIC_HIGH_QUALITY;
 	}
-	else if (audioChannel == 2 && m_bHighQuality) {
+	else if (m_audioChannel == 2 && m_bHighQuality) {
 		profile = AUDIO_PROFILE_MUSIC_HIGH_QUALITY_STEREO;
 	}
-	
-	//m_rtcEngine->setAudioProfile(profile, (AUDIO_SCENARIO_TYPE)m_scenario);
-	//apm->setParameters("{\"che.audio.codec.name\":\"OPUSFB\"}");
-	//AParameter apm(m_rtcEngine);
-	//apm->setParameters("{\"che.audio.specify.codec\": \"OPUSFB\"}");
+
 	ChannelMediaOptions options;
 	options.autoSubscribeAudio = muteAudio;
 	options.autoSubscribeVideo = muteVideo;
@@ -424,13 +341,13 @@ int AgoraRtcEngine::joinChannel(const std::string &key, const std::string &chann
 	options.channelProfile = CHANNEL_PROFILE_LIVE_BROADCASTING;
 	if (enableDual)
 		m_rtcEngine->enableDualStreamMode(true);
-	blog(LOG_INFO, "joinChannel: channel=%s, uid=%u", channel.c_str(), uid);
+	blog(LOG_INFO, "JoinChannel: channel=%s, uid=%u", channel.c_str(), uid);
 	m_rtcEngine->enableLoopbackRecording(loopbackRecording);
-	int r = m_rtcEngine->joinChannel(key.c_str(), channel.c_str(), uid, options);//joinChannel(key.data(), channel.data(), "", uid, options);//
+	int r = m_rtcEngine->joinChannel(key.c_str(), channel.c_str(), uid, options);//JoinChannel(key.data(), channel.data(), "", uid, options);//
 	return r;
 }
 
-int AgoraRtcEngine::joinChannel(const std::string & key, const std::string & channel, unsigned uid)
+int AgoraRtcEngine::JoinChannel(const std::string & key, const std::string & channel, unsigned uid)
 {
 	ChannelMediaOptions options;
 	options.autoSubscribeAudio = false;
@@ -441,45 +358,52 @@ int AgoraRtcEngine::joinChannel(const std::string & key, const std::string & cha
 	options.publishAudioTrack = false;
 	options.clientRoleType = CLIENT_ROLE_BROADCASTER;
 	options.channelProfile = CHANNEL_PROFILE_LIVE_BROADCASTING;
-	blog(LOG_INFO, "joinChannelEx: connection channel=%s, uid=%d", connection.channelId, connection.localUid);
-	int r = m_rtcEngine->joinChannelEx(key.c_str(), connection, options, m_eventHandlerCamera.get());//joinChannel(key.data(), channel.data(), "", uid, options);//
-	m_bCameraJoinChannel = true;
+	blog(LOG_INFO, "joinChannelEx: connection channel=%s, uid=%d", m_connection.channelId, m_connection.localUid);
+	int r = m_rtcEngine->joinChannelEx(key.c_str(), m_connection, options, m_eventHandlerCamera.get());//JoinChannel(key.data(), channel.data(), "", uid, options);//
+	m_cameraJoined = true;
 	return r;
 }
 
-int AgoraRtcEngine::leaveChannel()
+int AgoraRtcEngine::LeaveChannel()
 {
-	if (!m_bInitialize || !m_bJoinChannel)
+	if (!m_initialize || !m_joined)
 		return -1;
-	m_bJoinChannel = false;
+	m_joined = false;
 	int r = m_rtcEngine->leaveChannel();
 
-	bFirstAudioFrame  = true;
-	bFirstVideoFrame  = true;
-	bFirstCameraVideo = true;
-	if (fpPCM) {
-		fclose(fpPCM);
-		fpPCM = nullptr;
+	m_firstAudioFrame  = true;
+	m_firstVideoFrame  = true;
+	m_firstCameraVideo = true;
+	if (m_pcm) {
+		fclose(m_pcm);
+		m_pcm = nullptr;
 	}
 	return r;
 }
 
-int AgoraRtcEngine::leaveChannelCamera()
+int AgoraRtcEngine::LeaveChannelCamera()
 {
-	m_bCameraJoinChannel = false;
-	return m_rtcEngine->leaveChannelEx(connection);
+	m_cameraJoined = false;
+	return m_rtcEngine->leaveChannelEx(m_connection);
 }
 
-int AgoraRtcEngine::enableVideo(bool enabled)
+void AgoraRtcEngine::SetConnection(const std::string& channel, unsigned uid)
 {
-	return enabled ? m_rtcEngine->enableVideo()
-		       : m_rtcEngine->disableVideo();
+	m_channelId = channel;
+	m_connection.channelId = m_channelId.c_str();
+	m_localCameraUID = uid;
+	m_connection.localUid = m_localCameraUID;
 }
 
-int AgoraRtcEngine::setupRemoteVideo(unsigned int uid, void *view)
+int AgoraRtcEngine::EnableVideo(bool enabled)
+{
+	return enabled ? m_rtcEngine->enableVideo() : m_rtcEngine->disableVideo();
+}
+
+int AgoraRtcEngine::SetupRemoteVideo(unsigned int uid, void *view)
 {
 	view_t v = reinterpret_cast<view_t>(view);
-	VideoCanvas canvas; // (v, RENDER_MODE_FIT, uid);
+	VideoCanvas canvas; 
 	canvas.view = v;
 	canvas.renderMode = agora::media::base::RENDER_MODE_HIDDEN;
 	canvas.uid = uid;
@@ -487,69 +411,40 @@ int AgoraRtcEngine::setupRemoteVideo(unsigned int uid, void *view)
 	return m_rtcEngine->setupRemoteVideo(canvas);
 }
 
-bool AgoraRtcEngine::keepPreRotation(bool bRotate)
-{
-	int ret = -1;
-	AParameter apm(m_rtcEngine);
-	if (bRotate)
-		ret = apm->setParameters(
-			"{\"che.video.keep_prerotation\":true}");
-	else
-		ret = apm->setParameters(
-			"{\"che.video.keep_prerotation\":false}");
-	apm.release();
-	return ret == 0;
-}
-
-bool AgoraRtcEngine::setVideoProfileEx(int nWidth, int nHeight, int nFrameRate,
-				       int nBitRate, bool Agora)
+bool AgoraRtcEngine::SetVideoEncoder(int nWidth, int nHeight, int nFrameRate,
+	int nBitRate, bool Agora)
 {
 	VideoEncoderConfiguration config;
 	config.dimensions.width = nWidth;
 	config.dimensions.height = nHeight;
 	config.frameRate = (FRAME_RATE)nFrameRate;
 	config.bitrate = nBitRate;
-	videoFrameRate_ = nFrameRate;
-	if (nWidth < nHeight)
-		config.orientationMode = ORIENTATION_MODE_FIXED_PORTRAIT;
-	else
-		config.orientationMode = ORIENTATION_MODE_FIXED_LANDSCAPE;
-	int nRet = m_rtcEngine->setVideoEncoderConfiguration(config);
-
-	return nRet == 0 ? true : false;
+	config.orientationMode = nWidth < nHeight ? ORIENTATION_MODE_FIXED_PORTRAIT : ORIENTATION_MODE_FIXED_LANDSCAPE;
+	m_videoFrameRate = nFrameRate;
+	return m_rtcEngine->setVideoEncoderConfiguration(config) == 0 ? true : false;
 }
 
-bool AgoraRtcEngine::setCameraEncoderConfiguration(int w, int h, int fps, int bitrate)
+bool AgoraRtcEngine::SetCameraEncoderConfiguration(int w, int h, int fps, int bitrate)
 {
 	VideoEncoderConfiguration config;
 	config.dimensions.width = w;
 	config.dimensions.height = h;
 	config.frameRate = (FRAME_RATE)fps;
 	config.bitrate = bitrate;
-	if (w < h)
-		config.orientationMode = ORIENTATION_MODE_FIXED_PORTRAIT;
-	else
-		config.orientationMode = ORIENTATION_MODE_FIXED_LANDSCAPE;
 	config.orientationMode = ORIENTATION_MODE_ADAPTIVE;
-	int nRet = m_rtcEngine->setVideoEncoderConfigurationEx(config, connection);
+	int nRet = m_rtcEngine->setVideoEncoderConfigurationEx(config, m_connection);
 
 	return nRet == 0 ? true : false;
 }
 
-void AgoraRtcEngine::setConnection(const std::string& channel, unsigned uid)
+void AgoraRtcEngine::SetAudioProfile(int scenario, int channels, bool bHighQuality)
 {
-	channelId = channel;
-	connection.channelId = channelId.c_str();
-	localCameraUid = uid;
-	connection.localUid = localCameraUid;
+	m_scenario = (AUDIO_SCENARIO_TYPE)scenario;
+	m_audioChannel = channels;
+	m_bHighQuality = bHighQuality;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////
-//agora device
-///////////////////////////////////////////////////////////////////////////////////////
-
-
-int AgoraRtcEngine::getPalyoutDeviceVolume()
+int AgoraRtcEngine::GetPalyoutDeviceVolume()
 {
 	AAudioDeviceManager audioDeviceManager(m_rtcEngine);
 	if (!audioDeviceManager)
@@ -560,11 +455,7 @@ int AgoraRtcEngine::getPalyoutDeviceVolume()
 	return 0;
 }
 
-void AgoraRtcEngine::EnableAgoraCaptureMicAudio(bool bCapture)
-{
-}
-
-int AgoraRtcEngine::setPalyoutDeviceVolume(int volume)
+int AgoraRtcEngine::SetPalyoutDeviceVolume(int volume)
 {
 	AAudioDeviceManager audioDeviceManager(m_rtcEngine);
 	if (!audioDeviceManager)
@@ -572,48 +463,13 @@ int AgoraRtcEngine::setPalyoutDeviceVolume(int volume)
 	return audioDeviceManager->setPlaybackDeviceVolume(volume);
 }
 
-int AgoraRtcEngine::testSpeaker(bool start)
+bool AgoraRtcEngine::GetPlayoutDevices(std::vector<DEVICEINFO>& devices)
 {
-	agora::rtc::AAudioDeviceManager dm(m_rtcEngine);
-	if (!dm)
-		return -1;
-	if (start)
-		return dm->startPlaybackDeviceTest("audio_sample.wav");
-	else
-		return dm->stopPlaybackDeviceTest();
-}
-
-void AgoraRtcEngine::joinedChannelSuccess(const char *channel, unsigned int uid,
-					  int elapsed)
-{
-}
-
-int AgoraRtcEngine::AddPublishStreamUrl(const char *url,
-					bool transcodingEnabled)
-{
-	return m_rtcEngine->addPublishStreamUrl(url, transcodingEnabled);
-}
-int AgoraRtcEngine::RemovePublishStreamUrl(const char *url)
-{
-	return m_rtcEngine->removePublishStreamUrl(url);
-}
-int AgoraRtcEngine::SetLiveTranscoding(const LiveTranscoding &transcoding)
-{
-	return m_rtcEngine->setLiveTranscoding(transcoding);
-}
-
-int AgoraRtcEngine::EnableWebSdkInteroperability(bool enabled)
-{
-	return m_rtcEngine->enableWebSdkInteroperability(true);
-}
-
-bool AgoraRtcEngine::getPlayoutDevices(std::vector<DEVICEINFO>& devices)
-{
-	if (!m_bInitialize || !m_audioDeviceManager || !m_audioDeviceManager->get())
+	if (!m_initialize || !m_audioDeviceManager || !m_audioDeviceManager->get())
 		return false;
 
 	IAudioDeviceCollection* playoutDevice = (*m_audioDeviceManager)->enumeratePlaybackDevices();
-	
+
 	if (!playoutDevice)
 		return false;
 
@@ -634,25 +490,27 @@ void AgoraRtcEngine::SetPlayoutDevice(const char* id)
 	(*m_audioDeviceManager)->setPlaybackDevice(id);
 }
 
-void AgoraRtcEngine::enableLastmileTest(bool bEnable)
+int AgoraRtcEngine::AddPublishStreamUrl(const char *url,
+					bool transcodingEnabled)
+{
+	return m_rtcEngine->addPublishStreamUrl(url, transcodingEnabled);
+}
+int AgoraRtcEngine::RemovePublishStreamUrl(const char *url)
+{
+	return m_rtcEngine->removePublishStreamUrl(url);
+}
+int AgoraRtcEngine::SetLiveTranscoding(const LiveTranscoding &transcoding)
+{
+	return m_rtcEngine->setLiveTranscoding(transcoding);
+}
+
+void AgoraRtcEngine::EnableLastmileTest(bool bEnable)
 {
 	LastmileProbeConfig config;
 	if (bEnable)
 		m_rtcEngine->startLastmileProbeTest(config);
 	else
 		m_rtcEngine->stopLastmileProbeTest();
-}
-
-void AgoraRtcEngine::SavePcm(bool bSave)
-{
-	savePcm = bSave;
-}
-
-void AgoraRtcEngine::SetAudioProfile(int scenario, int channels, bool bHighQuality)
-{
-	m_scenario = (AUDIO_SCENARIO_TYPE)scenario;
-	audioChannel = channels;
-	m_bHighQuality = bHighQuality;
 }
 
 void AgoraRtcEngine::MuteAllRemoteVideo(bool bMute)
@@ -665,12 +523,35 @@ void AgoraRtcEngine::MuteAllRemoteAudio(bool bMute)
 	m_rtcEngine->muteAllRemoteAudioStreams(bMute);
 }
 
+void AgoraRtcEngine::MuteRemoteVideo(unsigned int uid, bool bMute)
+{
+	m_rtcEngine->muteRemoteVideoStream(uid, bMute);
+}
+
+void* AgoraRtcEngine::AgoraAudioObserver_Create()
+{
+	m_externalAudioframe.channels = 2;
+	m_externalAudioframe.samplesPerChannel = 480;
+	m_externalAudioframe.samplesPerSec = 48000;
+	m_externalAudioframe.bytesPerSample = TWO_BYTES_PER_SAMPLE;
+	m_externalAudioframe.type =
+		agora::media::IAudioFrameObserver::FRAME_TYPE_PCM16;
+	m_externalAudioframe.buffer =
+		new uint8_t[m_externalAudioframe.samplesPerChannel * 2 * 2];
+	memset(m_externalAudioframe.buffer, 0, m_externalAudioframe.samplesPerChannel * 2 * 2);
+	m_externalAudioframe.avsync_type = 0;
+	m_externalAudioframe.renderTimeMs = 0;
+
+	m_externalAudioFrameSize = m_externalAudioframe.samplesPerChannel * 2 * 2;
+	return &m_externalAudioframe;
+}
+
 std::string CurrentTimeString()
 {
 	using namespace std::chrono;
 
 	struct tm tstruct;
-	
+
 	char buf[80] = { 0 };
 	auto tp = system_clock::now();
 	auto now = system_clock::to_time_t(tp);
@@ -682,46 +563,51 @@ std::string CurrentTimeString()
 	return buf;
 }
 
-void AgoraRtcEngine::PushAudioFrame(struct encoder_frame* frame)
+void AgoraRtcEngine::AgoraAudioObserver_Destroy()
 {
-	if (!m_bInitialize || !m_bJoinChannel)
+	if (m_pMediaEngine == nullptr)
 		return;
 
-	if (savePcm) {
-		if (!fpPCM) {
-			std::string filePath = pcmFolder + CurrentTimeString();
-			filePath += ".pcm";
-			fpPCM = fopen(filePath.c_str(), "ab+");
+	if (m_externalAudioframe.buffer) {
+		delete[] m_externalAudioframe.buffer;
+		m_externalAudioframe.buffer = nullptr;
+	}
+}
+
+void AgoraRtcEngine::PushAudioFrame(struct encoder_frame* frame)
+{
+	if (!m_initialize || !m_joined)
+		return;
+
+	if (m_savePcm) {
+		if (!m_pcm) {
+			std::string filePath = m_pcmPath + CurrentTimeString();
+			filePath += ".m_pcm";
+			m_pcm = fopen(filePath.c_str(), "ab+");
 		}
 
-		if (fpPCM) {
-			fwrite(frame->data[0], 1, frame->linesize[0], fpPCM);
-		}
+		if (m_pcm) 
+			fwrite(frame->data[0], 1, frame->linesize[0], m_pcm);
 		else
-			blog(LOG_INFO, "agora tool pcm save failed");
+			blog(LOG_INFO, "agora tool m_pcm save failed");
 	}
 
-	int64_t renderTimeMs = getTickCount64();
-	if (bFirstAudioFrame) {
+	int64_t renderTimeMs = get_time_stamp();
+	if (m_firstAudioFrame) {
 		blog(LOG_INFO, "Agora First PushAudioFrame timestamp: %llu ms(system time)", renderTimeMs);
-		bFirstAudioFrame = false;
-		firstAudioFrameTs_ = renderTimeMs;
+		m_firstAudioFrame = false;
+		m_firstAudioFrameTs = renderTimeMs;
 	}
 
-	m_externalAudioframe.renderTimeMs = 0;// getTickCount64();
-	memcpy_s(m_externalAudioframe.buffer, frame->linesize[0],
-		frame->data[0], frame->linesize[0]);
-	bool bPush = false;
-	int delta = renderTimeMs - firstAudioFrameTs_;
+	m_externalAudioframe.renderTimeMs = 0;
+	memcpy(m_externalAudioframe.buffer, frame->data[0], frame->linesize[0]);
 	int ret = m_pMediaEngine->pushAudioFrame(AUDIO_RECORDING_SOURCE,
 		&m_externalAudioframe, false);
 
-
-	audioFrameCount_++;
-	if (audioFrameCount_ % (logInterverl_ * 100) == 0) {
+	m_audioFrameCount++;
+	if (m_audioFrameCount % (m_logInterval * 100) == 0) {
 		blog(LOG_INFO, "[%llu:] Audio PushAudioFrame timestamp: %llu ms, audio frame count: %llu,interval(time=%lfs)"
-			, audioFrameCount_ / 100, renderTimeMs, audioFrameCount_, (renderTimeMs - firstAudioFrameTs_)/(double)1000);
-
+			, m_audioFrameCount / 100, renderTimeMs, m_audioFrameCount, (renderTimeMs - m_firstAudioFrameTs)/(double)1000);
 	}
 }
 
@@ -729,8 +615,8 @@ void AgoraRtcEngine::SetExternalVideoFrame()
 {
 	struct obs_video_info ovi;
 	obs_get_video_info(&ovi);
-	agora_out_cx = ovi.output_width;
-	agora_out_cy = ovi.output_height;
+	m_agoraOutCX = ovi.output_width;
+	m_agoraOutCY = ovi.output_height;
 
 	m_externalVideoFrame.buffer = NULL;
 	m_externalVideoFrame.cropLeft = 0;
@@ -740,8 +626,8 @@ void AgoraRtcEngine::SetExternalVideoFrame()
 
 
 	m_externalVideoFrame.rotation = 0;
-	m_externalVideoFrame.height = agora_out_cy;
-	m_externalVideoFrame.stride = (agora_out_cx << 4) >> 4;
+	m_externalVideoFrame.height = m_agoraOutCY;
+	m_externalVideoFrame.stride = (m_agoraOutCX << 4) >> 4;
 	m_externalVideoFrame.timestamp = 0;
 	m_externalVideoFrame.type = agora::media::base::ExternalVideoFrame::VIDEO_BUFFER_RAW_DATA;
 	m_format = ovi.output_format;
@@ -769,7 +655,7 @@ void AgoraRtcEngine::SetExternalVideoFrame()
 
 void AgoraRtcEngine::PushVideoFrame(struct video_data* frame)
 {
-	if (!m_bInitialize || !m_bJoinChannel)
+	if (!m_initialize || !m_joined)
 		return;
 
 	struct obs_video_info ovi;
@@ -817,18 +703,18 @@ void AgoraRtcEngine::PushVideoFrame(struct video_data* frame)
 			ovi.output_width, ovi.output_height);
 		break;
 	}
-	m_externalVideoFrame.timestamp = getTickCount64();
+	m_externalVideoFrame.timestamp = get_time_stamp();
 	m_pMediaEngine->pushVideoFrame(&m_externalVideoFrame);
-	if (bFirstVideoFrame) {
+	if (m_firstVideoFrame) {
 		blog(LOG_INFO, "Agora First PushVideoFrame timestamp: %llu ms(system time)", m_externalVideoFrame.timestamp);
-		bFirstVideoFrame = false;
-		firstVideoFrameTs_ = m_externalVideoFrame.timestamp;
+		m_firstVideoFrame = false;
+		m_firstVideoFrameTs = m_externalVideoFrame.timestamp;
 	}
 
-	videoFrameCount_++;
-	if (videoFrameCount_ % (logInterverl_ * videoFrameRate_) == 0) {
+	m_videoFrameCount++;
+	if (m_videoFrameCount % (m_logInterval * m_videoFrameRate) == 0) {
 		blog(LOG_INFO, "[%llu:]Video PushVideoFrame timestamp: %llu ms, video frame count: %llu,interval(time=%lfs)"
-			, videoFrameCount_ / videoFrameRate_, m_externalVideoFrame.timestamp, videoFrameCount_, (m_externalVideoFrame.timestamp - firstVideoFrameTs_) / (double)1000);
+			, m_videoFrameCount / m_videoFrameRate, m_externalVideoFrame.timestamp, m_videoFrameCount, (m_externalVideoFrame.timestamp - m_firstVideoFrameTs) / (double)1000);
 	}
 }
 
@@ -897,7 +783,7 @@ void AgoraRtcEngine::SetExternalVideoFrameCamera(struct obs_source_frame* frame)
 
 void AgoraRtcEngine::PushCameraVideoFrame(struct obs_source_frame* frame)
 {
-	if (!m_bCameraJoinChannel)
+	if (!m_cameraJoined)
 		return;
 
 	if (m_externalVideoFrameCamera.stride != frame->width
@@ -908,11 +794,12 @@ void AgoraRtcEngine::PushCameraVideoFrame(struct obs_source_frame* frame)
 			m_externalVideoFrameCamera.buffer = nullptr;
 		}
 		SetExternalVideoFrameCamera(frame);
-		blog(LOG_INFO, "obs camera export to plugin: linesize 0=%d, 1=%d, 2=%d, \
-             width=%d, height=%d, format = %d, external format=%d"
+		blog(LOG_INFO, "obs camera export to plugin: linesize[0]=%d, linesize[1]=%d,"
+			"linesize[2]=%d,width=%d, height=%d,obs format = %s, external format=%s"
 			, frame->linesize[0], frame->linesize[1], frame->linesize[2]
-			, frame->width, frame->height, frame->format, m_externalVideoFrameCamera.format);
-		blog(LOG_INFO, "PushVideoFrame: connection channel=%s, uid=%d", connection.channelId, connection.localUid);
+			, frame->width, frame->height, mapOBSVideoFormat[frame->format].c_str()
+			, mapVideoFormat[m_externalVideoFrameCamera.format].c_str());
+		blog(LOG_INFO, "PushVideoFrame: m_connection channel=%s, uid=%d", m_connection.channelId, m_connection.localUid);
 	}
 
 	uint8_t* dst = (uint8_t*)m_externalVideoFrameCamera.buffer;
@@ -928,17 +815,14 @@ void AgoraRtcEngine::PushCameraVideoFrame(struct obs_source_frame* frame)
 		dst += m_externalVideoFrameCamera.stride * m_externalVideoFrameCamera.height;
 		copy_frame_data_plane2(dst, m_externalVideoFrameCamera.stride, frame, 1, m_externalVideoFrameCamera.height / 2);
 	}
-	else if (frame->format == VIDEO_FORMAT_BGRA) {
+	else if (frame->format == VIDEO_FORMAT_BGRA) 
 		copy_frame_data_plane2(dst, m_externalVideoFrameCamera.stride * 4, frame, 0, m_externalVideoFrameCamera.height);
-	}
-	else if (frame->format == VIDEO_FORMAT_BGRX) {
+	else if (frame->format == VIDEO_FORMAT_BGRX)
 		libyuv::ARGBMirror(frame->data[0], frame->linesize[0], dst, m_externalVideoFrameCamera.stride * 4
 			, m_externalVideoFrameCamera.stride, m_externalVideoFrameCamera.height);
-	}
-	else if (frame->format == VIDEO_FORMAT_RGBA) {
+	else if (frame->format == VIDEO_FORMAT_RGBA) 
 		copy_frame_data_plane2(dst, m_externalVideoFrameCamera.stride * 4, frame, 0, m_externalVideoFrameCamera.height);
-	}
-	else if (frame->format == VIDEO_FORMAT_I444) {
+	else if (frame->format == VIDEO_FORMAT_I444) 
 		libyuv::I444ToARGB(
 			frame->data[0], frame->linesize[0],
 			frame->data[1], frame->linesize[1],
@@ -946,8 +830,7 @@ void AgoraRtcEngine::PushCameraVideoFrame(struct obs_source_frame* frame)
 			(uint8_t*)m_externalVideoFrameCamera.buffer,
 			m_externalVideoFrameCamera.stride * 4,
 			frame->width, frame->height);
-	}
-	else if (frame->format == VIDEO_FORMAT_I422) {
+	else if (frame->format == VIDEO_FORMAT_I422)
 		libyuv::I422ToARGB(
 			frame->data[0], frame->linesize[0],
 			frame->data[1], frame->linesize[1],
@@ -955,34 +838,31 @@ void AgoraRtcEngine::PushCameraVideoFrame(struct obs_source_frame* frame)
 			(uint8_t*)m_externalVideoFrameCamera.buffer,
 			m_externalVideoFrameCamera.stride * 4,
 			frame->width, frame->height);
-	}
-	else if (frame->format == VIDEO_FORMAT_YUY2) {
+	else if (frame->format == VIDEO_FORMAT_YUY2)
 		libyuv::YUY2ToARGB(
 			frame->data[0], frame->linesize[0],
 			(uint8_t*)m_externalVideoFrameCamera.buffer,
 			m_externalVideoFrameCamera.stride * 4,
 			frame->width, frame->height
 		);
-	}
-	else if (frame->format == VIDEO_FORMAT_UYVY) {
+	else if (frame->format == VIDEO_FORMAT_UYVY)
 		libyuv::UYVYToARGB(
 			frame->data[0], frame->linesize[0],
 			(uint8_t*)m_externalVideoFrameCamera.buffer,
 			m_externalVideoFrameCamera.stride * 4,
 			frame->width, frame->height
 		);
-	}
-	else {
+	else 
 		blog(LOG_INFO, "PushCameraFrame: format:%d no support yet", frame->format);
-	}
-	connection.channelId = channelId.c_str();
-	connection.localUid = localCameraUid;
-	m_externalVideoFrameCamera.timestamp = getTickCount64();
-	m_pMediaEngine->pushVideoFrame(&m_externalVideoFrameCamera, connection);
 
-	if (bFirstCameraVideo) {
+	m_connection.channelId = m_channelId.c_str();
+	m_connection.localUid = m_localCameraUID;
+	m_externalVideoFrameCamera.timestamp = get_time_stamp();
+	m_pMediaEngine->pushVideoFrame(&m_externalVideoFrameCamera, m_connection);
+
+	if (m_firstCameraVideo) {
 		blog(LOG_INFO, "Agora First Camera PushVideoFrame timestamp: %llu ms", m_externalVideoFrameCamera.timestamp);
-		bFirstCameraVideo = false;
-		firstCameraFrameTs_ = m_externalVideoFrameCamera.timestamp;
+		m_firstCameraVideo = false;
+		m_firstCameraFrameTs = m_externalVideoFrameCamera.timestamp;
 	}
 }

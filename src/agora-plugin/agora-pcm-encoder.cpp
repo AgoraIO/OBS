@@ -9,8 +9,8 @@ static const char *AgoraGetAudioEncoderName(void*)
 
 static void* AgoraPCM_Create(obs_data_t* settings, obs_encoder_t* encoder )
 {
-	AgoraRtcEngine::GetInstance()->AgoraAudioObserver_Create();
-	return AgoraRtcEngine::GetInstance();
+	rtcEngine->AgoraAudioObserver_Create();
+	return rtcEngine;
 }
 
 static void AgoraPCM_Destroy(void* data)

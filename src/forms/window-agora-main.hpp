@@ -63,7 +63,8 @@ typedef struct tagAgoraToolSettings {
 	bool savePersistAppid = false;
 	std::string information_url = "";
 	int info_mode = 0;//0:manually 1:http get
-	bool SavePCM = false;
+	bool savePcm = false;
+	std::string pcmFolder = "";
 	int cpuThreshold = 95;
 	int logInterval = 20;
 	bool bDualStream = false;
@@ -142,7 +143,8 @@ private:
 
 	QTimer transcodingTimer;
 	QTimer showRemoteTimer;
-	QTimer joinFailedTimer;//token invalid ,exapired, joinChannel second time. no callback OnConnectionStateChanged for these reasons.
+	//token invalid ,exapired, JoinChannel second time. no callback OnConnectionStateChanged for these reasons.
+	QTimer joinFailedTimer;
 
 	bool joinFailed = false;
 	bool started = false;
@@ -175,15 +177,16 @@ private:
 	bool InitializeAgoraOutput();
 	bool StartAgoraOutput();
 	void StopAgoraOutput();
-	void joinChannel(std::string token);
+	void JoinChannel(std::string token);
 	void RemoveVideoPluginFilters();
+	void AddFilterCurrentScene();
 	
 	static void OBSEvent(obs_frontend_event event, void *);
 public slots:
 	void on_streamButton_clicked();
 	void on_settingsButton_clicked();
 	void on_exitButton_clicked();
-	// rtc envetn handler slot
+	
 	void onJoinChannelSuccess_slot(const char* channel, unsigned int uid, int elapsed);
 	void onBothJoinSuccess(const char* channel, unsigned int uid, int elapsed);
 	void onLeaveChannel_slot(const RtcStats &stats);
