@@ -609,9 +609,6 @@ void AgoraBasic::CreateDisplay()
 
 bool AgoraBasic::EnumSources(void* data, obs_source_t* source)
 {
-	if (obs_obj_invalid(source))
-		return false;
-
 	AgoraBasic* window = static_cast<AgoraBasic*>(data);
 	const char* name = obs_source_get_name(source);
 	const char* id = obs_source_get_id(source);
@@ -951,9 +948,7 @@ void AgoraBasic::on_streamButton_clicked()
 			ui->streamButton->setText(starting_text);
 			std::thread th([this](){
 
-				//connect timeout
 				curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 5); 
-				// get data timeout
 				curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10);
 
 				//cancel verify
@@ -969,9 +964,6 @@ void AgoraBasic::on_streamButton_clicked()
 				json_res.clear();
 				curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, http_callback);
 				curl_easy_setopt(curl, CURLOPT_WRITEDATA, &json_res);
-
-				//set URL
-				
 				//set POST data 
 				//char szUrl[1024] = { 0 };
 				//sprintf_s(szUrl, 1024, "%s?appid=%s&&uid=%u&channelName=%s", m_settings.information_url.c_str()

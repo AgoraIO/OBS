@@ -30,7 +30,7 @@ struct video_plugin_data {
 static const char *video_plugin_filter_name(void *unused)
 {
 	UNUSED_PARAMETER(unused);
-	return obs_module_text("VideoPluginFilter");
+	return obs_module_text("");
 }
 
 static void free_video_data(struct video_plugin_data *filter,
@@ -136,7 +136,7 @@ void RegistePluginVideoSource()
 	struct obs_source_info video_plugin_filter = {};
 	video_plugin_filter.id = "video_plugin_filter";
 	video_plugin_filter.type = OBS_SOURCE_TYPE_FILTER;
-	video_plugin_filter.output_flags = OBS_SOURCE_VIDEO | OBS_SOURCE_ASYNC;
+	video_plugin_filter.output_flags = OBS_SOURCE_VIDEO | OBS_SOURCE_ASYNC | OBS_SOURCE_DEPRECATED;
 	video_plugin_filter.get_name = video_plugin_filter_name;
 	video_plugin_filter.create = video_plugin_filter_create;
 	video_plugin_filter.destroy = video_plugin_filter_destroy;

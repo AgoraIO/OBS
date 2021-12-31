@@ -214,7 +214,6 @@ public:
 
 	static void DrawPreview(void *data, uint32_t cx, uint32_t cy);
 	static void RawVideoCallback(void *param, struct video_data *frame);
-	
 signals:
 	void DisplayCreated(AgoraBasic* agora);
 	void requestTokenSignal(QString, int err);
