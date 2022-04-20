@@ -46,7 +46,7 @@ public:
 	int  SetupRemoteVideo(unsigned int uid, void* view);
 
 	int  JoinChannel(const std::string& key, const std::string& channel,
-		 unsigned uid, bool enableDual, bool muteAudio = true,
+		 unsigned uid, bool audioProfile, bool enableDual, bool muteAudio = true,
 		 bool muteVideo = true, bool loopbackRecording = false); 
 
 	int  JoinChannel(const std::string& key, const std::string& channel, unsigned uid);
@@ -78,15 +78,13 @@ public:
 	void MuteAllRemoteVideo(bool bMute);
 	void MuteAllRemoteAudio(bool bMute);
 	void MuteRemoteVideo(unsigned int uid, bool bMute);
-
+	void SetPcmInfo(bool b, std::string path); 
 	bool IsInitialize() { return m_initialize; }
 	bool IsJoined() { return m_joined; }
 	bool IsCameraJoined() { return m_cameraJoined; }
 	void SetJoinFlag(bool b) { m_joined = b; }
 	void SetLogInterval(int interval) {	m_logInterval = interval;}
-    void SetPcmInfo(bool b, std::string path) {
-		m_savePcm = b; m_pcmPath = path;
-	}
+	
 	agora::rtc::IRtcEngine* getRtcEngine() { return m_rtcEngine; }
 signals:
 	void onJoinChannelSuccess(const char* channel, unsigned int uid, int elapsed);
@@ -119,7 +117,6 @@ private:
 	bool m_joined = false;
 	bool m_cameraJoined = false;
 	bool m_initialize = false;
-	
 	// external video
 	int m_externalVideoFrameSize;
 	enum video_format m_format;
@@ -163,6 +160,7 @@ private:
 	
 	std::map<video_format, std::string> mapOBSVideoFormat;
 	std::map<agora::media::base::VIDEO_PIXEL_FORMAT, std::string> mapVideoFormat;
+	std::vector<agora::rtc::AUDIO_SCENARIO_TYPE> audioScenarios;
 };
 #define rtcEngine AgoraRtcEngine::GetInstance() 
 

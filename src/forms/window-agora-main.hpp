@@ -64,6 +64,7 @@ typedef struct tagAgoraToolSettings {
 	std::string information_url = "";
 	int info_mode = 0;//0:manually 1:http get
 	bool savePcm = false;
+	bool setAudioProfile = false;
 	std::string pcmFolder = "";
 	int cpuThreshold = 95;
 	int logInterval = 20;

@@ -163,6 +163,23 @@ void copy_frame_data_plane2(uint8_t* dst, int line_size,
 	}
 }
 
+std::string CurrentTimeString()
+{
+	using namespace std::chrono;
+
+	struct tm tstruct;
+
+	char buf[80] = { 0 };
+	auto tp = system_clock::now();
+	auto now = system_clock::to_time_t(tp);
+	tstruct = *localtime(&now);
+	asctime(&tstruct);
+	sprintf(buf, "obs_agora_%d-%02d-%d_%d-%d-%d"
+		, tstruct.tm_year + 1900, tstruct.tm_mon + 1, tstruct.tm_mday
+		, tstruct.tm_hour, tstruct.tm_min, tstruct.tm_sec);
+	return buf;
+}
+
 AgoraRtcEngine *AgoraRtcEngine::GetInstance()
 {
 	if (m_agoraEngine == nullptr)
@@ -218,6 +235,14 @@ AgoraRtcEngine::AgoraRtcEngine()
 	mapVideoFormat.insert(std::make_pair(agora::media::base::VIDEO_TEXTURE_2D, "VIDEO_TEXTURE_2D"));
 	mapVideoFormat.insert(std::make_pair(agora::media::base::VIDEO_TEXTURE_OES, "VIDEO_TEXTURE_OES"));
 	mapVideoFormat.insert(std::make_pair(agora::media::base::VIDEO_PIXEL_I422, "VIDEO_PIXEL_I422"));
+
+	audioScenarios.push_back(AUDIO_SCENARIO_DEFAULT);
+	audioScenarios.push_back(AUDIO_SCENARIO_NUM);
+	audioScenarios.push_back(AUDIO_SCENARIO_GAME_STREAMING);
+	audioScenarios.push_back(AUDIO_SCENARIO_CHATROOM);
+	audioScenarios.push_back(AUDIO_SCENARIO_HIGH_DEFINITION);
+	audioScenarios.push_back(AUDIO_SCENARIO_CHORUS);
+	audioScenarios.push_back(AUDIO_SCENARIO_NUM);
 }
 
 AgoraRtcEngine::~AgoraRtcEngine()
@@ -307,22 +332,26 @@ int AgoraRtcEngine::SetChannelProfile(CHANNEL_PROFILE_TYPE profile)
 }
 
 int AgoraRtcEngine::JoinChannel(const std::string &key, const std::string &channel, 
-	unsigned int uid, bool enableDual, bool muteAudio , bool muteVideo, bool loopbackRecording)
+	unsigned int uid, bool audioProfile, bool enableDual, bool muteAudio , bool muteVideo, bool loopbackRecording)
 {
 	if (m_joined)
 		return 0;
-	agora::rtc::AUDIO_PROFILE_TYPE profile = agora::rtc::AUDIO_PROFILE_MUSIC_STANDARD;
-	if (m_audioChannel == 1 && !m_bHighQuality) {
-		profile = AUDIO_PROFILE_MUSIC_STANDARD;
-	}
-	else if (m_audioChannel == 2 && !m_bHighQuality) {
-		profile = AUDIO_PROFILE_MUSIC_STANDARD_STEREO;
-	}
-	else if (m_audioChannel == 1 && m_bHighQuality) {
-		profile = AUDIO_PROFILE_MUSIC_HIGH_QUALITY;
-	}
-	else if (m_audioChannel == 2 && m_bHighQuality) {
-		profile = AUDIO_PROFILE_MUSIC_HIGH_QUALITY_STEREO;
+
+	if (audioProfile) {
+		agora::rtc::AUDIO_PROFILE_TYPE profile = agora::rtc::AUDIO_PROFILE_MUSIC_STANDARD;
+		if (m_audioChannel == 1 && !m_bHighQuality) {
+			profile = AUDIO_PROFILE_MUSIC_STANDARD;
+		}
+		else if (m_audioChannel == 2 && !m_bHighQuality) {
+			profile = AUDIO_PROFILE_MUSIC_STANDARD_STEREO;
+		}
+		else if (m_audioChannel == 1 && m_bHighQuality) {
+			profile = AUDIO_PROFILE_MUSIC_HIGH_QUALITY;
+		}
+		else if (m_audioChannel == 2 && m_bHighQuality) {
+			profile = AUDIO_PROFILE_MUSIC_HIGH_QUALITY_STEREO;
+		}
+		m_rtcEngine->setAudioProfile(profile, m_scenario);
 	}
 
 	ChannelMediaOptions options;
@@ -334,8 +363,8 @@ int AgoraRtcEngine::JoinChannel(const std::string &key, const std::string &chann
 	options.publishAudioTrack = false;
 	options.clientRoleType = CLIENT_ROLE_BROADCASTER;
 	options.channelProfile = CHANNEL_PROFILE_LIVE_BROADCASTING;
-	if (enableDual)
-		m_rtcEngine->enableDualStreamMode(true);
+	
+	m_rtcEngine->enableDualStreamMode(VIDEO_SOURCE_CUSTOM, enableDual);
 	blog(LOG_INFO, "JoinChannel: channel=%s, uid=%u", channel.c_str(), uid);
 	m_rtcEngine->enableLoopbackRecording(loopbackRecording);
 	int r = m_rtcEngine->joinChannel(key.c_str(), channel.c_str(), uid, options);//JoinChannel(key.data(), channel.data(), "", uid, options);//
@@ -434,7 +463,7 @@ bool AgoraRtcEngine::SetCameraEncoderConfiguration(int w, int h, int fps, int bi
 
 void AgoraRtcEngine::SetAudioProfile(int scenario, int channels, bool bHighQuality)
 {
-	m_scenario = (AUDIO_SCENARIO_TYPE)scenario;
+	m_scenario = audioScenarios[scenario];
 	m_audioChannel = channels;
 	m_bHighQuality = bHighQuality;
 }
@@ -523,6 +552,23 @@ void AgoraRtcEngine::MuteRemoteVideo(unsigned int uid, bool bMute)
 	m_rtcEngine->muteRemoteVideoStream(uid, bMute);
 }
 
+void AgoraRtcEngine::SetPcmInfo(bool b, std::string path)
+{
+	m_savePcm = b; 
+	m_pcmPath = path;
+	if (m_joined) {
+		if (m_pcm && !m_savePcm) {
+			fclose(m_pcm);
+			m_pcm = nullptr;
+		}
+		else if (!m_pcm && m_savePcm) {
+			std::string filePath = m_pcmPath + CurrentTimeString();
+			filePath += ".pcm";
+			m_pcm = fopen(filePath.c_str(), "ab+");
+		}
+	}
+}
+
 void* AgoraRtcEngine::AgoraAudioObserver_Create()
 {
 	m_externalAudioframe.channels = 2;
@@ -539,23 +585,6 @@ void* AgoraRtcEngine::AgoraAudioObserver_Create()
 
 	m_externalAudioFrameSize = m_externalAudioframe.samplesPerChannel * 2 * 2;
 	return &m_externalAudioframe;
-}
-
-std::string CurrentTimeString()
-{
-	using namespace std::chrono;
-
-	struct tm tstruct;
-
-	char buf[80] = { 0 };
-	auto tp = system_clock::now();
-	auto now = system_clock::to_time_t(tp);
-	tstruct = *localtime(&now);
-	asctime(&tstruct);
-	sprintf(buf, "obs_agora_%d-%02d-%d_%d-%d-%d"
-		, tstruct.tm_year + 1900, tstruct.tm_mon + 1, tstruct.tm_mday
-		, tstruct.tm_hour, tstruct.tm_min, tstruct.tm_sec);
-	return buf;
 }
 
 void AgoraRtcEngine::AgoraAudioObserver_Destroy()
@@ -577,7 +606,7 @@ void AgoraRtcEngine::PushAudioFrame(struct encoder_frame* frame)
 	if (m_savePcm) {
 		if (!m_pcm) {
 			std::string filePath = m_pcmPath + CurrentTimeString();
-			filePath += ".m_pcm";
+			filePath += ".pcm";
 			m_pcm = fopen(filePath.c_str(), "ab+");
 		}
 

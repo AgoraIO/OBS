@@ -85,6 +85,7 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	startTestNet = tr("Agora.Setting.TestNet.Start");
 	stopTestNet = tr("Agora.Setting.TestNet.Stop");
 	ui->chkSavePCM->setText(tr("Basic.Settings.Agora.Save.PCM"));
+	ui->chkSetAudioProfile->setText(tr("Basic.Settings.Agora.Save.PCM"));
 	ui->labSystemCPU->setText(tr("Agora.CPU.Threshold"));
 	qualityUnknown = tr("Agora.Test.Network.Result.Unknown");
 	qualityExcellent= tr("Agora.Test.Network.Result.Excellent");
@@ -308,9 +309,10 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 
 	HookWidget(ui->chkPersistSaving, CHECK_CHANGED, GENERAL_CHANGED);
 	HookWidget(ui->chkSavePCM, CHECK_CHANGED, AUDIO_CHANGED);
+	HookWidget(ui->chkSetAudioProfile, CHECK_CHANGED, AUDIO_CHANGED);
 	HookWidget(ui->spinCPU, SPINBOX_CHANGED, GENERAL_CHANGED);
 	HookWidget(ui->chkLoopback, CHECK_CHANGED, AUDIO_CHANGED);
-
+	
 	connect(ui->chkPersistSaveAppid, &QCheckBox::toggled, this, &AgoraSettings::onChkSaveAppidSettings);
 	connect(ui->chkObsCamera, &QCheckBox::toggled, this, &AgoraSettings::on_chkObsCamera_check);
 	connect(rtcEngine, &AgoraRtcEngine::onLastmileQuality, this, &AgoraSettings::OnLastmileTest);
@@ -393,6 +395,8 @@ void AgoraSettings::SaveAudioSettings()
 	settings.scenario     = ui->cmbScenario->currentIndex();
 	settings.audioChannel = ui->cmbRecordChannelSetup->currentIndex() + 1;
 	settings.savePcm = ui->chkSavePCM->isChecked();
+	settings.setAudioProfile = ui->chkSetAudioProfile->isChecked();
+
 	settings.loopback = ui->chkLoopback->isChecked();
 	main->SetAgoraSetting(settings);
 	rtcEngine->SetAudioProfile(settings.scenario, settings.audioChannel, settings.bHighQuality);
@@ -628,6 +632,7 @@ void AgoraSettings::LoadAudioSettings()
 	
 	ui->cmbScenario->setCurrentIndex(settings.scenario);
 	ui->chkSavePCM->setChecked(settings.savePcm);
+	ui->chkSetAudioProfile->setChecked(settings.savePcm);
 	ui->chkLoopback->setChecked(settings.loopback);
 	ui->cmbRecordChannelSetup->setCurrentIndex(settings.audioChannel - 1);
 	loading = false;

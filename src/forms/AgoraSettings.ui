@@ -81,7 +81,7 @@
      <item>
       <widget class="QStackedWidget" name="settingsPages">
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="agoraPage">
         <layout class="QVBoxLayout" name="verticalLayout_16">
@@ -111,10 +111,10 @@
            <widget class="QWidget" name="scrollAreaWidgetContents">
             <property name="geometry">
              <rect>
-              <x>-137</x>
-              <y>-190</y>
-              <width>816</width>
-              <height>559</height>
+              <x>0</x>
+              <y>0</y>
+              <width>679</width>
+              <height>506</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_23">
@@ -1136,8 +1136,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>943</width>
-              <height>313</height>
+              <width>696</width>
+              <height>420</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_50">
@@ -1269,17 +1269,24 @@
                      </item>
                     </widget>
                    </item>
-                   <item row="3" column="1">
+                   <item row="4" column="1">
                     <widget class="QCheckBox" name="chkAudioHighQuality">
                      <property name="text">
                       <string>Basic.Settings.Agora.AudioProfile.High</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="4" column="1">
+                   <item row="5" column="1">
                     <widget class="QCheckBox" name="chkSavePCM">
                      <property name="text">
                       <string>Basic.Settings.Agora.Save.PCM</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="3" column="1">
+                    <widget class="QCheckBox" name="chkSetAudioProfile">
+                     <property name="text">
+                      <string>Basic.Settings.SetAudioProfile</string>
                      </property>
                     </widget>
                    </item>

@@ -127,7 +127,7 @@ AgoraBasic::AgoraBasic(QMainWindow *parent)
 
 	char path[512];
 	int len = os_get_config_path(path, sizeof(path), "obs-studio\\logs\\");
-	m_settings.savePcm = path;
+	m_settings.pcmFolder = path;
 	InitGlobalConfig();
 	InitBasicConfig();
 
@@ -186,6 +186,8 @@ AgoraBasic::~AgoraBasic()
 			config_set_uint(globalAgoraConfig, "AgoraTool", "CameraUID", 0);
 		}
 
+		config_set_bool(globalAgoraConfig, "AgoraTool", "savePcm", m_settings.savePcm);
+		config_set_bool(globalAgoraConfig, "AgoraTool", "setAudioProfile", m_settings.setAudioProfile);
 		config_set_uint(globalAgoraConfig, "AgoraTool", "logInterval", m_settings.logInterval);
 		config_set_uint(globalAgoraConfig, "AgoraTool", "InformationMode", m_settings.info_mode);
 
@@ -222,6 +224,10 @@ AgoraBasic::~AgoraBasic()
 		config_set_bool(globalAgoraConfig, "AgoraTool", "loopbackRecording", m_settings.loopback);
 	}
 	else {
+
+		config_set_bool(globalAgoraConfig, "AgoraTool", "savePcm", false);
+		config_set_bool(globalAgoraConfig, "AgoraTool", "setAudioProfile", false);
+
 		config_set_uint(globalAgoraConfig, "AgoraTool", "InformationMode", 0);
 		config_set_string(globalAgoraConfig, "AgoraTool", "InformationUrl", "");
 		config_set_string(globalAgoraConfig, "AgoraTool", "appid", "");
@@ -380,6 +386,8 @@ void AgoraBasic::InitBasicConfig()
 		if (m_settings.logInterval == 0)
 			m_settings.logInterval = 20;
 
+		m_settings.savePcm = config_get_bool(globalAgoraConfig, "AgoraTool", "savePcm");
+		m_settings.setAudioProfile = config_get_bool(globalAgoraConfig, "AgoraTool", "setAudioProfile");
 	}
 
 	m_settings.savePersistAppid = config_get_bool(globalAgoraConfig, "AgoraTool", "savePersistAppid");
@@ -821,7 +829,7 @@ void AgoraBasic::SetLiveTranscoding()
 	config.width = m_settings.rtmp_width;   //;
 	config.height = m_settings.rtmp_height; //;
 	config.videoFramerate = m_settings.rtmp_fps;
-	config.videoBitrate = m_settings.rtmp_height;
+	config.videoBitrate = m_settings.rtmp_bitrate;
 	config.videoGop = config.videoFramerate;
 	config.userCount = count + 1;
 	config.watermark = nullptr;
