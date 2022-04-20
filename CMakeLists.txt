@@ -92,7 +92,7 @@ if(WIN32)
 		libobs
 		Qt5::Core
 		Qt5::Widgets
-		"${CMAKE_SOURCE_DIR}/deps/Agora/${AGORA_ARCH}/agora_rtc_sdk.lib"
+		"${CMAKE_SOURCE_DIR}/deps/Agora/${AGORA_ARCH}/agora_rtc_sdk.dll.lib"
 		"${CMAKE_SOURCE_DIR}/deps/libyuv/${AGORA_ARCH}/yuv.lib"
 		"${CMAKE_SOURCE_DIR}/deps/curl/${AGORA_ARCH}/libcurl.lib")
 endif()

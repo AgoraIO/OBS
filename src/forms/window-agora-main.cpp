@@ -187,6 +187,8 @@ AgoraBasic::~AgoraBasic()
 		}
 
 		config_set_bool(globalAgoraConfig, "AgoraTool", "savePcm", m_settings.savePcm);
+		config_set_int(globalAgoraConfig, "AgoraTool", "videoInterval", m_settings.videoInterval);
+
 		config_set_bool(globalAgoraConfig, "AgoraTool", "setAudioProfile", m_settings.setAudioProfile);
 		config_set_uint(globalAgoraConfig, "AgoraTool", "logInterval", m_settings.logInterval);
 		config_set_uint(globalAgoraConfig, "AgoraTool", "InformationMode", m_settings.info_mode);
@@ -227,6 +229,7 @@ AgoraBasic::~AgoraBasic()
 
 		config_set_bool(globalAgoraConfig, "AgoraTool", "savePcm", false);
 		config_set_bool(globalAgoraConfig, "AgoraTool", "setAudioProfile", false);
+		config_set_int(globalAgoraConfig, "AgoraTool", "videoInterval", 0);
 
 		config_set_uint(globalAgoraConfig, "AgoraTool", "InformationMode", 0);
 		config_set_string(globalAgoraConfig, "AgoraTool", "InformationUrl", "");
@@ -387,6 +390,8 @@ void AgoraBasic::InitBasicConfig()
 			m_settings.logInterval = 20;
 
 		m_settings.savePcm = config_get_bool(globalAgoraConfig, "AgoraTool", "savePcm");
+		m_settings.videoInterval = config_get_int(globalAgoraConfig, "AgoraTool", "videoInterval");
+		
 		m_settings.setAudioProfile = config_get_bool(globalAgoraConfig, "AgoraTool", "setAudioProfile");
 	}
 
@@ -808,7 +813,7 @@ void AgoraBasic::JoinChannel(std::string token)
 	joinFailedTimer.stop();
 	joinFailedTimer.start(10000);
 	blog(LOG_INFO, "agora token:%s", m_settings.token.c_str());
-
+	rtcEngine->SetVideoBuffer(m_settings.videoInterval);
 	rtcEngine->JoinChannel(m_settings.token.c_str()
 		, m_settings.channelName.c_str(), m_settings.uid, m_settings.setAudioProfile ,m_settings.bDualStream,
 		!m_settings.muteAllRemoteAudioVideo, !m_settings.muteAllRemoteAudioVideo,
@@ -1206,6 +1211,8 @@ void AgoraBasic::onJoinChannelSuccess_slot(const char* channel, unsigned int uid
 		obs_enum_sources(EnumSources, this);
 		RemoveVideoPluginFilters();
 		AddFilterCurrentScene();
+
+
 		rtcEngine->JoinChannel(m_settings.camera_token.c_str(),
 			m_settings.channelName.c_str(), m_settings.camera_uid);
 		rtcEngine->SetCameraEncoderConfiguration(

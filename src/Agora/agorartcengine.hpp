@@ -85,6 +85,7 @@ public:
 	void SetJoinFlag(bool b) { m_joined = b; }
 	void SetLogInterval(int interval) {	m_logInterval = interval;}
 	
+	void SetVideoBuffer(int second);
 	agora::rtc::IRtcEngine* getRtcEngine() { return m_rtcEngine; }
 signals:
 	void onJoinChannelSuccess(const char* channel, unsigned int uid, int elapsed);

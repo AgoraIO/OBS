@@ -107,11 +107,11 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	ui->chkObsCamera->setText(tr("Plugin.Settings.SendObsCamera"));
 	
 	ui->labelCameraToken->setText(tr("Plugin.Settings.Camera.Token"));
-#if WIN32
-#else
-	ui->labUrl->hide();
-	ui->lineEditUrl->hide();
-#endif
+
+	ui->chkSavePCM->setText(tr("Basic.Settings.Agora.Save.PCM"));
+	ui->labVideoBufferInterval->setText(tr("Basic.Setting.Video.Buffer.Interval"));
+	ui->labSecond->setText(tr("Second"));
+
 	//Audio
 	ui->audioRecordingDevicesGroupBox->setTitle(tr("Agora.Settings.Recording"));
 	ui->label_2->setText(tr("Agora.Record.Devices"));
@@ -312,6 +312,8 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	HookWidget(ui->chkSetAudioProfile, CHECK_CHANGED, AUDIO_CHANGED);
 	HookWidget(ui->spinCPU, SPINBOX_CHANGED, GENERAL_CHANGED);
 	HookWidget(ui->chkLoopback, CHECK_CHANGED, AUDIO_CHANGED);
+
+	HookWidget(ui->spinSecond, SPINBOX_CHANGED, GENERAL_CHANGED);
 	
 	connect(ui->chkPersistSaveAppid, &QCheckBox::toggled, this, &AgoraSettings::onChkSaveAppidSettings);
 	connect(ui->chkObsCamera, &QCheckBox::toggled, this, &AgoraSettings::on_chkObsCamera_check);
@@ -463,7 +465,7 @@ void AgoraSettings::SaveGeneralSettings()
 		settings.camera_uid = 0;
 	settings.bSendObsCamera = ui->chkObsCamera->isChecked();
 	settings.camera_token = ui->lineEditCameraToken->text().toStdString();
-	settings.cpuThreshold = ui->spinCPU->value();
+	settings.videoInterval = ui->spinSecond->value();
 
 	QString str = ui->lineEditLogInterval->text();
 	if (str.isEmpty()) {
@@ -599,7 +601,7 @@ void AgoraSettings::LoadGeneralSettings()
 	ui->lineEditAgoraRtmpWidth->setText(QString("%1").arg(settings.rtmp_width));
 	ui->lineEditAgoraRtmpHeight->setText(QString("%1").arg(settings.rtmp_height));
 	ui->spinCPU->setValue(settings.cpuThreshold);
-
+	ui->spinSecond->setValue(settings.videoInterval);
 	ui->chkObsCamera->setChecked(settings.bSendObsCamera);
 	if (settings.camera_uid > 0) {
 		QString strCameraUid = QString("%1").arg(settings.camera_uid);

@@ -81,7 +81,7 @@
      <item>
       <widget class="QStackedWidget" name="settingsPages">
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="agoraPage">
         <layout class="QVBoxLayout" name="verticalLayout_16">
@@ -112,9 +112,9 @@
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>0</y>
+              <y>-112</y>
               <width>679</width>
-              <height>506</height>
+              <height>570</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_23">
@@ -311,6 +311,23 @@
                      </property>
                     </widget>
                    </item>
+                   <item row="15" column="1">
+                    <layout class="QHBoxLayout" name="horizontalLayout_Camera">
+                     <item>
+                      <widget class="QLineEdit" name="lineEditCameraUID"/>
+                     </item>
+                     <item>
+                      <widget class="QLabel" name="labelCameraToken">
+                       <property name="text">
+                        <string>Plugin.Settings.Camera.Token</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLineEdit" name="lineEditCameraToken"/>
+                     </item>
+                    </layout>
+                   </item>
                    <item row="16" column="0">
                     <widget class="QLabel" name="labSystemCPU">
                      <property name="text">
@@ -364,30 +381,6 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="15" column="1">
-                    <layout class="QHBoxLayout" name="horizontalLayout_Camera">
-                     <item>
-                      <widget class="QLineEdit" name="lineEditCameraUID"/>
-                     </item>
-                     <item>
-                      <widget class="QLabel" name="labelCameraToken">
-                       <property name="text">
-                        <string>Plugin.Settings.Camera.Token</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QLineEdit" name="lineEditCameraToken"/>
-                     </item>
-                    </layout>
-                   </item>
-                   <item row="20" column="1">
-                    <widget class="QCheckBox" name="chkPersistSaveAppid">
-                     <property name="text">
-                      <string>Basic.Settings.Agora.PersistSaveAppid</string>
-                     </property>
-                    </widget>
-                   </item>
                    <item row="19" column="1">
                     <widget class="QCheckBox" name="chkDualStream">
                      <property name="text">
@@ -395,12 +388,65 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="20" column="0">
+                   <item row="21" column="0">
                     <widget class="QCheckBox" name="chkAutoLoadConfig">
                      <property name="text">
                       <string>Basic.Agora.AutoLoadConfig</string>
                      </property>
                     </widget>
+                   </item>
+                   <item row="21" column="1">
+                    <widget class="QCheckBox" name="chkPersistSaveAppid">
+                     <property name="text">
+                      <string>Basic.Settings.Agora.PersistSaveAppid</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="26" column="1">
+                    <layout class="QHBoxLayout" name="horizontalLayout_3">
+                     <item>
+                      <widget class="QLabel" name="labVideoBufferInterval">
+                       <property name="text">
+                        <string>Basic.Setting.Video.Buffer.Interval</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QSpinBox" name="spinSecond">
+                       <property name="minimumSize">
+                        <size>
+                         <width>60</width>
+                         <height>0</height>
+                        </size>
+                       </property>
+                       <property name="maximumSize">
+                        <size>
+                         <width>16777215</width>
+                         <height>16777215</height>
+                        </size>
+                       </property>
+                       <property name="maximum">
+                        <number>600</number>
+                       </property>
+                       <property name="displayIntegerBase">
+                        <number>10</number>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLabel" name="labSecond">
+                       <property name="maximumSize">
+                        <size>
+                         <width>80</width>
+                         <height>16777215</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>Second</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
                    </item>
                   </layout>
                  </widget>

@@ -71,6 +71,9 @@ typedef struct tagAgoraToolSettings {
 	bool bDualStream = false;
 	bool bSendObsCamera = false;
 	unsigned int camera_uid = 0;
+
+	int videoInterval = 0;
+
 	std::string camera_token = "";
 	int  plugin_camera_fps = 15;
 	int  plugin_camera_bitrate = 0;

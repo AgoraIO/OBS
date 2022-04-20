@@ -71,7 +71,7 @@ public:
 		emit m_engine.onRemoteVideoStateChanged(uid, (int)state, (int)reason, elapsed);
 	}
 
-	virtual void onRtmpStreamingStateChanged(const char *url, RTMP_STREAM_PUBLISH_STATE state, RTMP_STREAM_PUBLISH_ERROR errCode) override
+	virtual void onRtmpStreamingStateChanged(const char *url, RTMP_STREAM_PUBLISH_STATE state, RTMP_STREAM_PUBLISH_ERROR_TYPE errCode) override
 	{
 		emit m_engine.onRtmpStreamingStateChanged(url,  state, errCode);
 	}
@@ -280,7 +280,7 @@ bool AgoraRtcEngine::InitEngine(std::string appid)
 	m_rtcEngine->enableVideo();
 	m_rtcEngine->setClientRole(CLIENT_ROLE_BROADCASTER);
 	m_pMediaEngine->setExternalVideoSource(true, false);
-	m_rtcEngine->setExternalAudioSource(true, 48000, 2);
+	m_pMediaEngine->setExternalAudioSource(true, 48000, 2);
 
 	m_audioDeviceManager = new AAudioDeviceManager(m_rtcEngine);
 	m_initialize = true;
@@ -567,6 +567,14 @@ void AgoraRtcEngine::SetPcmInfo(bool b, std::string path)
 			m_pcm = fopen(filePath.c_str(), "ab+");
 		}
 	}
+}
+
+void AgoraRtcEngine::SetVideoBuffer(int second)
+{
+	AParameter apm(m_rtcEngine);
+	char szParam[200] = { 0 };
+	sprintf(szParam, "{\"rtc.media_send_delay\":%d}", second * 1000);
+	apm->setParameters(szParam);
 }
 
 void* AgoraRtcEngine::AgoraAudioObserver_Create()
