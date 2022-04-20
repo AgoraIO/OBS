@@ -134,6 +134,11 @@
 
      对应Audio Profile的场景
 
+* 设置Audio Profile
+
+    选中Audio Profile，加入频道前才会调用setAudioProfile设置。
+
+
 * 高音质
 
      如果选中高音质，Audio Profile可以是

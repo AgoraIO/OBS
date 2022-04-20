@@ -85,7 +85,7 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	startTestNet = tr("Agora.Setting.TestNet.Start");
 	stopTestNet = tr("Agora.Setting.TestNet.Stop");
 	ui->chkSavePCM->setText(tr("Basic.Settings.Agora.Save.PCM"));
-	ui->chkSetAudioProfile->setText(tr("Basic.Settings.Agora.Save.PCM"));
+	ui->chkSetAudioProfile->setText(tr("Basic.Settings.SetAudioProfile"));
 	ui->labSystemCPU->setText(tr("Agora.CPU.Threshold"));
 	qualityUnknown = tr("Agora.Test.Network.Result.Unknown");
 	qualityExcellent= tr("Agora.Test.Network.Result.Excellent");

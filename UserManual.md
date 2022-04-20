@@ -141,6 +141,10 @@ Fill user basic information
 
      Audio Profile
 
+* Set Audio Profile
+
+     Check this, it'll call setAudioProfile before joinChannel.
+
 * High Quality
 
      If check this, Audio Profile will be

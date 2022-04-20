@@ -810,7 +810,7 @@ void AgoraBasic::JoinChannel(std::string token)
 	blog(LOG_INFO, "agora token:%s", m_settings.token.c_str());
 
 	rtcEngine->JoinChannel(m_settings.token.c_str()
-		, m_settings.channelName.c_str(), m_settings.uid, m_settings.bDualStream,
+		, m_settings.channelName.c_str(), m_settings.uid, m_settings.setAudioProfile ,m_settings.bDualStream,
 		!m_settings.muteAllRemoteAudioVideo, !m_settings.muteAllRemoteAudioVideo,
 		m_settings.loopback);
 	ui->streamButton->setText(starting_text);
