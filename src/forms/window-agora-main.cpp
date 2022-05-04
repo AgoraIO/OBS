@@ -15,7 +15,7 @@
 #if !defined(WIN32)
 #include <dispatch/dispatch.h>
 #endif
-#define AGORA_TOOL_VERSION "21.12.31.19.00"
+#define AGORA_TOOL_VERSION "22.04.29.19.45"
 using namespace std;
 
 bool DisplayResizeEvent::eventFilter(QObject *obj, QEvent *event)
@@ -218,7 +218,7 @@ AgoraBasic::~AgoraBasic()
 		config_set_bool(globalAgoraConfig, "AgoraTool", "savePersist", m_settings.savePersist);
 		config_set_string(globalAgoraConfig, "AgoraTool", "InformationUrl", m_settings.information_url.c_str());
 
-		config_set_bool(globalAgoraConfig, "AgoraTool", "SendOBSCamera", m_settings.bSendObsCamera);
+		config_set_bool(globalAgoraConfig, "AgoraTool", "SendOBSCamera", false);
 		config_set_int(globalAgoraConfig, "AgoraTool", "CameraEncWidth", m_settings.plugin_camera_width);
 		config_set_int(globalAgoraConfig, "AgoraTool", "CameraEncHeight", m_settings.plugin_camera_height);
 		config_set_int(globalAgoraConfig, "AgoraTool", "CameraEncFPS", m_settings.plugin_camera_fps);
@@ -371,7 +371,7 @@ void AgoraBasic::InitBasicConfig()
 			m_settings.camera_token = config_get_string(globalAgoraConfig, "AgoraTool", "CameraToken");
 
 		if (config_has_user_value(globalAgoraConfig, "AgoraTool", "SendOBSCamera"))
-			m_settings.bSendObsCamera = config_get_bool(globalAgoraConfig, "AgoraTool", "SendOBSCamera");
+			m_settings.bSendObsCamera = false;//config_get_bool(globalAgoraConfig, "AgoraTool", "SendOBSCamera");
 		if (config_has_user_value(globalAgoraConfig, "AgoraTool", "CameraEncWidth"))
 			m_settings.plugin_camera_width = config_get_int(globalAgoraConfig, "AgoraTool", "CameraEncWidth");
 		if (config_has_user_value(globalAgoraConfig, "AgoraTool", "CameraEncHeight"))
@@ -814,6 +814,7 @@ void AgoraBasic::JoinChannel(std::string token)
 	joinFailedTimer.start(10000);
 	blog(LOG_INFO, "agora token:%s", m_settings.token.c_str());
 	rtcEngine->SetVideoBuffer(m_settings.videoInterval);
+	
 	rtcEngine->JoinChannel(m_settings.token.c_str()
 		, m_settings.channelName.c_str(), m_settings.uid, m_settings.setAudioProfile ,m_settings.bDualStream,
 		!m_settings.muteAllRemoteAudioVideo, !m_settings.muteAllRemoteAudioVideo,
@@ -1029,8 +1030,12 @@ void AgoraBasic::on_streamButton_clicked()
 		StopAgoraOutput();
 		
 		rtcEngine->LeaveChannel();
-		if (joinFailed)
+		if (joinFailed) {
 			rtcEngine->SetJoinFlag(false);
+			RtcStats stats;
+			onLeaveChannel_slot(stats);
+		}
+		
 		if (m_settings.bSendObsCamera) 
 			rtcEngine->LeaveChannelCamera();
 		
@@ -1399,7 +1404,7 @@ void AgoraBasic::onConnectionStateChanged_slot(int state, int reason)
 			break;
 		}
 		joinFailedTimer.stop();
-
+		rtcEngine->SetJoinFlag(true);
 		QMessageBox::critical(NULL, "Error", info.c_str());
 		on_streamButton_clicked();
 		joinFailed = false;
@@ -1437,7 +1442,7 @@ void AgoraBasic::onCameraConnectionStateChanged_slot(int state, int reason)
 			break;
 		}
 		joinFailedTimer.stop();
-
+		rtcEngine->SetJoinFlag(true);
 		QMessageBox::critical(NULL, "Error", info.c_str());
 
 		on_streamButton_clicked();

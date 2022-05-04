@@ -128,7 +128,7 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	index = 0;
 	ui->cmbRecordChannelSetup->setItemText(0, tr("Mono"));
 	ui->cmbRecordChannelSetup->setItemText(1, tr("Stereo"));
-
+	ui->chkObsCamera->hide();
 	AgoraToolSettings settings;
 	main->GetAgoraSetting(settings);
 	if (settings.audioChannel == 2)
@@ -1030,6 +1030,20 @@ void AgoraSettings::showEvent(QShowEvent *event)
 	ui->lineEditUID->setEnabled(bEnabled);
 	ui->lineEditCameraUID->setEnabled(bEnabled);
 	ui->lineEditCameraToken->setEnabled(bEnabled);
+	ui->chkObsCamera->setEnabled(bEnabled);
+	ui->chkAudioHighQuality->setEnabled(bEnabled);
+	ui->chkSetAudioProfile->setEnabled(bEnabled);
+	ui->cmbRecordChannelSetup->setEnabled(bEnabled);
+	ui->chkDualStream->setEnabled(bEnabled);
+
+	ui->spinSecond->setEnabled(bEnabled);
+	ui->recordSampleRate->setEnabled(bEnabled);
+	
+	ui->lineEditAgoraRTmp->setEnabled(bEnabled);
+	ui->lineEditAgoraRtmpBitrate->setEnabled(bEnabled);
+	ui->lineEditAgoraRtmpFPS->setEnabled(bEnabled);
+	ui->lineEditAgoraRtmpWidth->setEnabled(bEnabled);
+	ui->lineEditAgoraRtmpHeight->setEnabled(bEnabled);
 }
 
 /*typedef void(*obs_source_audio_capture_t)(void *param, obs_source_t *source,
