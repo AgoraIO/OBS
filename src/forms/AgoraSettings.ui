@@ -112,9 +112,9 @@
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>-137</y>
+              <y>-164</y>
               <width>679</width>
-              <height>573</height>
+              <height>564</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_23">
@@ -426,7 +426,7 @@
                         </size>
                        </property>
                        <property name="maximum">
-                        <number>300</number>
+                        <number>600</number>
                        </property>
                        <property name="displayIntegerBase">
                         <number>10</number>
@@ -1182,8 +1182,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>655</width>
-              <height>319</height>
+              <width>647</width>
+              <height>315</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_50">
