@@ -1,7 +1,7 @@
 #include <obs-module.h>
 #include <obs-frontend-api.h>
 #include <QtCore/QTimer>
-#include <QtWidgets/QAction>
+#include <QAction>
 #include <QtWidgets/QMainWindow>
 #include "forms/window-agora-main.hpp"
 //#include "forms/window-init-agora-widget.hpp"
@@ -51,7 +51,7 @@ void initQT()
 void obs_module_unload() {
 	blog(LOG_INFO, "unoad agora tool!");
 }
-#else
+#else 
 __attribute__((visibility("default"))) void obs_module_unload() {
 	blog(LOG_INFO, "unoad agora tool!");
 }

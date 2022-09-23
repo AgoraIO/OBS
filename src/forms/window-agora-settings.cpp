@@ -469,8 +469,7 @@ void AgoraSettings::SaveGeneralSettings()
 
 	QString str = ui->lineEditLogInterval->text();
 	if (str.isEmpty()) {
-		str = QString("20");
-		ui->lineEditLogInterval->setText(QString(20));
+		ui->lineEditLogInterval->setText(QString("20"));
 	}
 	settings.logInterval = strtol(str.toStdString().data(), NULL, 10);
 
