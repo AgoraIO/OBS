@@ -6,10 +6,12 @@
 #include <AgoraBase.h>
 #include <IAgoraRtcEngine.h>
 #include <IAgoraMediaEngine.h>
+#include <IAgoraRtcEngineEx.h>
 #else
+#include <AgoraRtcKit/AgoraBase.h>
 #include <AgoraRtcKit/IAgoraRtcEngine.h>
 #include <AgoraRtcKit/IAgoraMediaEngine.h>
-#include <AgoraRtcKit/AgoraBase.h>
+#include <AgoraRtcKit/IAgoraRtcEngineEx.h>
 typedef const char * LPCSTR;
 #define true true
 #define false false
@@ -86,6 +88,10 @@ public:
 	void SetLogInterval(int interval) {	m_logInterval = interval;}
 	
 	void SetVideoBuffer(int second);
+	void SetExternalParams(std::string strJson);
+
+	void SetNewToken(std::string token);
+	int64_t getTimeOffset();
 	agora::rtc::IRtcEngine* getRtcEngine() { return m_rtcEngine; }
 signals:
 	void onJoinChannelSuccess(const char* channel, unsigned int uid, int elapsed);
@@ -104,7 +110,10 @@ signals:
 	void onFirstRemoteVideoFrame(unsigned uid, int width, int height, int elapsed);
 	void onRtmpStreamingStateChanged(const char *url, int state, int errCode);
 	void onSystemCPU(int cpuUsage);
-private:
+	void onTokenPrivilegeWillExpire(const char *token);
+
+	
+    private:
 	friend class AgoraRtcEngineEvent;
 	void SetExternalVideoFrame();
 	void SetExternalVideoFrameCamera(struct obs_source_frame* frame);
@@ -113,11 +122,13 @@ private:
 	static AgoraRtcEngine* m_agoraEngine;
 	agora::rtc::IRtcEngineEx* m_rtcEngine = nullptr;
 	agora::media::IMediaEngine* m_pMediaEngine = nullptr;
+	agora::rtc::LiveTranscoding m_transConfig;
 	std::unique_ptr<agora::rtc::IRtcEngineEventHandler> m_eventHandler;
 	std::unique_ptr<agora::rtc::IRtcEngineEventHandler> m_eventHandlerCamera;
 	bool m_joined = false;
 	bool m_cameraJoined = false;
 	bool m_initialize = false;
+	int64_t m_Offset;
 	// external video
 	int m_externalVideoFrameSize;
 	enum video_format m_format;
@@ -158,6 +169,10 @@ private:
 	std::string m_pcmPath = "";
 	int m_sampleRate = 48000;
 	int m_audioChannel = 2;
+
+	//test
+	FILE *fh = nullptr;
+	std::string logPath;
 	
 	std::map<video_format, std::string> mapOBSVideoFormat;
 	std::map<agora::media::base::VIDEO_PIXEL_FORMAT, std::string> mapVideoFormat;

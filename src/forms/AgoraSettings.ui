@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>857</width>
+    <width>753</width>
     <height>512</height>
    </rect>
   </property>
@@ -25,10 +25,17 @@
   <property name="windowTitle">
    <string>Settings</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="1" column="0">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="0" column="0">
       <widget class="QListWidget" name="listWidget">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
@@ -78,7 +85,7 @@
        </item>
       </widget>
      </item>
-     <item>
+     <item row="0" column="1">
       <widget class="QStackedWidget" name="settingsPages">
        <property name="currentIndex">
         <number>0</number>
@@ -112,9 +119,9 @@
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>-164</y>
-              <width>679</width>
-              <height>564</height>
+              <y>-159</y>
+              <width>642</width>
+              <height>549</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_23">
@@ -447,6 +454,20 @@
                       </widget>
                      </item>
                     </layout>
+                   </item>
+                   <item row="22" column="0">
+                    <widget class="QCheckBox" name="chkHardEncoderConfig">
+                     <property name="text">
+                      <string>Basic.Agora.HardEncoder</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="22" column="1">
+                    <widget class="QCheckBox" name="chkH265Config">
+                     <property name="text">
+                      <string>Basic.Agora.H265</string>
+                     </property>
+                    </widget>
                    </item>
                   </layout>
                  </widget>
@@ -1182,8 +1203,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>647</width>
-              <height>315</height>
+              <width>650</width>
+              <height>410</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_50">
@@ -1777,42 +1798,65 @@
         </layout>
        </widget>
        <widget class="QWidget" name="netTestPage">
-        <layout class="QFormLayout" name="formLayout_5">
-         <property name="fieldGrowthPolicy">
-          <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+        <widget class="QLabel" name="labelTestNetWork">
+         <property name="geometry">
+          <rect>
+           <x>15</x>
+           <y>265</y>
+           <width>16</width>
+           <height>16</height>
+          </rect>
          </property>
-         <property name="labelAlignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         <property name="styleSheet">
+          <string notr="true">color: rgb(255, 0, 0);</string>
          </property>
-         <item row="0" column="0">
-          <widget class="QPushButton" name="btnNetworkTest">
-           <property name="text">
-            <string>Agora.Setting.TestNet.Start</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QLabel" name="labelTestNetWork">
-           <property name="styleSheet">
-            <string notr="true">color: rgb(255, 0, 0);</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-        </layout>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="btnNetworkTest">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="geometry">
+          <rect>
+           <x>20</x>
+           <y>9</y>
+           <width>170</width>
+           <height>23</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Agora.Setting.TestNet.Start</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="btnSetParams">
+         <property name="geometry">
+          <rect>
+           <x>20</x>
+           <y>50</y>
+           <width>171</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Agora.Setting.SetParams</string>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="lineEditParams">
+         <property name="geometry">
+          <rect>
+           <x>210</x>
+           <y>50</y>
+           <width>351</width>
+           <height>31</height>
+          </rect>
+         </property>
+        </widget>
        </widget>
       </widget>
      </item>
     </layout>
-   </item>
-   <item>
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
-    </widget>
    </item>
   </layout>
  </widget>

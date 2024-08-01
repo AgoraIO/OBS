@@ -121,4 +121,7 @@ private slots:
 	void on_btnNetworkTest_clicked();
 	void OnLastmileTest(int quality);
 	void on_chkObsCamera_check(bool check);
+	void on_btnSetParams_clicked();
+	void on_chkHardEncoderConfig_check();
+	void on_chkH265Config_check();
 };

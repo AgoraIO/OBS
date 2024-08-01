@@ -71,6 +71,8 @@ typedef struct tagAgoraToolSettings {
 	bool bDualStream = false;
 	bool bSendObsCamera = false;
 	unsigned int camera_uid = 0;
+	bool bH265 = false;
+	bool bHardEncoder = false;
 
 	int videoInterval = 0;
 
@@ -209,6 +211,8 @@ public slots:
 	void reuquestToken_slot(QString json, int err);
 	void onSystemCPU_slot(int cpuUsage);
 	void onSceneChangedEvent();
+	void onTokenPrivilegeWillExpire_slot(const char *token);
+
 public:
 	void ToggleAgoraDialog();
 	AgoraBasic(QMainWindow *parent);

@@ -15,7 +15,7 @@
 #if !defined(WIN32)
 #include <dispatch/dispatch.h>
 #endif
-#define AGORA_TOOL_VERSION "22.09.06.19.00"
+#define AGORA_TOOL_VERSION "21.12.31.19.00"
 using namespace std;
 
 bool DisplayResizeEvent::eventFilter(QObject *obj, QEvent *event)
@@ -36,7 +36,8 @@ AgoraBasic::AgoraBasic(QMainWindow *parent)
 	, audio_encoder(nullptr)
 {
 	ui->setupUi(this);
-	setWindowFlags(windowFlags() | Qt::WindowMinimizeButtonHint);
+	setWindowFlags(windowFlags() | Qt::WindowMinimizeButtonHint |
+		       Qt::WindowMaximizeButtonHint);
 	//ui->previewDisabledWidget->setVisible(false);
 	ui->menubar->setVisible(false);
 
@@ -90,6 +91,7 @@ AgoraBasic::AgoraBasic(QMainWindow *parent)
 	connect(&joinFailedTimer, &QTimer::timeout, this, &AgoraBasic::joinFailed_slot);
 	connect(this, &AgoraBasic::requestTokenSignal, this, &AgoraBasic::reuquestToken_slot);
 	connect(rtcEngine, &AgoraRtcEngine::onSystemCPU, this, &AgoraBasic::onSystemCPU_slot);
+	connect(rtcEngine, &AgoraRtcEngine::onTokenPrivilegeWillExpire, this, &AgoraBasic::onTokenPrivilegeWillExpire_slot);
 
 	CreateRemoteVideos();
 	auto addDrawCallback = [this]() {
@@ -118,7 +120,7 @@ AgoraBasic::AgoraBasic(QMainWindow *parent)
 	ui->preview->installEventFilter(&resizeEventHandler);
 
 #if WIN32
-	CreateDisplay();
+	//CreateDisplay();
 #endif
 
 	InitializeAgoraOutput();
@@ -213,12 +215,14 @@ AgoraBasic::~AgoraBasic()
 
 		config_set_bool(globalAgoraConfig, "AgoraTool", "muteAllRemoteAudioVideo", m_settings.muteAllRemoteAudioVideo);
 		config_set_bool(globalAgoraConfig, "AgoraTool", "DualStream", m_settings.bDualStream);
+		config_set_bool(globalAgoraConfig, "AgoraTool", "H265Config", m_settings.bH265);
+		config_set_bool(globalAgoraConfig, "AgoraTool", "HardEncoderConfig", m_settings.bHardEncoder);
 
 		config_set_bool(globalAgoraConfig, "AgoraTool", "bHighQuality", m_settings.bHighQuality);
 		config_set_bool(globalAgoraConfig, "AgoraTool", "savePersist", m_settings.savePersist);
 		config_set_string(globalAgoraConfig, "AgoraTool", "InformationUrl", m_settings.information_url.c_str());
 
-		config_set_bool(globalAgoraConfig, "AgoraTool", "SendOBSCamera", false);
+		config_set_bool(globalAgoraConfig, "AgoraTool", "SendOBSCamera", m_settings.bSendObsCamera);
 		config_set_int(globalAgoraConfig, "AgoraTool", "CameraEncWidth", m_settings.plugin_camera_width);
 		config_set_int(globalAgoraConfig, "AgoraTool", "CameraEncHeight", m_settings.plugin_camera_height);
 		config_set_int(globalAgoraConfig, "AgoraTool", "CameraEncFPS", m_settings.plugin_camera_fps);
@@ -263,6 +267,9 @@ AgoraBasic::~AgoraBasic()
 		config_set_bool(globalAgoraConfig, "AgoraTool", "bHighQuality", false);
 
 		config_set_bool(globalAgoraConfig, "AgoraTool", "SendOBSCamera", false);
+
+		config_set_bool(globalAgoraConfig, "AgoraTool", "H265Config", false);
+		config_set_bool(globalAgoraConfig, "AgoraTool", "HardEncoderConfig", false);
 	}
 	
 	if(m_settings.savePersistAppid && m_settings.info_mode == 0)//manually
@@ -357,6 +364,8 @@ void AgoraBasic::InitBasicConfig()
 		m_settings.muteAllRemoteAudioVideo = config_get_bool(globalAgoraConfig, "AgoraTool", "muteAllRemoteAudioVideo");
 		m_settings.bDualStream = config_get_bool(globalAgoraConfig, "AgoraTool", "DualStream");
 		m_settings.bHighQuality = config_get_bool(globalAgoraConfig, "AgoraTool", "bHighQuality");
+		m_settings.bH265 = config_get_bool(globalAgoraConfig, "AgoraTool", "H265Config");
+		m_settings.bHardEncoder = config_get_bool(globalAgoraConfig, "AgoraTool", "HardEncoderConfig");
 		if (config_has_user_value(globalAgoraConfig, "AgoraTool", "InformationMode"))
 			m_settings.info_mode = config_get_int(globalAgoraConfig, "AgoraTool", "InformationMode");
 		if (config_has_user_value(globalAgoraConfig, "AgoraTool", "InformationUrl"))
@@ -371,7 +380,7 @@ void AgoraBasic::InitBasicConfig()
 			m_settings.camera_token = config_get_string(globalAgoraConfig, "AgoraTool", "CameraToken");
 
 		if (config_has_user_value(globalAgoraConfig, "AgoraTool", "SendOBSCamera"))
-			m_settings.bSendObsCamera = false;//config_get_bool(globalAgoraConfig, "AgoraTool", "SendOBSCamera");
+			m_settings.bSendObsCamera = config_get_bool(globalAgoraConfig, "AgoraTool", "SendOBSCamera");
 		if (config_has_user_value(globalAgoraConfig, "AgoraTool", "CameraEncWidth"))
 			m_settings.plugin_camera_width = config_get_int(globalAgoraConfig, "AgoraTool", "CameraEncWidth");
 		if (config_has_user_value(globalAgoraConfig, "AgoraTool", "CameraEncHeight"))
@@ -594,8 +603,12 @@ void AgoraBasic::ResetRemoteVideoWidget(int index)
 void AgoraBasic::CreateDisplay()
 {
 	QWindow* window = ui->preview->windowHandle();
-	if (display)
-		return;
+	//if (display)
+	//{
+	//	emit DisplayCreated(this);
+	//	return;
+	//}
+	//MessageBox(nullptr, L"111", L"222", MB_OK);
 #if _WIN32
 	QSize size = this->size();
 #else
@@ -607,6 +620,7 @@ void AgoraBasic::CreateDisplay()
 	info.format = GS_BGRA;
 	info.zsformat = GS_ZS_NONE;
 
+
 #ifdef _WIN32
 	info.window.hwnd = (HWND)ui->preview->winId();
 #elif __APPLE__
@@ -617,6 +631,8 @@ void AgoraBasic::CreateDisplay()
 #endif
 	display = obs_display_create(&info, backgroundColor);
 
+		blog(LOG_INFO, "AgoraBasic::CreateDisplay info.cx==%d, info.cy===%d,,display==%0x",
+	     info.cx, info.cy, &display);
 	emit DisplayCreated(this);
 }
 
@@ -637,6 +653,7 @@ bool AgoraBasic::EnumSources(void* data, obs_source_t* source)
 
 void AgoraBasic::AddFilterCurrentScene()
 {
+	blog(LOG_INFO, "AgoraBasic::AddFilterCurrentScene");
 	if (!vecCameraSources_.empty()) {
 		OBSScene scene = obs_scene_from_source(current_source);
 		bool find = false;
@@ -658,6 +675,7 @@ void AgoraBasic::AddFilterCurrentScene()
 
 void AgoraBasic::RemoveVideoPluginFilters()
 {
+	blog(LOG_INFO, "AgoraBasic::RemoveVideoPluginFilters");
 	for (int i = 0; i < vecCameraSources_.size(); ++i) {
 		OBSSource filter = nullptr;
 		while (filter = obs_source_get_filter_by_name(vecCameraSources_[i], "VideoPluginFilter")) {
@@ -708,8 +726,10 @@ void AgoraBasic::onBothJoinSuccess(const char* channel, unsigned int uid, int el
 			|| m_settings.rtmp_fps == 0) {
 			return;
 		}
-		SetLiveTranscoding();
+		blog(LOG_INFO, "onBothJoinSuccess  AddPublishStreamUrl");
+		
 		rtcEngine->AddPublishStreamUrl(m_settings.rtmp_url.c_str(), true);
+		SetLiveTranscoding();
 	}
 }
 
@@ -781,8 +801,8 @@ void AgoraBasic::JoinChannel(std::string token)
 	int output_width = ovi.output_width;
 	int output_height = ovi.output_height;
 
-	if (output_width * output_height > 1920 * 1080) {
-		float rate = sqrtf((float)(output_width * output_height) / (1920 * 1080.0f));
+	if (output_width * output_height > 3840 * 2160) {
+		float rate = sqrtf((float)(output_width * output_height) / (3840 * 2160));
 		float width = (float)output_width / rate;
 		float height = (float)output_height / rate;
 		output_width = width;
@@ -810,11 +830,24 @@ void AgoraBasic::JoinChannel(std::string token)
 
 	rtcEngine->SetConnection(m_settings.channelName, m_settings.camera_uid);
 
+	if (m_settings.bH265) {
+		std::string param1, param2;
+		//3.6¿ªÆôÓ²±à
+		//param1 = R"({"che.video.hw265_enc_enable" : 1})";
+		param2 = R"({"che.video.videoCodecIndex" : 2})";
+		//rtcEngine->SetExternalParams(
+		//	R"({"rtc.video.minscore_for_swh265enc" : 65})");
+		//rtcEngine->SetExternalParams(param1);
+		rtcEngine->SetExternalParams(param2);
+	}
+	if (m_settings.bHardEncoder) {
+		std::string strHardEncoder= R"({"engine.video.enable_hw_encoder" : true})";
+		rtcEngine->SetExternalParams(strHardEncoder);
+	}
 	joinFailedTimer.stop();
 	joinFailedTimer.start(10000);
 	blog(LOG_INFO, "agora token:%s", m_settings.token.c_str());
 	rtcEngine->SetVideoBuffer(m_settings.videoInterval);
-	
 	rtcEngine->JoinChannel(m_settings.token.c_str()
 		, m_settings.channelName.c_str(), m_settings.uid, m_settings.setAudioProfile ,m_settings.bDualStream,
 		!m_settings.muteAllRemoteAudioVideo, !m_settings.muteAllRemoteAudioVideo,
@@ -924,7 +957,7 @@ void AgoraBasic::SetLiveTranscoding()
 			config.transcodingUsers[index].uid = uids[index];
 		}
 	}
-
+	//config.videoCodecType = VIDEO_CODEC_H265_FOR_STREAM;
 	blog(LOG_INFO, "SetLiveTranscoding begin count:%d", config.userCount);
 	for (int i = 0; i < config.userCount; ++i) {
 		blog(LOG_INFO, "uid:%u, index:%d, x:%d, y:%d, w:%d, h:%d", config.transcodingUsers[i].uid, i, config.transcodingUsers[i].x, config.transcodingUsers[i].y, config.transcodingUsers[i].width, config.transcodingUsers[i].height);
@@ -1030,12 +1063,8 @@ void AgoraBasic::on_streamButton_clicked()
 		StopAgoraOutput();
 		
 		rtcEngine->LeaveChannel();
-		if (joinFailed) {
+		if (joinFailed)
 			rtcEngine->SetJoinFlag(false);
-			RtcStats stats;
-			onLeaveChannel_slot(stats);
-		}
-		
 		if (m_settings.bSendObsCamera) 
 			rtcEngine->LeaveChannelCamera();
 		
@@ -1107,6 +1136,8 @@ void AgoraBasic::ToggleAgoraDialog() {
 		m_settings.obs_bitrate = GetOBSBitrate();
 		setVisible(true);
 		blog(LOG_INFO, "show dialog");
+
+		CreateDisplay();
 	}
 	else {
 		setVisible(false);
@@ -1153,7 +1184,7 @@ static inline void GetScaleAndCenterPos(int baseCX, int baseCY, int windowCX,
 	windowAspect = double(windowCX) / double(windowCY);
 	baseAspect = double(baseCX) / double(baseCY);
 
-	if (windowAspect > baseAspect) {
+	if (windowAspect < baseAspect) {
 		scale = float(windowCY) / float(baseCY);
 		newCX = int(double(windowCY) * baseAspect);
 		newCY = windowCY;
@@ -1185,7 +1216,8 @@ void AgoraBasic::DrawPreview(void *data, uint32_t cx, uint32_t cy)
 
 	newCX = int(scale * float(sourceCX));
 	newCY = int(scale * float(sourceCY));
-
+	//y = 50;
+	//newCY = newCY + 50;
 	gs_viewport_push();
 	gs_projection_push();
 	gs_ortho(0.0f, float(sourceCX), 0.0f, float(sourceCY), -100.0f, 100.0f);
@@ -1404,7 +1436,7 @@ void AgoraBasic::onConnectionStateChanged_slot(int state, int reason)
 			break;
 		}
 		joinFailedTimer.stop();
-		rtcEngine->SetJoinFlag(true);
+
 		QMessageBox::critical(NULL, "Error", info.c_str());
 		on_streamButton_clicked();
 		joinFailed = false;
@@ -1442,7 +1474,7 @@ void AgoraBasic::onCameraConnectionStateChanged_slot(int state, int reason)
 			break;
 		}
 		joinFailedTimer.stop();
-		rtcEngine->SetJoinFlag(true);
+
 		QMessageBox::critical(NULL, "Error", info.c_str());
 
 		on_streamButton_clicked();
@@ -1494,7 +1526,11 @@ void AgoraBasic::showRemote_slot()
 		row = 2;
 		col = 1;
 	}
-	else if (count == 3 || count == 4) {
+	else if (count == 3) {
+		row = 3;
+		col = 1;
+	} 
+	else if (count == 4) {
 		row = 2;
 		col = 2;
 	}
@@ -1612,8 +1648,9 @@ void AgoraBasic::onSystemCPU_slot(int cpuUsage)
 	}
 }
 
-void AgoraBasic::OBSEvent(enum obs_frontend_event event, void* data)
+void AgoraBasic::OBSEvent(enum obs_frontend_event event, void *data)
 {
+	blog(LOG_INFO, "AgoraBasic::OBSEvent()  event ==%d",event);
 	AgoraBasic* basic = (AgoraBasic*)data;
 	if (event == OBS_FRONTEND_EVENT_SCRIPTING_SHUTDOWN) {
 		QString str = basic->ui->streamButton->text();
@@ -1640,6 +1677,7 @@ void AgoraBasic::OBSEvent(enum obs_frontend_event event, void* data)
 
 void AgoraBasic::onSceneChangedEvent()
 {
+	blog(LOG_INFO, "AgoraBasic::onSceneChangedEvent()");
 	current_source = obs_frontend_get_current_scene();
 	obs_source_release(current_source);
 	if (rtcEngine->IsCameraJoined()
@@ -1654,4 +1692,111 @@ void AgoraBasic::onSceneChangedEvent()
 		
 		AddFilterCurrentScene();
 	}
+}
+
+void AgoraBasic::onTokenPrivilegeWillExpire_slot(const char* token)
+{
+	blog(LOG_INFO, "AgoraBasic::onTokenPrivilegeWillExpire_slot()");
+	int res;
+	std::string json_res;
+	std::thread th([this, &res, &json_res]() {
+		curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 5);
+		curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10);
+
+		//cancel verify
+		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0);
+		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
+		curl_slist *header_list = NULL;
+		header_list = curl_slist_append(
+			header_list,
+			"Content-Type:application/json;charset=UTF-8");
+		/*header_list = curl_slist_append(header_list, auth_info.c_str());*/
+		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header_list);
+
+		//callback
+		
+		json_res.clear();
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, http_callback);
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &json_res);
+		//std::string testurl = R"(https://qinong.ghxvdd.com/api/liveRoom/getSWData?uid=160412)";
+		//curl_easy_setopt(curl, CURLOPT_URL, testurl.c_str());
+		curl_easy_setopt(curl, CURLOPT_URL, m_settings.information_url.c_str());
+		blog(LOG_INFO, "agora token url:%s", m_settings.information_url.c_str());
+
+		res = curl_easy_perform(curl);
+		blog(LOG_INFO, "agora request url res:%d", res);
+		if (nullptr != header_list)
+		{
+			curl_slist_free_all(header_list);
+		}
+
+		
+	});
+	th.join();
+	//std::string token = R"()";
+
+	blog(LOG_INFO, "request token result is %s.", json_res.c_str());
+	//emit this->requestTokenSignal(QString::fromUtf8(json_res.c_str()), 0);
+
+	if (res == CURLE_OK) 
+	{
+		blog(LOG_INFO, "agora request token: %s", json_res.c_str());
+
+//		json_res = R"({
+//    "code": 0,
+//    "data": {
+//        "appID": "73fefc287fb44206b66a4020c1d0a5ca",
+//        "token": "00673fefc287fb44206b66a4020c1d0a5caIAAgIw64g18RuetzojwO2hKi9h62723ZAGGJvT4BjvQxZAx+f9jSY0iIIgADenkAs2fpZQQAAQDWGuhlAgDWGuhlAwDWGuhlBADWGuhl",
+//        "channelName": "test",
+//        "uid": "123",
+//        "cameraUid": "",
+//        "cameraToken": ""
+//    }
+//})";
+		QJsonDocument doc = QJsonDocument::fromJson(json_res.c_str());
+		if (doc.isNull() || !doc.isObject()) 
+		{
+			QMessageBox::information(NULL, QString(""), requertTokenError);
+			blog(LOG_INFO, "request token result is null or not json");
+			ui->streamButton->setText(start_text);
+			return;
+		}
+
+		QJsonObject jsonObject = doc.object();
+		int code = jsonObject["code"].toInt();
+		if (code != 0) 
+		{
+			QMessageBox::information(NULL, QString(""), requertTokenError);
+			ui->streamButton->setText(start_text);
+			return;
+		}
+
+		QJsonObject jsData = jsonObject["data"].toObject();
+		if (doc.isNull() || !doc.isObject()) 
+		{
+			blog(LOG_INFO, "http request error");
+			ui->streamButton->setText(start_text);
+			return;
+		}
+#if _WIN32
+
+		m_settings.token = jsData["token"].toString().toUtf8();
+#else
+
+		m_settings.token = jsData["token"].toString().toStdString();
+#endif
+		m_settings.camera_token =
+			jsData["cameraToken"].toString().toStdString();
+
+		rtcEngine->SetNewToken(m_settings.token);
+		//JoinChannel(m_settings.token);
+		return;
+	} 
+	else 
+	{
+		QMessageBox::information(NULL, QString(""), requertTokenError);
+	}
+
+	
+	
 }

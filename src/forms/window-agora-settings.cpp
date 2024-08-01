@@ -22,6 +22,8 @@
 //agora
 #include <QSettings>
 #include <QFileDialog>
+#include <QJsonDocument>  
+#include <QJsonObject>  
 //end
 #define COMBO_CHANGED   SIGNAL(currentIndexChanged(int))
 #define EDIT_CHANGED    SIGNAL(textChanged(const QString &))
@@ -81,6 +83,8 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	ui->buttonAppid->setText(tr("Agora.General.Appid.Set"));
     ui->labUrl->setText(tr("Agora.Settings.Agora.APPTOKEN.URL"));
 	ui->chkDualStream->setText(tr("Agora.Settings.DualStream"));
+    ui->chkHardEncoderConfig->setText(tr("Basic.Agora.HardEncoder"));
+	ui->chkH265Config->setText(tr("Basic.Agora.H265"));
 	ui->labelLogInterval->setText(tr("Plugin.Settings.Log.Interval"));
 	startTestNet = tr("Agora.Setting.TestNet.Start");
 	stopTestNet = tr("Agora.Setting.TestNet.Stop");
@@ -128,7 +132,7 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	index = 0;
 	ui->cmbRecordChannelSetup->setItemText(0, tr("Mono"));
 	ui->cmbRecordChannelSetup->setItemText(1, tr("Stereo"));
-	ui->chkObsCamera->hide();
+
 	AgoraToolSettings settings;
 	main->GetAgoraSetting(settings);
 	if (settings.audioChannel == 2)
@@ -197,7 +201,7 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	persistSaveAppidInfo = tr("Basic.Settings.Agora.PersistSaveAppidInfo");
 	ui->baseAspect->setText(tr(""));
 	emptyUrlError = tr("Plugin.Settings.Error.EmptyUrl");
-
+	QString params = tr("Agora.Setting.SetParams");
 	ui->chkPersistSaveAppid->setText(persistSaveAppid);
 	//video encoder
 	ui->labelVideoEncoder->setText(tr("Agora.Settings.Video.Encoder"));
@@ -210,8 +214,10 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	ui->labCameraEncoderBitrate->setText(tr("Camera.Encoder.Settings.Bitrate"));
 	ui->labCameraEncoderFPS->setText(tr("Camera.Encoder.Settings.FPS"));
 	obs_frontend_pop_ui_translation();
+	
 	ui->btnNetworkTest->setText(startTestNet);
 	ui->labelTestNetWork->setText("");
+	ui->btnSetParams->setText(params);
 	ui->cmbAgoraFPS->setCurrentIndex(3);
 	fps_index = 0;
 	agora_fps[fps_index++] = 5;
@@ -282,6 +288,8 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 
 	HookWidget(ui->chkDualStream, CHECK_CHANGED, GENERAL_CHANGED);
 	HookWidget(ui->chkObsCamera, CHECK_CHANGED, GENERAL_CHANGED);
+	HookWidget(ui->chkH265Config, CHECK_CHANGED, GENERAL_CHANGED);
+	HookWidget(ui->chkHardEncoderConfig, CHECK_CHANGED, GENERAL_CHANGED);
 	HookWidget(ui->lineEditCameraUID , EDIT_CHANGED, GENERAL_CHANGED);
 	HookWidget(ui->lineEditCameraToken, EDIT_CHANGED, GENERAL_CHANGED);
 
@@ -317,6 +325,8 @@ AgoraSettings::AgoraSettings(QWidget *parent)
 	
 	connect(ui->chkPersistSaveAppid, &QCheckBox::toggled, this, &AgoraSettings::onChkSaveAppidSettings);
 	connect(ui->chkObsCamera, &QCheckBox::toggled, this, &AgoraSettings::on_chkObsCamera_check);
+	connect(ui->chkHardEncoderConfig, &QCheckBox::toggled, this, &AgoraSettings::on_chkHardEncoderConfig_check);
+	connect(ui->chkH265Config, &QCheckBox::toggled, this, &AgoraSettings::on_chkH265Config_check);
 	connect(rtcEngine, &AgoraRtcEngine::onLastmileQuality, this, &AgoraSettings::OnLastmileTest);
 }
 
@@ -467,8 +477,11 @@ void AgoraSettings::SaveGeneralSettings()
 	settings.camera_token = ui->lineEditCameraToken->text().toStdString();
 	settings.videoInterval = ui->spinSecond->value();
 
+	settings.bH265 = ui->chkH265Config->isChecked();
+	settings.bHardEncoder = ui->chkHardEncoderConfig->isChecked();
 	QString str = ui->lineEditLogInterval->text();
 	if (str.isEmpty()) {
+		str = QString("20");
 		ui->lineEditLogInterval->setText(QString("20"));
 	}
 	settings.logInterval = strtol(str.toStdString().data(), NULL, 10);
@@ -518,6 +531,12 @@ void AgoraSettings::SaveGeneralSettings()
 		SaveCheckBox(ui->chkObsCamera, "AgoraSettings",
 			"SendOBSCamera",
 			settings.bSendObsCamera);
+
+		SaveCheckBox(ui->chkH265Config, "AgoraSettings", "H265Config",
+			     settings.bH265);
+
+		SaveCheckBox(ui->chkHardEncoderConfig, "AgoraSettings", "HardEncoderConfig",
+			     settings.bHardEncoder);
 	}
 
 	main->SetAgoraSetting(settings);
@@ -586,6 +605,8 @@ void AgoraSettings::LoadGeneralSettings()
 	ui->chkPersistSaveAppid->setChecked(settings.savePersistAppid);
 	ui->chkMuteAllRemoteAV->setChecked(settings.muteAllRemoteAudioVideo);
 	ui->chkDualStream->setChecked(settings.bDualStream);
+	ui->chkH265Config->setChecked(settings.bH265);
+	ui->chkHardEncoderConfig->setChecked(settings.bHardEncoder);
 	QString strExpired = QString("%1").arg(settings.expiredTime);
 	ui->lineEditExpiredTs->setText(strExpired);
 	
@@ -1029,20 +1050,6 @@ void AgoraSettings::showEvent(QShowEvent *event)
 	ui->lineEditUID->setEnabled(bEnabled);
 	ui->lineEditCameraUID->setEnabled(bEnabled);
 	ui->lineEditCameraToken->setEnabled(bEnabled);
-	ui->chkObsCamera->setEnabled(bEnabled);
-	ui->chkAudioHighQuality->setEnabled(bEnabled);
-	ui->chkSetAudioProfile->setEnabled(bEnabled);
-	ui->cmbRecordChannelSetup->setEnabled(bEnabled);
-	ui->chkDualStream->setEnabled(bEnabled);
-
-	ui->spinSecond->setEnabled(bEnabled);
-	ui->recordSampleRate->setEnabled(bEnabled);
-	
-	ui->lineEditAgoraRTmp->setEnabled(bEnabled);
-	ui->lineEditAgoraRtmpBitrate->setEnabled(bEnabled);
-	ui->lineEditAgoraRtmpFPS->setEnabled(bEnabled);
-	ui->lineEditAgoraRtmpWidth->setEnabled(bEnabled);
-	ui->lineEditAgoraRtmpHeight->setEnabled(bEnabled);
 }
 
 /*typedef void(*obs_source_audio_capture_t)(void *param, obs_source_t *source,
@@ -1158,4 +1165,61 @@ void AgoraSettings::on_chkObsCamera_check(bool check)
 	ui->cmbCameraFPS->setVisible(check);
 	ui->labCameraEncoderRes->setVisible(check);
 	ui->cmbCameraResoltuion->setVisible(check);
+}
+
+
+
+void AgoraSettings::on_btnSetParams_clicked()
+{
+	
+	QString strParams = ui->lineEditParams->text();
+	QJsonParseError error;
+	//QByteArray responseData = QByteArray::fromString(str);
+	QJsonDocument docJson = QJsonDocument::fromJson(strParams.toUtf8(), &error);
+	if (error.error == QJsonParseError::NoError) 
+	{
+		blog(LOG_INFO, "AgoraSettings::QJsonParseError::NoError");
+		rtcEngine->SetExternalParams(
+			docJson.toJson(QJsonDocument::Compact).toStdString());
+	}
+	else
+	{
+		blog(LOG_INFO, "QJsonParseError == %d", error.error);
+	}
+}
+
+void AgoraSettings::on_chkHardEncoderConfig_check()
+{
+	std::string strHardEncoder;
+	if (ui->chkHardEncoderConfig->isChecked()) 
+	{
+		blog(LOG_INFO, "AgoraSettings::on_chkHardEncoderConfig_check isChecked");
+		strHardEncoder = R"({"engine.video.enable_hw_encoder" : true})";
+	}
+	else
+	{
+		blog(LOG_INFO, "AgoraSettings::on_chkHardEncoderConfig_check !!! isChecked");
+		strHardEncoder = R"({"engine.video.enable_hw_encoder" : false})";
+	}
+	//= 
+	rtcEngine->SetExternalParams(strHardEncoder);
+}
+
+void AgoraSettings::on_chkH265Config_check()
+{
+	std::string param1, param2;
+	if (ui->chkH265Config->isChecked()) 
+	{
+		blog(LOG_INFO, "AgoraSettings::on_chkH265Config_check isChecked");
+		//param1 = R"({"che.video.hw265_enc_enable" : 1})";
+		param2 = R"({"che.video.videoCodecIndex" : 2})";
+	}
+	else
+	{
+		blog(LOG_INFO, "AgoraSettings::on_chkH265Config_check !!!! isChecked");
+		//param1 = R"({"che.video.hw265_enc_enable" : 0})";
+		param2 = R"({"che.video.videoCodecIndex" : 1})";
+	}
+	//rtcEngine->SetExternalParams(param1);
+	rtcEngine->SetExternalParams(param2);
 }
