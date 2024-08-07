@@ -19,8 +19,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #ifndef PLUGINNAME_H
 #define PLUGINNAME_H
 
-#define PLUGIN_NAME "obs-multi-rtmp"
-#define PLUGIN_VERSION "0.3.0.2"
+#define PLUGIN_NAME "agora-ui-main"
+#define PLUGIN_VERSION "4.2.6.3"
 
 #define blog(level, msg, ...) blog(level, "[" PLUGIN_NAME "] " msg, ##__VA_ARGS__)
 
